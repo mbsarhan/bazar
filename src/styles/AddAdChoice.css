@@ -1,0 +1,53 @@
+/* تعديل بسيط على الحاوية الرئيسية لتناسب المحتوى الجديد */
+.choice-container {
+    max-width: 480px; 
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.choice-subtitle {
+    margin-top: -10px;
+    margin-bottom: 30px;
+    color: #666;
+}
+
+/* حاوية الاختيارات لتنظيمها بجانب بعضها */
+.choices-wrapper {
+    display: flex;
+    justify-content: space-around; /* توزيع المسافات بالتساوي */
+    gap: 20px; /* مسافة بين البطاقتين */
+}
+
+/* تصميم بطاقة الاختيار الواحدة */
+.choice-card {
+    flex: 1; /* كل بطاقة تأخذ نصف المساحة المتاحة */
+    padding: 30px 20px;
+    border: 2px solid var(--color-border-subtle);
+    border-radius: 16px; /* نفس استدارة الحاوية الرئيسية */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    color: var(--color-text-dark);
+}
+
+.choice-card:hover {
+    border-color: var(--color-accent-primary); /* تغيير لون الحدود عند المرور */
+    transform: translateY(-5px); /* رفع البطاقة قليلاً للأعلى */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* تصميم الأيقونة داخل البطاقة */
+.choice-card svg {
+    color: var(--color-accent-primary);
+    margin-bottom: 10px;
+}
+
+.choice-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.car-choice svg {
+  transform: scale(1.15); /* تكبير الأيقونة بنسبة 15% */
+}

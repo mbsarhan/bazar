@@ -1,0 +1,184 @@
+/* src/styles/forms.css */
+
+/* 1. تعريف متغيرات الألوان الرئيسية للتصميم */
+:root {
+    --color-bg-page: #F5F5F5;      /* Soft Gray */
+    --color-bg-card: #FFFFFF;      /* White */
+    --color-accent-primary: #90EE90; /* Light Green */
+    --color-accent-hover: #78d878;   /* نسخة أغمق قليلاً للتأثير عند المرور */
+    --color-text-dark: #33363b;     /* Dark Slate Gray */
+    --color-border-subtle: #DDDDDD; /* Light Gray for borders */
+}
+
+/* 2. استيراد الخط وتحضير الإعدادات العامة */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
+
+/* src/styles/forms.css */
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: var(--color-bg-page);
+    margin: 0;
+    direction: rtl;
+}
+
+
+.centered-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* استخدام min-height بدلاً من height للسماح بالتمدد إذا لزم الأمر */
+    padding: 20px 0; /* إضافة مسافة في حال كانت الشاشة صغيرة جداً */
+    box-sizing: border-box;
+}
+
+/* 3. تصميم حاوية النموذج (مع التعديلات الجديدة) */
+.form-container {
+    background-color: var(--color-bg-card);
+    padding: 40px;
+    /* --- تعديل: تمت زيادة استدارة الحواف لجعلها أكثر نعومة --- */
+    border-radius: 16px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    border: 1px solid var(--color-border-subtle);
+    
+    /* --- جديد: إعدادات ضرورية لإضافة الشريط العلوي --- */
+    position: relative; /* لجعل الشريط العلوي يتمركز بالنسبة للحاوية */
+    overflow: hidden;   /* لإخفاء أي جزء من الشريط يخرج عن الحواف المنحنية */
+}
+
+/* --- جديد: إضافة الشريط اللوني المتدرج في الأعلى --- */
+.form-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px; /* يمكنك التحكم في سماكة الشريط من هنا */
+    /* تدرج لوني جميل يبدأ من الأخضر الفاتح إلى الأخضر التركوازي */
+    background: linear-gradient(to right, #90EE90, #50C878, #48D1CC);
+}
+
+
+/* 4. تصميم حقول الإدخال */
+.form-group {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border-subtle);
+    /* --- تعديل: تنعيم حواف حقول الإدخال لتتناسق مع الحاوية --- */
+    border-radius: 10px;
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+    text-align: right;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 0 3px rgba(144, 238, 144, 0.3);
+}
+
+/* 5. تصميم زر الإرسال */
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-accent-primary);
+    border: none;
+    /* --- تعديل: تنعيم حواف الزر --- */
+    border-radius: 10px;
+    color: var(--color-text-dark);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.submit-btn:hover {
+    background-color: var(--color-accent-hover);
+}
+
+/* 6. تصميم الروابط الإضافية */
+.form-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.form-link a {
+    color: #56c256; 
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-link a:hover {
+    text-decoration: underline;
+}
+
+/* 7. تصميم رسائل الخطأ */
+.error-message {
+    color: #9c2a2a;
+    background-color: #fddede;
+    border: 1px solid #fab9b9;
+    /* --- تعديل: تنعيم حواف رسالة الخطأ --- */
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+/* --- جديد ومُحسّن: تصميم حقل كلمة المرور مع أيقونة داخلية --- */
+
+/* 1. الحاوية الجديدة التي تلتف حول الحقل والأيقونة فقط */
+.input-with-icon {
+  position: relative; /* هذا هو مفتاح الحل، لجعل الأيقونة تتمركز بداخله */
+  display: flex; /* يساعد في محاذاة العناصر الداخلية */
+  align-items: center; /* يضمن المحاذاة العمودية */
+}
+
+/* 2. تعديل حقل الإدخال داخل الحاوية الجديدة */
+.input-with-icon input {
+  width: 100%; /* اجعل الحقل يملأ الحاوية */
+  /* بما أن التصميم RTL، فالهامش سيكون على اليسار لإفساح المجال للأيقونة */
+  padding-left: 50px !important; 
+}
+
+/* 3. تصميم الأيقونة نفسها وموضعها */
+.password-toggle-icon {
+  position: absolute;
+  /* المسافة من الحافة اليسرى للحقل */
+  left: 15px; 
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease-in-out;
+  
+  /* لا حاجة لـ top أو transform بعد الآن بفضل Flexbox! */
+}
+
+.password-toggle-icon:hover {
+  opacity: 1;
+}
+
+/* 4. أيقونات SVG المضمنة (تبقى كما هي) */
+.password-toggle-icon.visible {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2333363b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+.password-toggle-icon.hidden {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2333363b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.88 9.88a3 3 0 1 0 4.24 4.24'/%3E%3Cpath d='M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68'/%3E%3Cpath d='M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61'/%3E%3Cline x1='2' y1='2' x2='22' y2='22'/%3E%3C/svg%3E");
+}
+
