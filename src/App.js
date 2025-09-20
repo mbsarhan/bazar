@@ -4,9 +4,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-ro
 // 1. استيراد المكونات الأساسية
 import SignUp from './components/SignUp';
 import Login from './components/Login';
-import AddAdChoice from './components/AddAdChoice';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
-// 2. استيراد مكون نموذج السيارة الذي أضفناه
+
+import AddAdChoice from './components/AddAdChoice';
 import AddCarForm from './components/AddCarForm'; 
 import AddRealEstateForm from './components/AddRealEstateForm';
 
@@ -28,7 +30,6 @@ const Dashboard = () => (
     </Link>
   </div>
 );
-const ForgotPassword = () => <div style={{textAlign: 'center', marginTop: '50px', fontSize: '24px'}}><h2>صفحة استعادة كلمة المرور</h2><p>سيتم إرسال التعليمات إلى بريدك الإلكتروني.</p></div>;
 
 
 function App() {
@@ -41,7 +42,10 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         <Route path="/dashboard" element={<Dashboard />} />
+        
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
 
         <Route path="/add-ad" element={<AddAdChoice />} />
 

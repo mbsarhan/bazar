@@ -1,9 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/forms.css'; // إعادة استخدام الأنماط
-import '../styles/AddAdForm.css'; // إعادة استخدام الأنماط
+import '../styles/forms.css';
+import '../styles/AddAdForm.css';
 
-// أيقونة الرفع (نفسها المستخدمة في نموذج السيارة)
 const UploadIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
 );
@@ -11,23 +10,11 @@ const UploadIcon = () => (
 const AddRealEstateForm = () => {
     const navigate = useNavigate();
 
-    // 1. تعريف حالة النموذج بحقول العقارات
     const [formData, setFormData] = useState({
-        transactionType: 'بيع',
-        propertyType: 'شقة',
-        province: 'دمشق',
-        city: '',
-        address: '',
-        area: '',
-        bedrooms: '',
-        bathrooms: '',
-        floorNumber: '',
-        constructionStatus: 'جاهز',
-        finishingStatus: 'جيد',
-        price: '',
-        currency: 'ل.س',
-        isNegotiable: false,
-        description: '',
+        transactionType: 'بيع', propertyType: 'شقة', province: 'دمشق',
+        city: '', address: '', area: '', bedrooms: '', bathrooms: '',
+        floorNumber: '', constructionStatus: 'جاهز', finishingStatus: 'جيد',
+        price: '', currency: 'ل.س', isNegotiable: false, description: '',
     });
 
     const [images, setImages] = useState([]);
@@ -35,8 +22,6 @@ const AddRealEstateForm = () => {
     const [errors, setErrors] = useState({});
 
     const fileInputRef = useRef(null);
-
-    // --- الدوال المنطقية (معظمها منسوخ من نموذج السيارة) ---
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -61,7 +46,7 @@ const AddRealEstateForm = () => {
         setImages(prev => prev.filter((_, i) => i !== index));
     };
     
-    // 2. تحديث منطق التحقق لحقول العقارات
+    // --- تحديث منطق التحقق ليشمل جميع الحقول ---
     const handleSubmit = (e) => {
         e.preventDefault();
         setErrorMessage('');
@@ -69,21 +54,23 @@ const AddRealEstateForm = () => {
 
         const newErrors = {};
         
-        // التحقق من الحقول الإلزامية
+        // التحقق من كل حقل في النموذج
         if (!formData.city) newErrors.city = true;
         if (!formData.address) newErrors.address = true;
         if (!formData.area) newErrors.area = true;
+        if (!formData.bedrooms) newErrors.bedrooms = true; // تمت إضافته
+        if (!formData.bathrooms) newErrors.bathrooms = true; // تمت إضافته
+        if (!formData.floorNumber) newErrors.floorNumber = true; // تمت إضافته
         if (!formData.price) newErrors.price = true;
         if (!formData.description) newErrors.description = true;
         
-        // التحقق من وجود صورتين على الأقل
         if (images.length < 2) {
             newErrors.images = true;
         }
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            setErrorMessage('يرجى ملء جميع الحقول الإلزامية ورفع صورتين على الأقل.');
+            setErrorMessage('يرجى ملء جميع الحقول الإلزامية.');
             window.scrollTo(0, 0);
             return;
         }
@@ -93,7 +80,6 @@ const AddRealEstateForm = () => {
         navigate('/dashboard');
     };
 
-    // 3. تعريف بيانات القوائم المنسدلة للعقارات
     const transactionTypes = ['بيع', 'إيجار', 'استثمار'];
     const propertyTypes = ['شقة', 'فيلا', 'محل تجاري', 'مكتب', 'أرض', 'مزرعة', 'شاليه', 'مستودع', 'سوق تجاري'];
     const constructionStatuses = ['جاهز', 'على الهيكل', 'قيد الإنشاء'];
@@ -108,7 +94,7 @@ const AddRealEstateForm = () => {
             {errorMessage && <div className="error-message">{errorMessage}</div>}
 
             <form onSubmit={handleSubmit}>
-                {/* --- 4. بناء أقسام النموذج باستخدام الحقول الجديدة --- */}
+                {/* --- تحديث جميع الحقول لتكون إلزامية --- */}
                 <fieldset>
                     <legend>معلومات أساسية</legend>
                     <div className="form-grid">
@@ -149,16 +135,16 @@ const AddRealEstateForm = () => {
                             <input type="number" name="area" value={formData.area} onChange={handleChange} className={errors.area ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="bedrooms">غرف النوم</label>
-                            <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange} />
+                            <label htmlFor="bedrooms">غرف النوم *</label>
+                            <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange} className={errors.bedrooms ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="bathrooms">الحمامات</label>
-                            <input type="number" name="bathrooms" value={formData.bathrooms} onChange={handleChange} />
+                            <label htmlFor="bathrooms">الحمامات *</label>
+                            <input type="number" name="bathrooms" value={formData.bathrooms} onChange={handleChange} className={errors.bathrooms ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="floorNumber">رقم الطابق</label>
-                            <input type="number" name="floorNumber" value={formData.floorNumber} onChange={handleChange} />
+                            <label htmlFor="floorNumber">رقم الطابق *</label>
+                            <input type="number" name="floorNumber" value={formData.floorNumber} onChange={handleChange} className={errors.floorNumber ? 'input-error' : ''} />
                         </div>
                          <div className="form-group">
                             <label htmlFor="constructionStatus">حالة البناء *</label>
@@ -179,7 +165,7 @@ const AddRealEstateForm = () => {
                             <input type="number" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="currency">العملة</label>
+                            <label htmlFor="currency">العملة *</label>
                             <select name="currency" value={formData.currency} onChange={handleChange}>
                                 <option value="ل.س">ليرة سورية (SYP)</option>
                                 <option value="USD">دولار أمريكي (USD)</option>
@@ -212,7 +198,7 @@ const AddRealEstateForm = () => {
                     </div>
                 </fieldset>
                 
-                <button type="submit" className="submit-btn">نشر إعلان العقار</button>
+                <button type="submit" className="submit-btn">نشر الإعلان</button>
             </form>
         </div>
     );
