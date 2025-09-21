@@ -1,26 +1,50 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
+import ProgressBar from './ProgressBar'; 
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
 
 const UploadIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 
+    fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" 
+    strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
 );
 
 const AddRealEstateForm = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        transactionType: 'بيع', propertyType: 'شقة', province: 'دمشق',
-        city: '', address: '', area: '', bedrooms: '', bathrooms: '',
-        floorNumber: '', constructionStatus: 'جاهز', finishingStatus: 'جيد',
-        price: '', currency: 'ل.س', isNegotiable: false, description: '',
+        transactionType: 'بيع',
+        propertyType: 'شقة',
+        province: 'دمشق',
+        city: '',
+        address: '',
+        area: '',
+        bedrooms: '',
+        bathrooms: '',
+        floorNumber: '',
+        constructionStatus: 'جاهز',
+        finishingStatus: 'جيد',
+        price: '',
+        currency: 'ل.س',
+        isNegotiable: false,
+        description: '',
     });
 
     const [images, setImages] = useState([]);
+    const [videoFile, setVideoFile] = useState(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isUploading, setIsUploading] = useState(false);
+
+
     const [errorMessage, setErrorMessage] = useState('');
     const [errors, setErrors] = useState({});
 
+
+    const imageInputRef = useRef(null);
+    const videoInputRef = useRef(null);
     const fileInputRef = useRef(null);
 
     const handleChange = (e) => {
@@ -42,13 +66,65 @@ const AddRealEstateForm = () => {
         e.target.value = null;
     };
 
+    const handleVideoChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setVideoFile(file);
+        setIsUploading(true);
+        setUploadProgress(0);
+
+        const formData = new FormData();
+        formData.append('video', file);
+
+        // --- محاكاة الرفع باستخدام Axios ---
+        // في التطبيق الحقيقي، سيكون هذا الرابط من الخادم الخاص بك
+        axios.post('https://httpbin.org/post', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = (progressEvent.loaded / progressEvent.total) * 100;
+                setUploadProgress(percentCompleted);
+
+                if (percentCompleted === 100) {
+                    setIsUploading(false);
+                }
+            },
+        })
+        .then(response => {
+            console.log('تم رفع الفيديو بنجاح (محاكاة):', response.data);
+            setIsUploading(false);
+            // يمكنك حفظ رابط الفيديو الذي يعود من الخادم هنا
+        })
+        .catch(error => {
+            console.error('حدث خطأ أثناء رفع الفيديو:', error);
+            setIsUploading(false);
+            // عرض رسالة خطأ للمستخدم
+            setErrorMessage('فشل رفع الفيديو. يرجى المحاولة مرة أخرى.');
+            setVideoFile(null); // إزالة الفيديو الفاشل
+        });
+        
+        e.target.value = null;
+    };
+
     const removeImage = (index) => {
         setImages(prev => prev.filter((_, i) => i !== index));
     };
+
+    const removeVideo = () => {
+        setVideoFile(null);
+        setUploadProgress(0);
+        setIsUploading(false);
+    };
     
-    // --- تحديث منطق التحقق ليشمل جميع الحقول ---
     const handleSubmit = (e) => {
         e.preventDefault();
+        // منع الإرسال أثناء رفع الفيديو
+        if (isUploading) {
+            setErrorMessage('يرجى الانتظار حتى يكتمل رفع الفيديو.');
+            return;
+        }
         setErrorMessage('');
         setErrors({});
 
@@ -58,9 +134,6 @@ const AddRealEstateForm = () => {
         if (!formData.city) newErrors.city = true;
         if (!formData.address) newErrors.address = true;
         if (!formData.area) newErrors.area = true;
-        if (!formData.bedrooms) newErrors.bedrooms = true; // تمت إضافته
-        if (!formData.bathrooms) newErrors.bathrooms = true; // تمت إضافته
-        if (!formData.floorNumber) newErrors.floorNumber = true; // تمت إضافته
         if (!formData.price) newErrors.price = true;
         if (!formData.description) newErrors.description = true;
         
@@ -135,16 +208,16 @@ const AddRealEstateForm = () => {
                             <input type="number" name="area" value={formData.area} onChange={handleChange} className={errors.area ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="bedrooms">غرف النوم *</label>
-                            <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange} className={errors.bedrooms ? 'input-error' : ''} />
+                            <label htmlFor="bedrooms">غرف النوم</label>
+                            <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange}/>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="bathrooms">الحمامات *</label>
-                            <input type="number" name="bathrooms" value={formData.bathrooms} onChange={handleChange} className={errors.bathrooms ? 'input-error' : ''} />
+                            <label htmlFor="bathrooms">الحمامات</label>
+                            <input type="number" name="bathrooms" value={formData.bathrooms} onChange={handleChange} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="floorNumber">رقم الطابق *</label>
-                            <input type="number" name="floorNumber" value={formData.floorNumber} onChange={handleChange} className={errors.floorNumber ? 'input-error' : ''} />
+                            <label htmlFor="floorNumber">رقم الطابق</label>
+                            <input type="number" name="floorNumber" value={formData.floorNumber} onChange={handleChange} />
                         </div>
                          <div className="form-group">
                             <label htmlFor="constructionStatus">حالة البناء *</label>
@@ -179,7 +252,7 @@ const AddRealEstateForm = () => {
                 </fieldset>
 
                 <fieldset>
-                    <legend>التفاصيل والصور</legend>
+                    <legend>التفاصيل والوسائط</legend>
                      <div className="form-group">
                         <label htmlFor="description">وصف تفصيلي للعقار والميزات *</label>
                         <textarea name="description" rows="5" value={formData.description} onChange={handleChange} placeholder="اكتب هنا عن ميزات العقار كالإطلالة، وجود مصعد، كراج، تدفئة..." className={errors.description ? 'input-error' : ''}></textarea>
@@ -196,9 +269,32 @@ const AddRealEstateForm = () => {
                         </div>
                         <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} multiple />
                     </div>
+                    <div className="form-group">
+                        <label>فيديو (جولة داخل العقار) - اختياري</label>
+                        <div className="video-uploader">
+                            {videoFile ? (
+                                <div className="video-preview">
+                                    {uploadProgress === 100 && <video controls src={URL.createObjectURL(videoFile)} />}
+                                    {isUploading && uploadProgress < 100 && <ProgressBar progress={uploadProgress} />}
+                                    <button type="button" onClick={removeVideo} className="remove-image-btn">&times;</button>
+                                </div>
+                            ) : (
+                                // --- أضفنا className هنا ---
+                                <div className="upload-box video-upload-box" onClick={() => videoInputRef.current.click()}>
+                                    <div className="upload-placeholder">
+                                        <UploadIcon />
+                                        <span>اختر فيديو</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <input type="file" ref={videoInputRef} onChange={handleVideoChange} accept="video/*" style={{ display: 'none' }} />
+                    </div>
                 </fieldset>
                 
-                <button type="submit" className="submit-btn">نشر الإعلان</button>
+                <button type="submit" className="submit-btn" disabled={isUploading}>
+                    {isUploading ? 'جاري رفع الفيديو...' : 'نشر الإعلان'}
+                </button>
             </form>
         </div>
     );

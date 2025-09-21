@@ -15,6 +15,7 @@ const UploadIcon = () => (
 const AddCarForm = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
+        dealType: 'بيع',
         manufacturer: '',
         model: '',
         condition: 'مستعملة',
@@ -104,7 +105,7 @@ const AddCarForm = () => {
         // إذا كان هناك أخطاء، قم بتحديث الحالة وإيقاف الإرسال
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            setErrorMessage('يرجى ملء جميع الحقول الإلزامية المميزة باللون الأحمر.');
+            setErrorMessage('يرجى ملء جميع الحقول الإلزامية.');
             window.scrollTo(0, 0);
             return;
         }
@@ -114,6 +115,7 @@ const AddCarForm = () => {
         navigate('/dashboard');
     };
     
+    const dealTypes = ['بيع', 'إيجار'];
     const conditions = ['جديدة', 'مستعملة', 'متضررة'];
     const transmissions = ['أوتوماتيك', 'عادي', 'الاثنان معاً'];
     const fuelTypes = ['بنزين', 'ديزل', 'كهرباء', 'هايبرد'];
@@ -155,7 +157,12 @@ const AddCarForm = () => {
                 <fieldset>
                     <legend>المعلومات الأساسية</legend>
                     <div className="form-grid">
-                        {/* 4. إضافة الكلاس الديناميكي لكل حقل إلزامي */}
+                        <div className="form-group">
+                            <label htmlFor="dealType">نوع الصفقة *</label>
+                            <select id="dealType" name="dealType" value={formData.dealType} onChange={handleChange}>
+                                {dealTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                            </select>
+                        </div>
                         <div className="form-group">
                             <label htmlFor="manufacturer">الشركة المصنّعة *</label>
                             <input type="text" id="manufacturer" name="manufacturer" value={formData.manufacturer} onChange={handleChange} className={errors.manufacturer ? 'input-error' : ''} />

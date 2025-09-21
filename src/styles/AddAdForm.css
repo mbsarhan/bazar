@@ -87,7 +87,8 @@ legend {
 
 
 /* --- تصميم قسم رفع الصور --- */
-.image-uploader {
+.image-uploader,
+.video-uploader {
     border: 2px dashed var(--color-border-subtle);
     border-radius: 10px;
     padding: 15px;
@@ -95,15 +96,14 @@ legend {
 
 .image-grid-container {
     display: grid;
-    /* إنشاء شبكة من عمودين متساويين، مع إمكانية التحول لعمود واحد في الشاشات الصغيرة */
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
 }
 
 /* صندوق الرفع نفسه */
 .upload-box {
     width: 100%;
-    height: 180px; /* زيادة الارتفاع ليتناسب مع صور السيارات */
+    height: 120px; /* الارتفاع الافتراضي للصور */
     border-radius: 10px;
     display: flex;
     justify-content: center;
@@ -112,15 +112,14 @@ legend {
     background-color: var(--color-bg-page);
     color: #888;
     transition: all 0.2s ease-in-out;
-    padding: 0; /* إزالة الحشوة الداخلية للسماح للصورة بملء المساحة */
-    position: relative; /* ضروري لمعاينة الصورة */
-    overflow: hidden; /* لإخفاء أي جزء من الصورة يخرج عن الحواف */
+    position: relative;
+    overflow: hidden;
 }
-
 .upload-box:hover {
     background-color: #e9e9e9;
     color: var(--color-text-dark);
 }
+
 
 /* --- جديد: تصميم المحتوى داخل صندوق الرفع الفارغ --- */
 .upload-placeholder {
@@ -148,6 +147,31 @@ legend {
     height: 100%;
     object-fit: cover;
     /* لا نحتاج لـ border-radius هنا لأن .upload-box لديه overflow: hidden */
+}
+
+.video-preview {
+    width: 100%;
+    max-width: 450px;  /* عرض أقصى مناسب */
+    height: 250px;      /* ارتفاع ثابت ومحدد */
+    background-color: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative; /* ضروري لموضع العناصر الداخلية */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.video-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* يضمن ملء الفيديو للمساحة دون تشويه */
+}
+
+/* توسيط شريط التقدم داخل حاوية الفيديو */
+.video-preview .progress-bar-container {
+    position: absolute;
+    width: 90%;
+    z-index: 10;
 }
 
 /* تعديل موضع زر الإزالة ليكون في الزاوية العلوية اليسرى */
