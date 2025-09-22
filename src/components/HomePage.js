@@ -8,7 +8,9 @@ import '../styles/HomePage.css';
 
 const HomePage = () => {
     // دمج وترتيب جميع الإعلانات حسب الأحدث (نفترض أن id الأكبر هو الأحدث)
-    const allAds = [...carAdsData, ...realEstateAdsData].sort((a, b) => b.id - a.id);
+    const allAds = [...carAdsData, ...realEstateAdsData]
+    .filter(ad => ad.status === 'فعال') // <-- هذا هو السطر الجديد الذي يقوم بالتصفية
+    .sort((a, b) => b.id - a.id);
 
     return (
         <div className="home-page-container">

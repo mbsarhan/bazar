@@ -117,9 +117,9 @@
 
 .ads-list-container {
     display: grid;
-    /* شبكة متجاوبة تعرض البطاقات بشكل جميل على كل الشاشات */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
+    /* --- تم التعديل هنا --- */
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px; /* يمكننا تقليل المسافة قليلاً لتبدو أفضل */
 }
 
 .ad-card {
