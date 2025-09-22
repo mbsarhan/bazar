@@ -1,0 +1,10 @@
+/* src/styles/HomePage.css */
+.home-page-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.home-page-container h1 {
+    margin-bottom: 30px;
+}
+/* سنعيد استخدام نفس كلاس ads-list-container من Dashboard.css */

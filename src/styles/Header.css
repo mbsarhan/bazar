@@ -1,0 +1,46 @@
+/* src/styles/Header.css */
+.main-header {
+    background-color: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding: 15px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    text-decoration: none;
+}
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.add-ad-btn {
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-dark);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+.add-ad-btn:hover {
+    background-color: var(--color-accent-hover);
+}
+.user-link, .login-link {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-text-dark);
+}

@@ -1,0 +1,219 @@
+/* src/styles/Dashboard.css */
+
+/* 1. الهيكل الرئيسي */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 260px 1fr; /* عرض ثابت للقائمة الجانبية والباقي للمحتوى */
+    height: 100vh;
+    background-color: var(--color-bg-page);
+}
+
+/* 2. تصميم القائمة الجانبية */
+.dashboard-sidebar {
+    background-color: var(--color-bg-card);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--color-text-dark);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.sidebar-nav {
+    flex-grow: 1; /* تجعل القائمة تملأ المساحة المتاحة */
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: 15px 20px;
+    color: var(--color-text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--color-bg-page);
+}
+
+/* هذا هو الكلاس الذي يضيفه NavLink تلقائياً للرابط النشط */
+.sidebar-nav a.active {
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-dark);
+}
+
+.logout-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #fddede;
+    border: 1px solid #fab9b9;
+    border-radius: 10px;
+    color: #9c2a2a;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.logout-btn:hover {
+    background-color: #fccfcf;
+}
+
+
+/* 3. تصميم مساحة المحتوى */
+.dashboard-content {
+    padding: 40px;
+    overflow-y: auto; /* إضافة شريط تمرير إذا زاد المحتوى عن ارتفاع الشاشة */
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+/* 4. تصميم بطاقات الإحصائيات في صفحة "نظرة عامة" */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: var(--color-bg-card);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card h2 {
+    font-size: 2.5rem;
+    margin: 0 0 10px 0;
+    color: var(--color-accent-primary);
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 1rem;
+    color: #666;
+}
+
+/* --- 5. أنماط قوائم الإعلانات --- */
+
+.ads-list-container {
+    display: grid;
+    /* شبكة متجاوبة تعرض البطاقات بشكل جميل على كل الشاشات */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.ad-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden; /* لإخفاء أي زوائد من الصورة */
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.ad-card-image {
+    position: relative;
+    height: 200px;
+}
+
+.ad-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ad-card-status {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+/* ألوان شارة الحالة */
+.status-active { background-color: rgba(80, 200, 120, 0.9); } /* أخضر */
+.status-pending { background-color: rgba(255, 165, 0, 0.9); } /* برتقالي */
+.status-sold { background-color: rgba(231, 76, 60, 0.9); } /* أحمر */
+
+.ad-card-details {
+    padding: 20px;
+    flex-grow: 1; /* يدفع الأزرار إلى الأسفل دائماً */
+}
+
+.ad-card-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+.ad-card-price {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    margin: 0 0 10px 0;
+}
+.ad-card-location {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+.ad-card-actions {
+    display: flex;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.ad-card-actions .action-btn {
+    flex: 1; /* كل زر يأخذ ثلث المساحة */
+    padding: 12px;
+    background-color: transparent;
+    border: none;
+    border-left: 1px solid var(--color-border-subtle);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px; /* مسافة بين الأيقونة والنص */
+    transition: background-color 0.2s ease-in-out;
+}
+.ad-card-actions .action-btn:last-child {
+    border-left: none;
+}
+
+.ad-card-actions .action-btn:hover {
+    background-color: var(--color-bg-page);
+}
+
+.action-btn.view-btn { color: #3498db; }
+.action-btn.edit-btn { color: #f39c12; }
+.action-btn.delete-btn { color: #e74c3c; }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import '../styles/forms.css';
 
 const Login = () => {
@@ -8,6 +9,11 @@ const Login = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  const location = useLocation(); // 3. للوصول إلى المعلومات الممررة
+  const auth = useAuth(); // 4. للوصول لدالة login
+
+  const from = location.state?.redirectTo || '/dashboard';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,10 +24,10 @@ const Login = () => {
       return;
     }
 
-    console.log('بيانات تسجيل الدخول:', { credential, password });
-
-    alert('تم تسجيل الدخول بنجاح!');
-    navigate('/dashboard');
+    auth.login({ credential, password });
+    
+    // 7. التوجيه إلى المسار الصحيح
+    navigate(from, { replace: true });
   };
 
   return (
