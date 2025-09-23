@@ -217,3 +217,112 @@
 .action-btn.view-btn { color: #3498db; }
 .action-btn.edit-btn { color: #f39c12; }
 .action-btn.delete-btn { color: #e74c3c; }
+
+.ad-card-clickable-area {
+    text-decoration: none;
+    color: inherit; /* ليرث اللون الطبيعي للنص */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.ad-card-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* عمودان متساويان */
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* مسافة بين الأيقونة والنص */
+    font-size: 0.85rem; /* حجم خط موحد وأصغر قليلاً */
+    color: #555;
+}
+
+.spec-item svg {
+    /* لون أيقونة محايد */
+    color: #888;
+    flex-shrink: 0; /* لمنع الأيقونة من التقلص */
+}
+
+/* --- 7. أنماط معرض الصور داخل البطاقة --- */
+
+/* تعديل حاوية الصورة لتكون مرجعاً للعناصر العائمة */
+.ad-card-image {
+    position: relative;
+    height: 200px;
+}
+
+/* تصميم أسهم التنقل */
+/* This is the new, updated version */
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    /* We still need translateY for vertical centering */
+    transform: translateY(-50%); 
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    z-index: 10;
+    opacity: 0;
+    
+    /* --- MODIFIED --- */
+    /* Animate all the properties we are about to change */
+    transition: all 0.2s ease-in-out; 
+}
+
+.nav-arrow.left {
+    left: 10px;
+}
+
+.nav-arrow.right {
+    right: 10px;
+}
+
+.ad-card:hover .nav-arrow {
+    opacity: 1;
+}
+
+.nav-arrow:hover {
+    /* Make the background a solid, bright white */
+    background-color: white;
+
+    /* Add a simple, white glow */
+    box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
+}
+
+/* تصميم نقاط التنقل */
+.pagination-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+    direction: ltr; /* <-- THIS IS THE FIX */
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease;
+}
+
+.dot.active {
+    background-color: white;
+}

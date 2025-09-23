@@ -192,3 +192,9 @@ body {
     margin-bottom: 20px;
     font-size: 14px;
 }
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* عمودان متساويان في العرض */
+    gap: 15px; /* مسافة بين الحقلين */
+}

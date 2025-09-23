@@ -1,0 +1,112 @@
+/* src/styles/AdDetailPage.css */
+
+.ad-detail-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.ad-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* للسماح بالالتفاف على الشاشات الصغيرة */
+    gap: 20px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.ad-detail-header h1 {
+    margin: 0;
+}
+
+.ad-detail-price {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    white-space: nowrap; /* لمنع كسر السعر إلى سطرين */
+}
+
+.ad-detail-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* قسم الصور يأخذ ضعف مساحة التفاصيل */
+    gap: 40px;
+}
+
+/* التجاوب مع الشاشات الصغيرة */
+@media (max-width: 900px) {
+    .ad-detail-content {
+        grid-template-columns: 1fr; /* عمود واحد فقط */
+    }
+}
+
+.main-image {
+    width: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+}
+
+.ad-detail-info h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+.info-item {
+    display: flex;
+    justify-content: space-between;
+}
+.info-item span {
+    color: #555;
+}
+
+.ad-detail-description {
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.seller-info {
+    background-color: var(--color-bg-page);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.seller-info h4 {
+    margin-top: 0;
+}
+
+.not-found {
+    text-align: center;
+    padding-top: 50px;
+}
+.not-found a {
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.info-item {
+    background-color: var(--color-bg-page);
+    padding: 12px 15px;
+    border-radius: 8px;
+    align-items: center; /* محاذاة عمودية للمحتوى */
+}
+
+.info-item strong {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* مسافة بين الأيقونة والنص */
+    color: #333;
+}
+
+.info-item span {
+    font-weight: 600; /* جعل القيمة بخط أغمق قليلاً */
+}

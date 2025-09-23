@@ -23,6 +23,8 @@ import MyCarAds from './components/dashboard/MyCarAds';
 import MyRealEstateAds from './components/dashboard/MyRealEstateAds';
 import Reviews from './components/dashboard/Reviews';
 
+import AdDetailPage from './components/AdDetailPage';
+
 // مكونات وهمية لتمثيل الصفحات الأخرى
 const Dashboard = () => (
   <div style={{ textAlign: 'center', marginTop: '50px', fontSize: '24px' }}>
@@ -50,6 +52,8 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />
+
+          <Route path="/ad/:adId" element={<AdDetailPage />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

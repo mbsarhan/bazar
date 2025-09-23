@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../styles/forms.css';
 
 const SignUp = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [credential, setCredential] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,7 +16,7 @@ const SignUp = () => {
     e.preventDefault();
     setError('');
 
-    if (!credential || !password || !confirmPassword) {
+    if (!firstName || !lastName || !credential || !password || !confirmPassword) {
       setError('يرجى ملء جميع الحقول.');
       return;
     }
@@ -24,7 +26,7 @@ const SignUp = () => {
       return;
     }
 
-    console.log('تم إرسال بيانات التسجيل:', { credential, password });
+    console.log('تم إرسال بيانات التسجيل:', { firstName, lastName, credential, password });
 
     alert('تم إنشاء الحساب بنجاح! سيتم إرسال رمز تأكيد.');
     navigate('/login');
@@ -36,6 +38,26 @@ const SignUp = () => {
         <h2>إنشاء حساب جديد</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="firstName">الاسم الأول</label>
+              <input
+                type="text"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="lastName">اسم العائلة</label>
+              <input
+                type="text"
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+          </div>
           <div className="form-group">
             <label htmlFor="credential">البريد الإلكتروني أو رقم هاتف سوري</label>
             <input
