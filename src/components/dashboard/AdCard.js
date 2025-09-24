@@ -40,6 +40,12 @@ const AdCard = ({ ad, isPublic = false }) => {
         setCurrentIndex(newIndex);
     };
 
+    const goToSlide = (e, slideIndex) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setCurrentIndex(slideIndex);
+    };
+
     return (
         <div className="ad-card">
             <Link to={`/ad/${ad.id}`} className="ad-card-clickable-area">
@@ -59,6 +65,7 @@ const AdCard = ({ ad, isPublic = false }) => {
                                     <div
                                         key={index}
                                         className={`dot ${currentIndex === index ? 'active' : ''}`}
+                                        onClick={(e) => goToSlide(e, index)}
                                     />
                                 ))}
                             </div>
