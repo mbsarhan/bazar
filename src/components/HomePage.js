@@ -4,6 +4,7 @@ import { carAdsData, realEstateAdsData } from './dashboard/mockData';
 // سنحتاج إلى بطاقة عرض عامة، يمكننا تعديل AdCard لاحقاً أو إنشاء واحدة جديدة
 // للتبسيط الآن، سنستخدم نفس تصميم AdCard لكن بدون أزرار التحكم
 import AdCard from './dashboard/AdCard'; 
+import SearchFilters from './SearchFilters';
 import '../styles/HomePage.css';
 
 const HomePage = () => {
@@ -14,10 +15,12 @@ const HomePage = () => {
 
     return (
         <div className="home-page-container">
+            {/* 2. Add the component here */}
+            <SearchFilters />
+
             <h1>أحدث الإعلانات</h1>
             <div className="ads-list-container">
                 {allAds.map(ad => (
-                    // يجب تعديل AdCard لكي لا تظهر أزرار التحكم للزوار
                     <AdCard key={ad.id} ad={ad} isPublic={true} />
                 ))}
             </div>

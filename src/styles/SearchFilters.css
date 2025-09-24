@@ -1,0 +1,140 @@
+/* src/styles/SearchFilters.css */
+
+/* Main container styling remains similar */
+.search-container {
+    background-color: var(--color-bg-card);
+    border-radius: 18px;
+    padding: 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-border-subtle);
+}
+
+/* Tabs styling remains the same */
+.search-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--color-bg-page);
+}
+.tab-btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #888;
+    position: relative;
+    transition: color 0.2s ease-in-out;
+}
+.tab-btn.active {
+    color: var(--color-text-dark);
+}
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-accent-primary);
+}
+
+/* --- NEW: Big Search Bar Styles --- */
+.main-search-bar {
+    display: flex; /* <-- CHANGED from grid to flex */
+    gap: 10px;
+}
+
+/* We now need to tell the input field to take up the available space */
+.search-input-wrapper {
+    position: relative;
+    flex-grow: 1; /* <-- ADDED: This makes the input wrapper expand */
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px; /* RTL position */
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    /* --- MODIFIED: Reduced vertical padding --- */
+    padding: 12px 50px 12px 20px;
+    /* --- MODIFIED: Slightly reduced font size for balance --- */
+    font-size: 1rem;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: 'Cairo', sans-serif;
+}
+.search-input-wrapper input:focus {
+    outline: none;
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 0 3px rgba(144, 238, 144, 0.3);
+}
+
+.filter-btn, .search-btn-main {
+    /* --- MODIFIED: Reduced vertical padding to match the input --- */
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* --- REMOVED: height: 100% is no longer needed --- */
+    box-sizing: border-box;
+}
+
+.filter-btn {
+    background-color: var(--color-bg-page);
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-dark);
+}
+.filter-btn:hover {
+    background-color: #e9e9e9;
+}
+
+.search-btn-main {
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-dark);
+    border: none;
+}
+.search-btn-main:hover {
+    background-color: var(--color-accent-hover);
+}
+
+
+/* --- NEW: Styles for Filters inside the Modal --- */
+.modal-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.modal-filters-grid .filter-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-filters-grid .filter-item label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.modal-filters-grid .filter-item input,
+.modal-filters-grid .filter-item select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 10px;
+    font-size: 1rem;
+}
