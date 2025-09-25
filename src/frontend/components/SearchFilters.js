@@ -1,12 +1,16 @@
-// src/components/SearchFilters.js
+// src/frontend/components/SearchFilters.js
 import React, { useState } from 'react';
 import { SlidersHorizontal, Search } from 'lucide-react';
-import Modal from './dashboard/Modal'; // We'll reuse our excellent Modal component
+import Slider from 'rc-slider';
+import Modal from './dashboard/Modal';
 import '../styles/SearchFilters.css';
+
+// Formatting remains for USD, but the output string is just the number
+const formatPrice = (val) => `$${val.toLocaleString('en-US')}`;
 
 const SearchFilters = () => {
     const [activeTab, setActiveTab] = useState('cars');
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for the modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <div className="search-container">
@@ -25,7 +29,6 @@ const SearchFilters = () => {
                 </button>
             </div>
 
-            {/* --- New Big Search Bar Layout --- */}
             <div className="main-search-bar">
                 <div className="search-input-wrapper">
                     <Search className="search-icon" size={24} />
@@ -43,12 +46,10 @@ const SearchFilters = () => {
                 </button>
             </div>
 
-            {/* --- Filters Modal --- */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onConfirm={() => {
-                    // Logic to apply filters will go here
                     setIsModalOpen(false);
                 }}
                 title="فلاتر البحث المتقدمة"
@@ -60,8 +61,10 @@ const SearchFilters = () => {
     );
 };
 
-// --- Car Filters (Now for the Modal) ---
+// --- Car Filters with USD Range Slider ---
 const CarFilters = () => {
+    const [priceRange, setPriceRange] = useState([2000, 20000]);
+
     return (
         <div className="modal-filters-grid">
             <div className="filter-item">
@@ -80,20 +83,32 @@ const CarFilters = () => {
                     <option value="used">مستعملة</option>
                 </select>
             </div>
-             <div className="filter-item">
-                <label>السعر الأدنى</label>
-                <input type="number" placeholder="مثال: 50,000,000" />
-            </div>
-            <div className="filter-item">
-                <label>السعر الأعلى</label>
-                <input type="number" placeholder="مثال: 100,000,000" />
+            <div className="filter-item filter-item-full">
+                <label>نطاق السعر (دولار أمريكي)</label>
+                <div className="range-slider-wrapper">
+                    {/* --- FIX: Use <Slider range ... /> instead of <Range ... /> --- */}
+                    <Slider 
+                        range
+                        min={1000}
+                        max={50000}
+                        step={500}
+                        value={priceRange}
+                        onChange={setPriceRange}
+                        allowCross={false}
+                    />
+                    <div className="range-labels">
+                        <span>{formatPrice(priceRange[0])}</span>
+                        <span>{formatPrice(priceRange[1])}</span>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-// --- Real Estate Filters (Now for the Modal) ---
 const RealEstateFilters = () => {
+    const [priceRange, setPriceRange] = useState([25000, 250000]);
+    
     return (
         <div className="modal-filters-grid">
             <div className="filter-item">
@@ -112,17 +127,24 @@ const RealEstateFilters = () => {
                     <option value="villa">فيلا</option>
                 </select>
             </div>
-            <div className="filter-item">
-                <label>نوع الصفقة</label>
-                 <select>
-                    <option value="">الكل</option>
-                    <option value="sale">بيع</option>
-                    <option value="rent">إيجار</option>
-                </select>
-            </div>
-             <div className="filter-item">
-                <label>المساحة الأدنى (م²)</label>
-                <input type="number" placeholder="مثال: 90" />
+            <div className="filter-item filter-item-full">
+                <label>نطاق السعر (دولار أمريكي)</label>
+                <div className="range-slider-wrapper">
+                     {/* --- FIX: Use <Slider range ... /> instead of <Range ... /> --- */}
+                     <Slider 
+                        range
+                        min={10000}
+                        max={500000}
+                        step={5000}
+                        value={priceRange}
+                        onChange={setPriceRange}
+                        allowCross={false}
+                    />
+                    <div className="range-labels">
+                        <span>{formatPrice(priceRange[0])}</span>
+                        <span>{formatPrice(priceRange[1])}</span>
+                    </div>
+                </div>
             </div>
         </div>
     );

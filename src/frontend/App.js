@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
+import ScrollToTop from './components/ScrollToTop';
 
 // 1. استيراد المكونات الأساسية
 import SignUp from './components/SignUp';
@@ -11,6 +12,7 @@ import ResetPassword from './components/ResetPassword';
 import Header from './components/Header';
 import HomePage from './components/HomePage';
 
+import 'rc-slider/assets/index.css';
 
 import AddAdChoice from './components/AddAdChoice';
 import AddCarForm from './components/AddCarForm';
@@ -49,6 +51,8 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
+
         <Header />
         <Routes>
           <Route path="/" element={<HomePage />} />

@@ -5,11 +5,11 @@ import '../styles/AddAdForm.css';
 
 const UploadIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-    viewBox="0 0 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" />
-    <line x1="12" y1="3" x2="12" y2="15" /></svg>
+        viewBox="0 0 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" y1="3" x2="12" y2="15" /></svg>
 );
 
 const AddCarForm = () => {
@@ -37,7 +37,7 @@ const AddCarForm = () => {
 
     const [errorMessage, setErrorMessage] = useState(''); // لرسالة الخطأ العامة في الأعلى
     const [errors, setErrors] = useState({});
-    
+
     const fileInputRef = useRef(null);
     const uploadMode = useRef(null); // لتحديد ما إذا كنا نرفع صورة إلزامية أم إضافية
 
@@ -49,7 +49,7 @@ const AddCarForm = () => {
             setErrors(prev => ({ ...prev, [name]: false }));
         }
     };
-    
+
     const handleUploadClick = (mode, fieldName = null) => {
         uploadMode.current = { mode, fieldName }; // mode: 'mandatory' or 'extra'
         fileInputRef.current.click();
@@ -64,7 +64,7 @@ const AddCarForm = () => {
         if (mode === 'mandatory') {
             setMandatoryImages(prev => ({ ...prev, [fieldName]: files[0] }));
             // إزالة الخطأ من حقل الصورة عند رفعها
-             if (errors[fieldName]) {
+            if (errors[fieldName]) {
                 setErrors(prev => ({ ...prev, [fieldName]: false }));
             }
         } else if (mode === 'extra') {
@@ -72,7 +72,7 @@ const AddCarForm = () => {
         }
         e.target.value = null;
     };
-    
+
     const removeMandatoryImage = (fieldName) => {
         setMandatoryImages(prev => ({ ...prev, [fieldName]: null }));
     };
@@ -87,7 +87,7 @@ const AddCarForm = () => {
         setErrors({});
 
         const newErrors = {};
-        
+
         // التحقق من الحقول النصية الإلزامية
         if (!formData.manufacturer) newErrors.manufacturer = true;
         if (!formData.model) newErrors.model = true;
@@ -114,7 +114,7 @@ const AddCarForm = () => {
         alert('تم إرسال الإعلان للمراجعة بنجاح!');
         navigate('/dashboard');
     };
-    
+
     const dealTypes = ['بيع', 'إيجار'];
     const conditions = ['جديدة', 'مستعملة', 'متضررة'];
     const transmissions = ['أوتوماتيك', 'عادي', 'الاثنان معاً'];
@@ -171,7 +171,7 @@ const AddCarForm = () => {
                             <label htmlFor="model">الموديل *</label>
                             <input type="text" id="model" name="model" value={formData.model} onChange={handleChange} className={errors.model ? 'input-error' : ''} />
                         </div>
-                         <div className="form-group">
+                        <div className="form-group">
                             <label htmlFor="year">سنة الصنع *</label>
                             <input type="number" id="year" name="year" value={formData.year} onChange={handleChange} placeholder="مثال: 2022" className={errors.year ? 'input-error' : ''} />
                         </div>
@@ -189,48 +189,44 @@ const AddCarForm = () => {
                         <div className="form-group">
                             <label htmlFor="transmission">ناقل الحركة *</label>
                             <select id="transmission" name="transmission" value={formData.transmission} onChange={handleChange}
-                            className={errors.transmission ? 'input-error' : ''}>
-                                 {transmissions.map(t => <option key={t} value={t}>{t}</option>)}
+                                className={errors.transmission ? 'input-error' : ''}>
+                                {transmissions.map(t => <option key={t} value={t}>{t}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="fuelType">نوع الوقود *</label>
                             <select id="fuelType" name="fuelType" value={formData.fuelType} onChange={handleChange}
-                            className={errors.fuelType ? 'input-error' : ''}>
+                                className={errors.fuelType ? 'input-error' : ''}>
                                 {fuelTypes.map(f => <option key={f} value={f}>{f}</option>)}
                             </select>
                         </div>
-                         <div className="form-group">
+                        <div className="form-group">
                             <label htmlFor="mileage">المسافة المقطوعة (كم) *</label>
                             <input type="number" id="mileage" name="mileage" value={formData.mileage} onChange={handleChange}
-                            placeholder="مثال: 50000" className={errors.mileage ? 'input-error' : ''}/>
+                                placeholder="مثال: 50000" className={errors.mileage ? 'input-error' : ''} />
                         </div>
                     </div>
                 </fieldset>
 
                 {/* --- القسم الثالث: السعر والموقع (موجود الآن) --- */}
-                 <fieldset>
+                <fieldset>
                     <legend>السعر والموقع</legend>
                     <div className="form-grid">
                         <div className="form-group price-group">
-                            <label htmlFor="price">السعر ($) *</label>
-                            <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} 
-                            className={errors.price ? 'input-error' : ''}/>
+                            <label htmlFor="price">السعر (دولار أمريكي) *</label>
+                            <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                             <div className="checkbox-group">
                                 <input type="checkbox" id="isNegotiable" name="isNegotiable" checked={formData.isNegotiable} onChange={handleChange} />
-                                <label htmlFor="isNegotiable">قابل للتفاوض</label>
+                                <label htmlFor="isNegotiable">السعر قابل للتفاوض</label>
                             </div>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="province">المحافظة</label>
-                             <select id="province" name="province" value={formData.province} onChange={handleChange}>
-                                {provinces.map(p => <option key={p} value={p}>{p}</option>)}
-                            </select>
+                            <label htmlFor="province">المحافظة *</label>
+                            <select id="province" name="province" value={formData.province} onChange={handleChange}>{/* ... options ... */}</select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="city">المدينة / المنطقة *</label>
-                            <input type="text" id="city" name="city" value={formData.city} onChange={handleChange} 
-                            className={errors.city ? 'input-error' : ''}/>
+                            <input type="text" id="city" name="city" value={formData.city} onChange={handleChange} className={errors.city ? 'input-error' : ''} />
                         </div>
                     </div>
                 </fieldset>
@@ -243,7 +239,7 @@ const AddCarForm = () => {
                         <textarea id="description" name="description" rows="5" value={formData.description} onChange={handleChange} placeholder="اكتب هنا أي تفاصيل إضافية عن حالة السيارة، الميزات، إلخ..."></textarea>
                     </div>
                 </fieldset>
-                
+
                 {/* --- القسم الخامس: الصور الإلزامية (القسم الجديد) --- */}
                 <fieldset>
                     <legend>الصور الإلزامية</legend>
@@ -268,7 +264,7 @@ const AddCarForm = () => {
                                 </div>
                             </div>
                         ))}
-                        
+
                         {/* زر "أضف صورة" الدائم */}
                         <div className="upload-box" onClick={() => handleUploadClick('extra')}>
                             <div className="upload-placeholder">
@@ -278,17 +274,17 @@ const AddCarForm = () => {
                         </div>
                     </div>
                 </fieldset>
-                
+
                 {/* حقل إدخال الملفات المخفي والمحدث */}
-                <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleFileChange} 
-                    accept="image/*" 
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
                     style={{ display: 'none' }}
                     multiple // السماح بتحديد عدة ملفات مرة واحدة للصور الإضافية
                 />
-                
+
                 <button type="submit" className="submit-btn">نشر الإعلان</button>
             </form>
         </div>
