@@ -1,5 +1,6 @@
 <?php
 
+use Faker\Provider\bg_BG\PhoneNumber;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone');
             $table->string('password');
+            $table->boolean('admin');
+            $table->decimal('review');
+            $table->integer('total_view');
             $table->rememberToken();
             $table->timestamps();
         });
