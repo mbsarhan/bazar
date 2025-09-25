@@ -1,15 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; 
-import ProgressBar from './ProgressBar'; 
+import axios from 'axios';
+import ProgressBar from './ProgressBar';
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
 
 const UploadIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 
-    fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" 
-    strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24"
+        fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+        strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
 );
 
 const AddRealEstateForm = () => {
@@ -59,8 +59,8 @@ const AddRealEstateForm = () => {
         const files = Array.from(e.target.files);
         if (files.length > 0) {
             setImages(prev => [...prev, ...files]);
-            if(errors.images) {
-                setErrors(prev => ({...prev, images: false}));
+            if (errors.images) {
+                setErrors(prev => ({ ...prev, images: false }));
             }
         }
         e.target.value = null;
@@ -92,19 +92,19 @@ const AddRealEstateForm = () => {
                 }
             },
         })
-        .then(response => {
-            console.log('تم رفع الفيديو بنجاح (محاكاة):', response.data);
-            setIsUploading(false);
-            // يمكنك حفظ رابط الفيديو الذي يعود من الخادم هنا
-        })
-        .catch(error => {
-            console.error('حدث خطأ أثناء رفع الفيديو:', error);
-            setIsUploading(false);
-            // عرض رسالة خطأ للمستخدم
-            setErrorMessage('فشل رفع الفيديو. يرجى المحاولة مرة أخرى.');
-            setVideoFile(null); // إزالة الفيديو الفاشل
-        });
-        
+            .then(response => {
+                console.log('تم رفع الفيديو بنجاح (محاكاة):', response.data);
+                setIsUploading(false);
+                // يمكنك حفظ رابط الفيديو الذي يعود من الخادم هنا
+            })
+            .catch(error => {
+                console.error('حدث خطأ أثناء رفع الفيديو:', error);
+                setIsUploading(false);
+                // عرض رسالة خطأ للمستخدم
+                setErrorMessage('فشل رفع الفيديو. يرجى المحاولة مرة أخرى.');
+                setVideoFile(null); // إزالة الفيديو الفاشل
+            });
+
         e.target.value = null;
     };
 
@@ -117,7 +117,7 @@ const AddRealEstateForm = () => {
         setUploadProgress(0);
         setIsUploading(false);
     };
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
         // منع الإرسال أثناء رفع الفيديو
@@ -129,14 +129,14 @@ const AddRealEstateForm = () => {
         setErrors({});
 
         const newErrors = {};
-        
+
         // التحقق من كل حقل في النموذج
         if (!formData.city) newErrors.city = true;
         if (!formData.address) newErrors.address = true;
         if (!formData.area) newErrors.area = true;
         if (!formData.price) newErrors.price = true;
         if (!formData.description) newErrors.description = true;
-        
+
         if (images.length < 2) {
             newErrors.images = true;
         }
@@ -194,22 +194,22 @@ const AddRealEstateForm = () => {
                             <input type="text" name="city" value={formData.city} onChange={handleChange} className={errors.city ? 'input-error' : ''} />
                         </div>
                         <div className="form-group full-width">
-                             <label htmlFor="address">العنوان التفصيلي *</label>
-                             <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="مثال: المزة - شارع الجلاء - بناء 22" className={errors.address ? 'input-error' : ''} />
+                            <label htmlFor="address">العنوان التفصيلي *</label>
+                            <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="مثال: المزة - شارع الجلاء - بناء 22" className={errors.address ? 'input-error' : ''} />
                         </div>
                     </div>
                 </fieldset>
 
                 <fieldset>
                     <legend>المواصفات</legend>
-                     <div className="form-grid four-columns">
+                    <div className="form-grid four-columns">
                         <div className="form-group">
                             <label htmlFor="area">المساحة (م²) *</label>
                             <input type="number" name="area" value={formData.area} onChange={handleChange} className={errors.area ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
                             <label htmlFor="bedrooms">غرف النوم</label>
-                            <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange}/>
+                            <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange} />
                         </div>
                         <div className="form-group">
                             <label htmlFor="bathrooms">الحمامات</label>
@@ -219,7 +219,7 @@ const AddRealEstateForm = () => {
                             <label htmlFor="floorNumber">رقم الطابق</label>
                             <input type="number" name="floorNumber" value={formData.floorNumber} onChange={handleChange} />
                         </div>
-                         <div className="form-group">
+                        <div className="form-group">
                             <label htmlFor="constructionStatus">حالة البناء *</label>
                             <select name="constructionStatus" value={formData.constructionStatus} onChange={handleChange}>{constructionStatuses.map(s => <option key={s} value={s}>{s}</option>)}</select>
                         </div>
@@ -237,14 +237,8 @@ const AddRealEstateForm = () => {
                             <label htmlFor="price">السعر المطلوب *</label>
                             <input type="number" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="currency">العملة *</label>
-                            <select name="currency" value={formData.currency} onChange={handleChange}>
-                                <option value="ل.س">ليرة سورية (SYP)</option>
-                                <option value="USD">دولار أمريكي (USD)</option>
-                            </select>
-                        </div>
-                         <div className="form-group checkbox-group price-checkbox">
+                        {/* The currency dropdown is correctly removed */}
+                        <div className="form-group checkbox-group price-checkbox">
                             <input type="checkbox" id="isNegotiable" name="isNegotiable" checked={formData.isNegotiable} onChange={handleChange} />
                             <label htmlFor="isNegotiable">السعر قابل للتفاوض</label>
                         </div>
@@ -253,7 +247,7 @@ const AddRealEstateForm = () => {
 
                 <fieldset>
                     <legend>التفاصيل والوسائط</legend>
-                     <div className="form-group">
+                    <div className="form-group">
                         <label htmlFor="description">وصف تفصيلي للعقار والميزات *</label>
                         <textarea name="description" rows="5" value={formData.description} onChange={handleChange} placeholder="اكتب هنا عن ميزات العقار كالإطلالة، وجود مصعد، كراج، تدفئة..." className={errors.description ? 'input-error' : ''}></textarea>
                     </div>
@@ -291,7 +285,7 @@ const AddRealEstateForm = () => {
                         <input type="file" ref={videoInputRef} onChange={handleVideoChange} accept="video/*" style={{ display: 'none' }} />
                     </div>
                 </fieldset>
-                
+
                 <button type="submit" className="submit-btn" disabled={isUploading}>
                     {isUploading ? 'جاري رفع الفيديو...' : 'نشر الإعلان'}
                 </button>
