@@ -38,7 +38,7 @@ const CarFilters = ({ filters, onFilterChange }) => {
                 <label>نطاق السعر (دولار أمريكي)</label>
                 <div className="range-slider-wrapper">
                     <Slider 
-                        range min={MIN} max={MAX} step={1000}
+                        range min={MIN} max={MAX} step={500}
                         value={filters.priceRange} 
                         onChange={newRange => onFilterChange('priceRange', newRange)} 
                         allowCross={false}
