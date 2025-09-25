@@ -1,19 +1,162 @@
 // src/frontend/components/SearchFilters.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SlidersHorizontal, Search } from 'lucide-react';
 import Slider from 'rc-slider';
 import Modal from './dashboard/Modal';
 import '../styles/SearchFilters.css';
 
-// Formatting remains for USD, but the output string is just the number
 const formatPrice = (val) => `$${val.toLocaleString('en-US')}`;
 
+// --- Car Filters Component ---
+const CarFilters = ({ filters, onFilterChange }) => {
+    const MIN = 0;
+    const MAX = 300000;
+
+    const leftPercent = ((filters.priceRange[0] - MIN) / (MAX - MIN)) * 100;
+    const rightPercent = ((filters.priceRange[1] - MIN) / (MAX - MIN)) * 100;
+    const areLabelsClose = (filters.priceRange[1] - filters.priceRange[0]) < (MAX - MIN) * 0.18;
+
+    return (
+        <div className="modal-filters-grid">
+            <div className="filter-item">
+                <label>المحافظة</label>
+                <select>
+                    <option value="">كل المحافظات</option>
+                    <option value="damascus">دمشق</option>
+                    <option value="aleppo">حلب</option>
+                </select>
+            </div>
+            <div className="filter-item">
+                <label>الحالة</label>
+                 <select>
+                    <option value="">الكل</option>
+                    <option value="new">جديدة</option>
+                    <option value="used">مستعملة</option>
+                </select>
+            </div>
+            <div className="filter-item filter-item-full">
+                <label>نطاق السعر (دولار أمريكي)</label>
+                <div className="range-slider-wrapper">
+                    <Slider 
+                        range min={MIN} max={MAX} step={1000}
+                        value={filters.priceRange} 
+                        onChange={newRange => onFilterChange('priceRange', newRange)} 
+                        allowCross={false}
+                    />
+                    <div className={`range-labels ${areLabelsClose ? 'labels-are-close' : ''}`}>
+                        <span className="range-label-min" style={{ left: `${leftPercent}%` }}>
+                            {formatPrice(filters.priceRange[0])}
+                        </span>
+                        <span className="range-label-max" style={{ left: `${rightPercent}%` }}>
+                            {formatPrice(filters.priceRange[1])}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Real Estate Filters Component ---
+const RealEstateFilters = ({ filters, onFilterChange }) => {
+    const MIN = 0;
+    const MAX = 1000000;
+
+    const leftPercent = ((filters.priceRange[0] - MIN) / (MAX - MIN)) * 100;
+    const rightPercent = ((filters.priceRange[1] - MIN) / (MAX - MIN)) * 100;
+    const areLabelsClose = (filters.priceRange[1] - filters.priceRange[0]) < (MAX - MIN) * 0.20;
+
+    return (
+        <div className="modal-filters-grid">
+            <div className="filter-item">
+                <label>المحافظة</label>
+                <select>
+                    <option value="">كل المحافظات</option>
+                    <option value="damascus">دمشق</option>
+                    <option value="aleppo">حلب</option>
+                </select>
+            </div>
+            <div className="filter-item">
+                <label>نوع العقار</label>
+                 <select>
+                    <option value="">الكل</option>
+                    <option value="apartment">شقة</option>
+                    <option value="villa">فيلا</option>
+                </select>
+            </div>
+            <div className="filter-item filter-item-full">
+                <label>نطاق السعر (دولار أمريكي)</label>
+                <div className="range-slider-wrapper">
+                     <Slider 
+                        range min={MIN} max={MAX} step={10000}
+                        value={filters.priceRange} 
+                        onChange={newRange => onFilterChange('priceRange', newRange)} 
+                        allowCross={false}
+                    />
+                    <div className={`range-labels ${areLabelsClose ? 'labels-are-close' : ''}`}>
+                        <span className="range-label-min" style={{ left: `${leftPercent}%` }}>
+                            {formatPrice(filters.priceRange[0])}
+                        </span>
+                        <span className="range-label-max" style={{ left: `${rightPercent}%` }}>
+                            {formatPrice(filters.priceRange[1])}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Main SearchFilters Component ---
 const SearchFilters = () => {
     const [activeTab, setActiveTab] = useState('cars');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // "Committed" filter state that lives in the parent
+    const [carFilters, setCarFilters] = useState({ priceRange: [0, 300000] });
+    const [realEstateFilters, setRealEstateFilters] = useState({ priceRange: [0, 1000000] });
+
+    // "Temporary" state for the modal to work on
+    const [tempFilters, setTempFilters] = useState({});
+
+    // When the modal opens, copy the current filters to the temporary state
+    const openFilterModal = () => {
+        const currentFilters = activeTab === 'cars' ? carFilters : realEstateFilters;
+        setTempFilters(currentFilters);
+        setIsModalOpen(true);
+    };
+
+    // When "Confirm" is clicked, save temp state to the main state
+    const handleConfirmFilters = () => {
+        if (activeTab === 'cars') {
+            setCarFilters(tempFilters);
+        } else {
+            setRealEstateFilters(tempFilters);
+        }
+        setIsModalOpen(false);
+        // Here you would trigger the actual search/filtering of the main page
+        console.log("Filters Saved:", tempFilters);
+    };
+
+    // A function to update the temporary state from within the modal
+    const handleTempFilterChange = (filterName, value) => {
+        setTempFilters(prevFilters => ({
+            ...prevFilters,
+            [filterName]: value
+        }));
+    };
+    
+    // When switching tabs, if the modal is open, update the temp filters
+    useEffect(() => {
+        if(isModalOpen) {
+            const currentFilters = activeTab === 'cars' ? carFilters : realEstateFilters;
+            setTempFilters(currentFilters);
+        }
+    }, [activeTab, isModalOpen]);
+
     return (
         <div className="search-container">
+            {/* --- UI WAS MISSING FROM HERE --- */}
             <div className="search-tabs">
                 <button 
                     className={`tab-btn ${activeTab === 'cars' ? 'active' : ''}`}
@@ -37,7 +180,7 @@ const SearchFilters = () => {
                         placeholder={activeTab === 'cars' ? "ابحث بالاسم أو الموديل (كيا ريو...)" : "ابحث بالمنطقة أو العنوان..."} 
                     />
                 </div>
-                <button className="filter-btn" onClick={() => setIsModalOpen(true)}>
+                <button className="filter-btn" onClick={openFilterModal}>
                     <SlidersHorizontal size={20} />
                     <span>فلاتر</span>
                 </button>
@@ -45,107 +188,20 @@ const SearchFilters = () => {
                     بحث
                 </button>
             </div>
+            {/* --- END OF MISSING UI --- */}
 
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onConfirm={() => {
-                    setIsModalOpen(false);
-                }}
+                onConfirm={handleConfirmFilters}
                 title="فلاتر البحث المتقدمة"
             >
-                {activeTab === 'cars' && <CarFilters />}
-                {activeTab === 'real-estate' && <RealEstateFilters />}
+                {activeTab === 'cars' ? (
+                    <CarFilters filters={tempFilters} onFilterChange={handleTempFilterChange} />
+                ) : (
+                    <RealEstateFilters filters={tempFilters} onFilterChange={handleTempFilterChange} />
+                )}
             </Modal>
-        </div>
-    );
-};
-
-// --- Car Filters with USD Range Slider ---
-const CarFilters = () => {
-    const [priceRange, setPriceRange] = useState([2000, 20000]);
-
-    return (
-        <div className="modal-filters-grid">
-            <div className="filter-item">
-                <label>المحافظة</label>
-                <select>
-                    <option value="">كل المحافظات</option>
-                    <option value="damascus">دمشق</option>
-                    <option value="aleppo">حلب</option>
-                </select>
-            </div>
-            <div className="filter-item">
-                <label>الحالة</label>
-                 <select>
-                    <option value="">الكل</option>
-                    <option value="new">جديدة</option>
-                    <option value="used">مستعملة</option>
-                </select>
-            </div>
-            <div className="filter-item filter-item-full">
-                <label>نطاق السعر (دولار أمريكي)</label>
-                <div className="range-slider-wrapper">
-                    {/* --- FIX: Use <Slider range ... /> instead of <Range ... /> --- */}
-                    <Slider 
-                        range
-                        min={1000}
-                        max={50000}
-                        step={500}
-                        value={priceRange}
-                        onChange={setPriceRange}
-                        allowCross={false}
-                    />
-                    <div className="range-labels">
-                        <span>{formatPrice(priceRange[0])}</span>
-                        <span>{formatPrice(priceRange[1])}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const RealEstateFilters = () => {
-    const [priceRange, setPriceRange] = useState([25000, 250000]);
-    
-    return (
-        <div className="modal-filters-grid">
-            <div className="filter-item">
-                <label>المحافظة</label>
-                <select>
-                    <option value="">كل المحافظات</option>
-                    <option value="damascus">دمشق</option>
-                    <option value="aleppo">حلب</option>
-                </select>
-            </div>
-            <div className="filter-item">
-                <label>نوع العقار</label>
-                 <select>
-                    <option value="">الكل</option>
-                    <option value="apartment">شقة</option>
-                    <option value="villa">فيلا</option>
-                </select>
-            </div>
-            <div className="filter-item filter-item-full">
-                <label>نطاق السعر (دولار أمريكي)</label>
-                <div className="range-slider-wrapper">
-                     {/* --- FIX: Use <Slider range ... /> instead of <Range ... /> --- */}
-                     <Slider 
-                        range
-                        min={10000}
-                        max={500000}
-                        step={5000}
-                        value={priceRange}
-                        onChange={setPriceRange}
-                        allowCross={false}
-                    />
-                    <div className="range-labels">
-                        <span>{formatPrice(priceRange[0])}</span>
-                        <span>{formatPrice(priceRange[1])}</span>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
