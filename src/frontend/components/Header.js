@@ -5,9 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import '../styles/Header.css'; // ملف أنماط جديد
 
 const Header = () => {
-    const { user } = useAuth();
+    const { user, isDashboardCollapsed } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+
+    const isDashboardPage = location.pathname.startsWith('/dashboard');
 
     const handleAddAdClick = () => {
         if (user) {
@@ -29,7 +31,8 @@ const Header = () => {
     };
 
     return (
-        <header className="main-header">
+        // 3. Apply a conditional class to the header
+        <header className={`main-header ${isDashboardPage ? 'on-dashboard' : ''} ${isDashboardCollapsed ? 'collapsed' : ''}`}>
             <div className="header-content">
                 <Link to="/" className="logo" onClick={handleLogoClick}>
                     بازار

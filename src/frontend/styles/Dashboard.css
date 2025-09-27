@@ -1,32 +1,81 @@
-/* src/styles/Dashboard.css */
+/* src/frontend/styles/Dashboard.css */
 
-/* 1. الهيكل الرئيسي */
 .dashboard-container {
-    display: grid;
-    grid-template-columns: 260px 1fr; /* عرض ثابت للقائمة الجانبية والباقي للمحتوى */
-    height: 100vh;
-    background-color: var(--color-bg-page);
+    padding-right: 260px;
+    transition: padding-right 0.3s ease-in-out;
 }
 
-/* 2. تصميم القائمة الجانبية */
 .dashboard-sidebar {
+    width: 260px;
     background-color: var(--color-bg-card);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
+    border-left: 1px solid var(--color-border-subtle);
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    padding: 15px;
+    transition: width 0.3s ease-in-out;
 }
 
-.sidebar-header h3 {
-    text-align: center;
-    font-size: 1.5rem;
-    color: var(--color-text-dark);
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--color-border-subtle);
+.sidebar-header {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    height: 50px; 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .sidebar-nav {
-    flex-grow: 1; /* تجعل القائمة تملأ المساحة المتاحة */
+    position: absolute;
+    top: 80px;
+    bottom: 80px;
+    left: 15px;
+    right: 15px;
+    overflow-y: auto;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+/* --- THIS IS THE GUARANTEED FIX --- */
+/* Default (Expanded) State Styles */
+.sidebar-logo-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    white-space: nowrap;
+    opacity: 1;
+    max-width: 200px; /* Use a specific max-width for animation */
+    overflow: hidden;
+    transition: opacity 0.2s ease, max-width 0.3s ease-in-out; /* Animate max-width */
+}
+
+.sidebar-nav a span,
+.logout-btn span {
+    white-space: nowrap;
+    opacity: 1;
+    max-width: 200px; /* Use a specific max-width for animation */
+    overflow: hidden;
+    transition: opacity 0.2s ease, max-width 0.3s ease-in-out; /* Animate max-width */
+}
+/* --- END OF FIX --- */
+
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    padding: 5px;
 }
 
 .sidebar-nav ul {
@@ -36,21 +85,24 @@
 }
 
 .sidebar-nav a {
-    display: block;
-    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    font-size: 1rem;
     color: var(--color-text-dark);
     text-decoration: none;
     font-weight: 600;
     border-radius: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     transition: all 0.2s ease-in-out;
+    overflow: hidden; /* Add overflow hidden to the link */
 }
 
 .sidebar-nav a:hover {
     background-color: var(--color-bg-page);
 }
 
-/* هذا هو الكلاس الذي يضيفه NavLink تلقائياً للرابط النشط */
 .sidebar-nav a.active {
     background-color: var(--color-accent-primary);
     color: var(--color-text-dark);
@@ -58,25 +110,47 @@
 
 .logout-btn {
     width: 100%;
-    padding: 12px;
-    background-color: #fddede;
-    border: 1px solid #fab9b9;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-start;
+    padding: 12px 15px;
+    background-color: transparent;
+    border: 1px solid transparent;
     border-radius: 10px;
     color: #9c2a2a;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    overflow: hidden; /* Add overflow hidden to the button */
 }
+
 .logout-btn:hover {
-    background-color: #fccfcf;
+    background-color: #fddede;
 }
 
+/* Styles for the COLLAPSED state */
+.dashboard-container.collapsed {
+    padding-right: 80px;
+}
 
-/* 3. تصميم مساحة المحتوى */
+.dashboard-container.collapsed .dashboard-sidebar {
+    width: 80px;
+}
+
+/* Set max-width to 0 in collapsed state */
+.dashboard-container.collapsed .sidebar-logo-text,
+.dashboard-container.collapsed .sidebar-nav a span,
+.dashboard-container.collapsed .logout-btn span {
+    opacity: 0;
+    max-width: 0;
+}
+
 .dashboard-content {
     padding: 40px;
-    overflow-y: auto; /* إضافة شريط تمرير إذا زاد المحتوى عن ارتفاع الشاشة */
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .content-header {
@@ -86,7 +160,6 @@
     margin-bottom: 40px;
 }
 
-/* 4. تصميم بطاقات الإحصائيات في صفحة "نظرة عامة" */
 .stats-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -113,13 +186,11 @@
     color: #666;
 }
 
-/* --- 5. أنماط قوائم الإعلانات --- */
-
+/* Styles for Ad Lists */
 .ads-list-container {
     display: grid;
-    /* --- تم التعديل هنا --- */
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px; /* يمكننا تقليل المسافة قليلاً لتبدو أفضل */
+    gap: 20px;
 }
 
 .ad-card {
