@@ -1,56 +1,80 @@
-// src/components/dashboard/DashboardLayout.js
+// src/frontend/components/dashboard/DashboardLayout.js
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import '../../styles/Dashboard.css'; 
+import { LayoutDashboard, User, Car, Home, Star, LogOut, PanelLeftClose, PanelRightClose } from 'lucide-react';
 import Modal from './Modal';
+import '../../styles/Dashboard.css';
+import { useAuth } from '../../context/AuthContext';
 
 const DashboardLayout = () => {
     const navigate = useNavigate();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+    const { isDashboardCollapsed, setIsDashboardCollapsed } = useAuth();
 
     const handleLogoutConfirm = () => {
-        // منطق تسجيل الخروج الحقيقي سيتم إضافته لاحقاً
         alert('تم تسجيل الخروج بنجاح!');
-        setIsLogoutModalOpen(false); // إغلاق المودال
+        setIsLogoutModalOpen(false);
         navigate('/login');
     };
 
-    const handleLogoutClick = () => {
-        setIsLogoutModalOpen(true);
-    };
-
     return (
-        <div className="dashboard-container">
+        // Apply a class to the container when collapsed
+        <div className={`dashboard-container ${isDashboardCollapsed ? 'collapsed' : ''}`}>
             <aside className="dashboard-sidebar">
                 <div className="sidebar-header">
-                    <h3>لوحة التحكم</h3>
+                    {/* The text will be hidden with CSS when collapsed */}
+                    <h3 className="sidebar-logo-text">بازار</h3>
+                    <button className="sidebar-toggle-btn" onClick={() => setIsDashboardCollapsed(!isDashboardCollapsed)}>
+                        {isDashboardCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
+                    </button>
                 </div>
                 <nav className="sidebar-nav">
                     <ul>
-                        {/* 
-                            نستخدم NavLink بدلاً من Link لأنه يضيف كلاس "active" تلقائياً
-                            للرابط الذي يتوافق مع المسار الحالي، مما يسهل تمييزه.
-                            prop "end" مهم للصفحة الرئيسية لمنعها من أن تكون نشطة دائماً.
-                        */}
-                        <li><NavLink to="/dashboard" end>نظرة عامة</NavLink></li>
-                        <li><NavLink to="/dashboard/my-profile">معلوماتي الشخصية</NavLink></li>
-                        <li><NavLink to="/dashboard/car-ads">إعلاناتي للسيارات</NavLink></li>
-                        <li><NavLink to="/dashboard/real-estate-ads">إعلاناتي للعقارات</NavLink></li>
-                        <li><NavLink to="/dashboard/reviews">تقييماتي</NavLink></li>
+                        {/* Each link now has an icon and a span for the text */}
+                        <li>
+                            <NavLink to="/dashboard" end>
+                                <LayoutDashboard size={20} />
+                                <span>نظرة عامة</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink to="/dashboard/my-profile">
+                                <User size={20} />
+                                <span>معلوماتي الشخصية</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink to="/dashboard/car-ads">
+                                <Car size={20} />
+                                <span>إعلاناتي للسيارات</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink to="/dashboard/real-estate-ads">
+                                <Home size={20} />
+                                <span>إعلاناتي للعقارات</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink to="/dashboard/reviews">
+                                <Star size={20} />
+                                <span>تقييماتي</span>
+                            </NavLink>
+                        </li>
                     </ul>
                 </nav>
                 <div className="sidebar-footer">
-                    <button onClick={handleLogoutClick} className="logout-btn">تسجيل الخروج</button>
+                    <button onClick={() => setIsLogoutModalOpen(true)} className="logout-btn">
+                        <LogOut size={20} />
+                        <span>تسجيل الخروج</span>
+                    </button>
                 </div>
             </aside>
 
             <main className="dashboard-content">
-                {/* 
-                    <Outlet> هو المكان الذي ستقوم react-router بعرض المكونات
-                    الفرعية فيه (مثل صفحة نظرة عامة، معلوماتي، إلخ).
-                */}
                 <Outlet />
             </main>
+
             <Modal
                 isOpen={isLogoutModalOpen}
                 onClose={() => setIsLogoutModalOpen(false)}

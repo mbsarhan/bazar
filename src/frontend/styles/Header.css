@@ -6,7 +6,21 @@
     position: sticky;
     top: 0;
     z-index: 999;
+    transition: padding-right 0.3s ease-in-out; /* Animate the padding */
 }
+
+.main-header.on-dashboard {
+    /* Make space for the expanded sidebar */
+    padding-right: 260px; 
+}
+
+/* --- NEW: Styles for when the dashboard sidebar is collapsed --- */
+.main-header.on-dashboard.collapsed {
+    /* Shrink the space to match the collapsed sidebar */
+    padding-right: 80px;
+}
+/* --- END OF FIX --- */
+
 .header-content {
     display: flex;
     justify-content: space-between;
@@ -43,4 +57,17 @@
     font-weight: 600;
     text-decoration: none;
     color: var(--color-text-dark);
+}
+
+.main-header.on-dashboard .logo {
+    /* The default margin in the expanded state is 20px */
+    margin-right: 20px;
+    /* The transition property lives here, so it applies to any change */
+    transition: margin-right 0.3s ease-in-out;
+}
+
+/* 2. Define the state for the logo WHEN the dashboard is collapsed */
+.main-header.on-dashboard.collapsed .logo {
+    /* When collapsed, the margin animates back to 0 */
+    margin-right: 0px;
 }
