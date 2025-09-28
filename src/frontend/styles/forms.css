@@ -13,6 +13,9 @@
 /* 2. استيراد الخط وتحضير الإعدادات العامة */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
 
+html {
+    overflow-y: scroll;
+}
 /* src/styles/forms.css */
 body {
     font-family: 'Cairo', sans-serif;
@@ -197,4 +200,16 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr; /* عمودان متساويان في العرض */
     gap: 15px; /* مسافة بين الحقلين */
+}
+
+/* ============================================= */
+/* Global Tooltip Styles                         */
+/* ============================================= */
+.bazaar-tooltip {
+    background-color: #333 !important;
+    color: white !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 0.9rem !important;
+    z-index: 9999 !important; /* Ensure it's on top of everything */
 }
