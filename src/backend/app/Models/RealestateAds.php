@@ -8,18 +8,18 @@ class RealestateAds extends Model
 {
     protected $table = 'realestate_ads';
     
-    protected $fillabe = [
+    protected $fillable = [
         'ads_id',
-        'realestate-type',
-        'detailed-address',
-        'realestate-size',
-        'bedroom-num',
-        'bathroom-num ', 
-        'floor-num ',
-        'building-status ',
-        'cladding-condition ',
-        'negotiable-check',
-        'video-url',
+        'realestate_type',
+        'detailed_address',
+        'realestate_size',
+        'bedroom_num',
+        'bathroom_num ', 
+        'floor_num ',
+        'building_status ',
+        'cladding_condition ',
+        'negotiable_check',
+        'video_url',
 
     ];
 

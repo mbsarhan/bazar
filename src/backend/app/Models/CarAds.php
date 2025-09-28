@@ -20,16 +20,7 @@ class CarAds extends Model
         'distance_traveled',
 
     ];
-        // Define columns that should be treated as Carbon instances (dates)
-    protected function casts(){
-        return [
-            
-            'model_year' => 'datetime',
-        ];
-
-    }
     
-
     /**
      * Get the parent Advertisement that owns this car-specific listing data.
      */
