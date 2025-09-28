@@ -18,7 +18,7 @@ class CarAds extends Model
         'gear',
         'fule_type',
         'distance_traveled',
-
+        'negotiable_check'
     ];
     
     /**
