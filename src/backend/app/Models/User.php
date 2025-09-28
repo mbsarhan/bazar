@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Http\Controllers\UserRatingsController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,6 +13,8 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -50,4 +53,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+       public function advertisements()
+    {
+        
+        return $this->hasMany(Advertisement::class, 'owner_id');
+    }
+        public function ratingsGiven() 
+    {
+        return $this->hasMany(UserRating::class, 'rater_id');
+    }
+
+      public function ratingsReceived()
+    {
+        return $this->hasMany(UserRating::class, 'rated_id');
+    }
+
+  
 }
