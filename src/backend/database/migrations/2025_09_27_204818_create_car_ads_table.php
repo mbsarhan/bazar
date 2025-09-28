@@ -16,11 +16,12 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('ads_id') ->constrained('advertisements')->onDelete('cascade');
             $table->string('manufacturer');
-            $table->year('model_year')->nullable(); 
-            $table->enum('status', ['New', 'Used', 'Certified Pre-Owned'])->default('Used');
-            $table->enum('gear', ['Manual', 'Automatic', 'Semi-Automatic'])->nullable();
-            $table->enum('fule_type', ['Gasoline', 'Diesel', 'Electric', 'Hybrid'])->nullable();
-            $table->unsignedBigInteger('distance_traveled')->default(0);
+            $table->year('model_year'); 
+            $table->enum('status', ['جديدة', 'مستعملة', 'متضررة'])->default('مستعملة');
+            $table->enum('gear', ['عادي', 'أوتوماتيك', 'الإثنان معا']);
+            $table->enum('fule_type', ['بانزين', 'ديزل', 'كهرباء', 'هايبرد']);
+            $table->unsignedBigInteger('distance_traveled');
+            $table->boolean('negotiable_check')->default(false);
             $table->unique('ads_id'); 
 
             

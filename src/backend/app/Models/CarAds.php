@@ -8,7 +8,7 @@ class CarAds extends Model
 {
 
     protected $table = 'car_ads';
-    protected $fillabe = [
+    protected $fillable = [
         
         'ads_id',
         'manufacturer',
