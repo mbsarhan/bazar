@@ -2,26 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
+        // We still only need these from the user
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'phone' => 'required|string|max:255',
         ]);
 
+        // When creating the user, we now set the default values
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'admin' => false,      // <-- SET DEFAULT
+            'review' => 0,         // <-- SET DEFAULT
+            'total_view' => 0,     // <-- SET DEFAULT
         ]);
 
         $token = $user->createToken('authToken')->plainTextToken;
@@ -45,12 +52,9 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['These credentials do not match our records.'],
+                'email' => ['The provided credentials do not match our records.'],
             ]);
         }
-
-        // Revoke existing tokens for the user if you want only one active token at a time
-        // $user->tokens()->delete();
 
         $token = $user->createToken('authToken')->plainTextToken;
 
@@ -64,7 +68,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Delete the current token being used
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
