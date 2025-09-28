@@ -222,7 +222,7 @@ const AddCarForm = () => {
                         </div>
                         <div className="form-group">
                             <label htmlFor="province">المحافظة *</label>
-                            <select id="province" name="province" value={formData.province} onChange={handleChange}>{/* ... options ... */}</select>
+                            <select id="province" name="province" value={formData.province} onChange={handleChange}>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="city">المدينة / المنطقة *</label>
