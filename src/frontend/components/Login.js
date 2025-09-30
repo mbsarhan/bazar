@@ -15,7 +15,7 @@ const Login = () => {
 
   const from = location.state?.redirectTo || '/dashboard';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -23,11 +23,17 @@ const Login = () => {
       setError('يرجى إدخال البريد/رقم الهاتف وكلمة المرور.');
       return;
     }
+    try{
+        await auth.login({ credential, password });
+        // 7.إذا كانت البيانات صحيحة التوجيه إلى المسار الصحيح
+        navigate(from, { replace: true });
 
-    auth.login({ credential, password });
+    } catch (err) {
+      // إذا كانت البيانات خاطئة أعرض الخطأ
+      setError(err.message);
+    }
+
     
-    // 7. التوجيه إلى المسار الصحيح
-    navigate(from, { replace: true });
   };
 
   return (

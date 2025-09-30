@@ -25,13 +25,19 @@ const TooltipWrapper = ({ content, children }) => {
 const DashboardLayout = () => {
     const navigate = useNavigate();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-    
-    const { isDashboardCollapsed, setIsDashboardCollapsed } = useAuth();
+    // --- CHANGE 1: Get the 'logout' function from the context ---
+    const { isDashboardCollapsed, setIsDashboardCollapsed, logout } = useAuth();
 
-    const handleLogoutConfirm = () => {
-        alert('تم تسجيل الخروج بنجاح!');
-        setIsLogoutModalOpen(false);
-        navigate('/login');
+    // --- CHANGE 2: Make this function 'async' and call the context's logout ---
+    const handleLogoutConfirm = async () => {
+        try {
+            await logout(); // This now calls our API and clears local storage
+            setIsLogoutModalOpen(false); // Close the modal
+            navigate('/login'); // Redirect the user to the login page
+        } catch (error) {
+            console.error("Logout failed:", error);
+            // Optionally, show an error message to the user
+        }
     };
 
     // The outer div is no longer needed, we return the elements directly
