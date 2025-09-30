@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('bedroom_num')->default(0);
             $table->unsignedSmallInteger('bathroom_num')->default(0);
             $table->unsignedSmallInteger('floor_num')->default(0);
-            $table->enum('building_status', ['جاهز', 'على الهيكل', 'قيد الإنشاء'])->default('Ready');
+            $table->enum('building_status', ['جاهز', 'على الهيكل', 'قيد الإنشاء'])->default('جاهز');
             $table->string('cladding_condition');
             $table->boolean('negotiable_check')->default(false);
             $table->string('video_url');
