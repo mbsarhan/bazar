@@ -36,7 +36,7 @@ const Header = () => {
                         + أضف إعلاناً
                     </button>
                     {user ? (
-                        <Link to="/dashboard" className="user-link">{user.name}</Link>
+                        <Link to="/dashboard" className="user-link">{user.fname}</Link>
                     ) : (
                         <Link to="/login" className="login-link">تسجيل الدخول</Link>
                     )}
