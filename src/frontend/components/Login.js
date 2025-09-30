@@ -41,7 +41,7 @@ const Login = () => {
       <div className="form-container">
         <h2>تسجيل الدخول</h2>
         {error && <div className="error-message">{error}</div>}
-        <form onSubmit={navigate(from, { replace: true })}>
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="credential">البريد الإلكتروني أو رقم الهاتف</label>
             <input
