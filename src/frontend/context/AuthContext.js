@@ -80,23 +80,53 @@ export const AuthProvider = ({ children }) => {
     };
 
     /**
-     * The NEW logout function that clears the token and user data.
+     * The NEW logout function.
+     * It calls the API to invalidate the token on the server,
+     * then cleans up the client-side state.
      */
-    const logout = () => {
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem('authToken');
+    const logout = async () => {
+        // We need the token to tell the server which session to end.
+        const currentToken = localStorage.getItem('authToken');
+        
+        // If for some reason there's no token, just clean up and exit.
+        if (!currentToken) {
+            setUser(null);
+            setToken(null);
+            return;
+        }
+
+        try {
+            // Make the POST request to the /api/logout endpoint
+            await fetch(`${API_URL}/logout`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    // This is the most important part: sending the user's token
+                    'Authorization': `Bearer ${currentToken}`,
+                },
+            });
+
+        } catch (error) {
+            console.error("API logout failed, but logging out locally anyway:", error);
+        } finally {
+            // This 'finally' block runs whether the API call succeeds or fails.
+            // This ensures the user is always logged out on the frontend.
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem('authToken');
+        }
     };
 
-    // The value provided to all components that use this context
-    const value = {
-        user,
-        token,
-        login,
-        logout,
-        isDashboardCollapsed,
-        setIsDashboardCollapsed
-    };
+    // Make sure the rest of your file (like the 'value' object and return statement) is correct.
+// The 'value' object should look like this:
+const value = {
+    user,
+    token,
+    login,
+    logout, // The new async logout function
+    isDashboardCollapsed,
+    setIsDashboardCollapsed
+};
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
