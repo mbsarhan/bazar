@@ -49,7 +49,7 @@ ChartJS.register(
 
 const DashboardOverview = () => {
     const { user } = useAuth();
-    const userName = user ? user.name : "المستخدم";
+    const userName = user ? user.fname : "المستخدم";
 
     // --- 1. Calculate Statistics ---
     const carStats = {
