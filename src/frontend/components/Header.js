@@ -1,38 +1,32 @@
-// src/components/Header.js
+// src/frontend/components/Header.js (Reverted to simple, consistent version)
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import '../styles/Header.css'; // ملف أنماط جديد
+import '../styles/Header.css';
 
 const Header = () => {
-    const { user, isDashboardCollapsed } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
-
-    const isDashboardPage = location.pathname.startsWith('/dashboard');
 
     const handleAddAdClick = () => {
         if (user) {
             navigate('/add-ad');
         } else {
-            // سنمرر معلومة إضافية لصفحة تسجيل الدخول
-            // لتخبرها إلى أين يجب أن تعود بعد النجاح
             navigate('/login', { state: { redirectTo: '/add-ad' } });
         }
     };
 
     const handleLogoClick = () => {
-        if (location.pathname === '/') {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
+        // This function ensures clicking the logo on the homepage scrolls to top
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     };
 
     return (
-        // 3. Apply a conditional class to the header
-        <header className={`main-header ${isDashboardPage ? 'on-dashboard' : ''} ${isDashboardCollapsed ? 'collapsed' : ''}`}>
+        // The header no longer has any conditional classes
+        <header className="main-header">
             <div className="header-content">
                 <Link to="/" className="logo" onClick={handleLogoClick}>
                     بازار

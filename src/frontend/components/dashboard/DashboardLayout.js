@@ -2,13 +2,30 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, User, Car, Home, Star, LogOut, PanelLeftClose, PanelRightClose } from 'lucide-react';
-import Modal from './Modal';
-import '../../styles/Dashboard.css';
 import { useAuth } from '../../context/AuthContext';
+import Modal from './Modal';
+import Tippy from '@tippyjs/react'; // 1. Import Tippy
+import 'tippy.js/dist/tippy.css'; // 2. Import the default tooltip styles
+import '../../styles/Dashboard.css';
+
+const TooltipWrapper = ({ content, children }) => {
+    const { isDashboardCollapsed } = useAuth();
+    return (
+        <Tippy 
+            content={content} 
+            placement="left" 
+            disabled={!isDashboardCollapsed}
+            theme="bazaar" // <-- ADD THIS LINE
+        >
+            {children}
+        </Tippy>
+    );
+};
 
 const DashboardLayout = () => {
     const navigate = useNavigate();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+    
     const { isDashboardCollapsed, setIsDashboardCollapsed } = useAuth();
 
     const handleLogoutConfirm = () => {
@@ -17,12 +34,11 @@ const DashboardLayout = () => {
         navigate('/login');
     };
 
+    // The outer div is no longer needed, we return the elements directly
     return (
-        // Apply a class to the container when collapsed
-        <div className={`dashboard-container ${isDashboardCollapsed ? 'collapsed' : ''}`}>
-            <aside className="dashboard-sidebar">
+        <div>
+            <aside className={`dashboard-sidebar ${isDashboardCollapsed ? 'collapsed' : ''}`}>
                 <div className="sidebar-header">
-                    {/* The text will be hidden with CSS when collapsed */}
                     <h3 className="sidebar-logo-text">بازار</h3>
                     <button className="sidebar-toggle-btn" onClick={() => setIsDashboardCollapsed(!isDashboardCollapsed)}>
                         {isDashboardCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
@@ -30,48 +46,61 @@ const DashboardLayout = () => {
                 </div>
                 <nav className="sidebar-nav">
                     <ul>
-                        {/* Each link now has an icon and a span for the text */}
+                        {/* 4. Wrap each link in the TooltipWrapper */}
                         <li>
-                            <NavLink to="/dashboard" end>
-                                <LayoutDashboard size={20} />
-                                <span>نظرة عامة</span>
-                            </NavLink>
+                            <TooltipWrapper content="نظرة عامة">
+                                <NavLink to="/dashboard" end>
+                                    <LayoutDashboard size={20} />
+                                    <span>نظرة عامة</span>
+                                </NavLink>
+                            </TooltipWrapper>
                         </li>
                         <li>
-                            <NavLink to="/dashboard/my-profile">
-                                <User size={20} />
-                                <span>معلوماتي الشخصية</span>
-                            </NavLink>
+                            <TooltipWrapper content="معلوماتي الشخصية">
+                                <NavLink to="/dashboard/my-profile">
+                                    <User size={20} />
+                                    <span>معلوماتي الشخصية</span>
+                                </NavLink>
+                            </TooltipWrapper>
                         </li>
                         <li>
-                            <NavLink to="/dashboard/car-ads">
-                                <Car size={20} />
-                                <span>إعلاناتي للسيارات</span>
-                            </NavLink>
+                            <TooltipWrapper content="إعلاناتي للسيارات">
+                                <NavLink to="/dashboard/car-ads">
+                                    <Car size={20} />
+                                    <span>إعلاناتي للسيارات</span>
+                                </NavLink>
+                            </TooltipWrapper>
                         </li>
                         <li>
-                            <NavLink to="/dashboard/real-estate-ads">
-                                <Home size={20} />
-                                <span>إعلاناتي للعقارات</span>
-                            </NavLink>
+                            <TooltipWrapper content="إعلاناتي للعقارات">
+                                <NavLink to="/dashboard/real-estate-ads">
+                                    <Home size={20} />
+                                    <span>إعلاناتي للعقارات</span>
+                                </NavLink>
+                            </TooltipWrapper>
                         </li>
                         <li>
-                            <NavLink to="/dashboard/reviews">
-                                <Star size={20} />
-                                <span>تقييماتي</span>
-                            </NavLink>
+                            <TooltipWrapper content="تقييماتي">
+                                <NavLink to="/dashboard/reviews">
+                                    <Star size={20} />
+                                    <span>تقييماتي</span>
+                                </NavLink>
+                            </TooltipWrapper>
                         </li>
                     </ul>
                 </nav>
                 <div className="sidebar-footer">
-                    <button onClick={() => setIsLogoutModalOpen(true)} className="logout-btn">
-                        <LogOut size={20} />
-                        <span>تسجيل الخروج</span>
-                    </button>
+                    <TooltipWrapper content="تسجيل الخروج">
+                        <button onClick={() => setIsLogoutModalOpen(true)} className="logout-btn">
+                            <LogOut size={20} />
+                            <span>تسجيل الخروج</span>
+                        </button>
+                    </TooltipWrapper>
                 </div>
             </aside>
 
-            <main className="dashboard-content">
+            {/* The main content area also gets the collapsed class to adjust its margin */}
+            <main className={`dashboard-content ${isDashboardCollapsed ? 'collapsed' : ''}`}>
                 <Outlet />
             </main>
 
