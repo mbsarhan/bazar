@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate,useLocation } from 'react-router-dom';
 import '../styles/forms.css';
 
 const SignUp = () => {
@@ -11,7 +11,10 @@ const SignUp = () => {
     const [error, setError] = useState(''); // This will now always be a string
     const [success, setSuccess] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    //const navigate = useNavigate(); commented for wating
+    const navigate = useNavigate(); //commented for wating
+
+    const location = useLocation();
+    const from = location.state?.redirectTo || '/login';
 
     const api_url = 'http://127.0.0.1:8000/api';
 
@@ -59,6 +62,7 @@ const SignUp = () => {
             }
 
             setSuccess('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.');
+            navigate(from, { replace: true });
 
         } catch (err) {
             setError(err.message); // Set the error as a plain string
