@@ -22,10 +22,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|string|email',
+            // --- UPDATED RULE FOR 'credential' ---
+            'credential' => 'required|string', // We'll handle email/phone detection in the controller
             'password' => 'required|string',
-
         ];
     }
 }
-//sadasdasdasdasdasdas
