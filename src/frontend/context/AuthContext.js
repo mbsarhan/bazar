@@ -50,17 +50,19 @@ export const AuthProvider = ({ children }) => {
      * It will be called from your Login.js component.
      */
     const login = async (credentials) => {
-        // Your form uses 'credential', but our API expects 'email'
+        // --- THIS IS THE KEY CHANGE HERE ---
+        // Your Login.js component is already sending { credential, password }
+        // So we can directly use 'credential' here.
         const loginPayload = {
-            email: credentials.credential,
+            credential: credentials.credential, // Send the credential as is
             password: credentials.password
         };
 
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
             body: JSON.stringify(loginPayload),
         });
