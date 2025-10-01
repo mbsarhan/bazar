@@ -7,36 +7,32 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            // 'password' => 'required|string|min:8|confirmed',
+
+            // --- THIS IS THE UPDATED LOGIC ---
+            // The email must be a valid email and unique, but it's only required if the phone field is not present.
+            'email' => 'required_without:phone|nullable|string|email|max:255|unique:users',
+            
+            // The phone is only required if the email field is not present.
+            'phone' => 'required_without:email|nullable|string|max:255',
+
             'password' => [
                 'required',
                 'string',
                 'confirmed',
                 Password::min(8)
-                    ->mixedCase() // يتطلب حروفاً كبيرة وصغيرة
-                    ->numbers(),   // يتطلب أرقاماً
+                    ->mixedCase()
+                    ->numbers(),
             ],
-            'phone' => 'required|string|max:255',
         ];
     }
 }
-//asdasdasdsadasdad
