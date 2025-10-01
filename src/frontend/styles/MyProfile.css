@@ -1,0 +1,51 @@
+/* src/frontend/styles/MyProfile.css */
+.profile-page-wrapper {
+    max-width: 700px;
+    /* This is the key: auto margins on left and right will center the block */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.profile-form-container {
+    max-width: 700px; /* A comfortable width for a profile page */
+    background-color: var(--color-bg-card);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-border-subtle);
+    margin-bottom: 30px; /* Space between the two form containers */
+}
+
+/* We reuse the 'form-row' class from forms.css for the name fields */
+
+/* Style for disabled input fields */
+.form-group input:disabled {
+    background-color: var(--color-bg-page);
+    cursor: not-allowed;
+    color: #888;
+}
+
+.email-display-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.email-display-wrapper input {
+    flex-grow: 1; /* Make the input take up the available space */
+}
+
+.change-btn {
+    padding: 10px 20px;
+    background-color: var(--color-bg-page);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    color: var(--color-text-dark);
+}
+
+.change-btn:hover {
+    background-color: #e0e0e0;
+}
