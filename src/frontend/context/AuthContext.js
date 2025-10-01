@@ -69,10 +69,13 @@ export const AuthProvider = ({ children }) => {
 
         const result = await response.json();
 
+        // This part is crucial for showing validation errors from the service
         if (!response.ok) {
-            // If the API returns an error (e.g., wrong password),
-            // throw an error so the Login.js component can display it.
-            throw new Error(result.message || 'Login failed.');
+            let errorMessage = result.message;
+            if (result.errors && result.errors.credential) {
+                errorMessage = result.errors.credential[0]; // Get the specific error message
+            }
+            throw new Error(errorMessage || 'Login failed.');
         }
 
         // --- On Success ---
