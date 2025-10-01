@@ -56,11 +56,25 @@ class AuthService
     public function login(array $data): array
     {
         try {
-            $user = User::where('email', $data['email'])->first();
+            // --- THIS IS THE NEW LOGIC ---
+            $credential = $data['credential'];
+            $password = $data['password'];
 
-            if (! $user || ! Hash::check($data['password'], $user->password)) {
+            $user = null;
+
+            // Determine if the credential is an email or a phone number
+            if (filter_var($credential, FILTER_VALIDATE_EMAIL)) {
+                // It's an email, find the user by email.
+                $user = User::where('email', $credential)->first();
+            } else {
+                // It's not an email, assume it's a phone number.
+                $user = User::where('phone', $credential)->first();
+            }
+
+            if (! $user || ! Hash::check($password, $user->password)) {
                 throw ValidationException::withMessages([
-                    'email' => ['The provided credentials do not match our records.'],
+                    // Use 'credential' as the key to match the form field
+                    'credential' => ['بيانات الاعتماد المقدمة غير صحيحة.'],
                 ]);
             }
 
@@ -68,30 +82,15 @@ class AuthService
 
             return [
                 'message' => 'تمت عملية تسجيل الدخول بنجاح',
-                // 'user' => $user,
                 'access_token' => $token,
-                // 'token_type' => 'Bearer',
+                'user' => $user, // It's good practice to return the user object on login
             ];
         } catch (ValidationException $e) {
-            // Log invalid login attempts separately
-            Log::warning('Login validation failed', [
-                'error' => $e->getMessage(),
-                'data'  => $data,
-            ]);
-
-            throw $e; // rethrow so controller handles validation errors correctly
+            // This allows Laravel's default handling of validation errors (422 response)
+            throw $e;
         } catch (Exception $e) {
-            // Log unexpected errors
-            Log::error('Login failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'data'  => $data,
-            ]);
-
-            return [
-                'message' => 'فشل تسجيل الدخول الرجاء إعادة المحاولة',
-                'error'   => $e->getMessage(),
-            ];
+            Log::error('Login failed', ['error' => $e->getMessage()]);
+            return ['message' => 'فشل تسجيل الدخول الرجاء إعادة المحاولة'];
         }
     }
 }
