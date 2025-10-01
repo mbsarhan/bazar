@@ -20,7 +20,15 @@ class RegisterRequest extends FormRequest
 
             // --- THIS IS THE UPDATED LOGIC ---
             // The email must be a valid email and unique, but it's only required if the phone field is not present.
-            'email' => 'required_without:phone|nullable|string|email|max:255|unique:users',
+            'email' => [
+                'required_without:phone',
+                'nullable',
+                'string',
+                'email',
+                'max:255',
+                'unique:users',
+                'regex:/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|edu|org|net)$/i',
+            ],
             
             // The phone is only required if the email field is not present.
             'phone' => [

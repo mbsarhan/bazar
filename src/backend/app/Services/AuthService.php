@@ -31,9 +31,6 @@ class AuthService
 
             return [
                 'message' => 'تمت عملية تسجيل المستخدم بنجاح',
-                // 'user' => $user,
-                // 'access_token' => $token,
-                // 'token_type' => 'Bearer',
             ];
         } catch (Exception $e) {
             // Log the error for debugging
