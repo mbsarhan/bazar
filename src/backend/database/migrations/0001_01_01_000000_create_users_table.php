@@ -16,9 +16,9 @@ return new class extends Migration
             $table->id();
             $table->string('fname');
             $table->string('lname');
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('phone');
+            $table->string('phone')->unique()->nullable();
             $table->string('password');
             $table->boolean('admin');
             $table->decimal('review');
