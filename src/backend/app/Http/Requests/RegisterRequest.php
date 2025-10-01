@@ -23,7 +23,14 @@ class RegisterRequest extends FormRequest
             'email' => 'required_without:phone|nullable|string|email|max:255|unique:users',
             
             // The phone is only required if the email field is not present.
-            'phone' => 'required_without:email|nullable|string|max:255',
+            'phone' => [
+                'required_without:email',
+                'nullable',
+                'string',
+                'unique:users',
+                'regex:/^\+?[0-9]{7,15}$/'
+            ],
+
 
             'password' => [
                 'required',
