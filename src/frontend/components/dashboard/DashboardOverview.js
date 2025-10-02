@@ -171,7 +171,7 @@ const DashboardOverview = () => {
                 </div>
                 <div className="stat-card stat-card-sold">
                     <h2>{carStats.sold}</h2>
-                    <p>إعلانات سيارات مباعة</p>
+                    <p>إعلانات سيارات مباعة أو مؤجرة</p>
                 </div>
             </div>
 

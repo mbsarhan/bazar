@@ -2,12 +2,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import { AuthProvider } from './context/AuthContext';
 import 'rc-slider/assets/index.css';
 
-// Import all your components
+import { AuthProvider } from './context/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
-import Header from './components/Header'; // The main site header
+
+// --- Import pages and layouts ---
+import Header from './components/Header';
 import HomePage from './components/HomePage';
 import AdDetailPage from './components/AdDetailPage';
 import Login from './components/Login';
@@ -18,10 +19,11 @@ import AddAdChoice from './components/AddAdChoice';
 import AddCarForm from './components/AddCarForm';
 import AddRealEstateForm from './components/AddRealEstateForm';
 
-// Import Dashboard components
+// --- Import Dashboard Layout and its pages ---
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import DashboardOverview from './components/dashboard/DashboardOverview';
 import MyProfile from './components/dashboard/MyProfile';
+import SecuritySettings from './components/dashboard/SecuritySettings'; // Make sure this is imported
 import MyCarAds from './components/dashboard/MyCarAds';
 import MyRealEstateAds from './components/dashboard/MyRealEstateAds';
 import Reviews from './components/dashboard/Reviews';
@@ -32,11 +34,10 @@ function App() {
     <AuthProvider>
       <Router>
         <ScrollToTop />
-        {/* The Header is now here, so it will appear on EVERY page */}
         <Header /> 
         
         <Routes>
-          {/* Public Routes no longer need a special layout */}
+          {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/ad/:adId" element={<AdDetailPage />} />
           <Route path="/login" element={<Login />} />
@@ -51,11 +52,12 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardOverview />} />
             <Route path="my-profile" element={<MyProfile />} />
+            <Route path="security-settings" element={<SecuritySettings />} />
             <Route path="car-ads" element={<MyCarAds />} />
             <Route path="real-estate-ads" element={<MyRealEstateAds />} />
             <Route path="reviews" element={<Reviews />} />
           </Route>
-        
+
         </Routes>
       </Router>
     </AuthProvider>

@@ -49,3 +49,48 @@
 .change-btn:hover {
     background-color: #e0e0e0;
 }
+
+.security-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
+
+.security-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.security-option-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-bg-card);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border-subtle);
+}
+
+.option-icon {
+    color: var(--color-text-dark);
+    margin-left: 20px; /* RTL equivalent of margin-right */
+}
+
+.option-details {
+    flex-grow: 1; /* This pushes the button to the far left */
+}
+
+.option-details h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.option-details .current-value {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+    direction: ltr; /* Force LTR for emails and passwords */
+    text-align: right; /* Align the LTR text to the right */
+}

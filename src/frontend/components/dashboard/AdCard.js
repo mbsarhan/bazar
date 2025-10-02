@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
     GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench, 
-    Home, Square, BedDouble, Bath, ChevronLeft, ChevronRight, Eye
+    Home, Square, ChevronLeft, ChevronRight, Eye
 } from 'lucide-react';
 
 // أيقونات SVG بسيطة للأزرار
