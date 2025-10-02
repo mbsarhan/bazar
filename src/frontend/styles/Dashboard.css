@@ -436,3 +436,33 @@
 .stat-card-sold h2 {
     color: #e74c3c; /* Red */
 }
+
+/* ============================================= */
+/* 10. Ad Card View Counter Styles                */
+/* ============================================= */
+.ad-card-views {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    /* Create the ribbon shape */
+    padding: 10px 15px 10px 20px;
+    border-bottom-right-radius: 16px; /* Rounded corner to complete the look */
+    
+    /* The "Frosted Glass" effect */
+    background-color: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    /* Text and Icon styling */
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* Add a subtle shadow for readability */
+    z-index: 5;
+    
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

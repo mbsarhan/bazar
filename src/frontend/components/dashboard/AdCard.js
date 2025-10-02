@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
     GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench, 
-    Home, Square, BedDouble, Bath, ChevronLeft, ChevronRight,
+    Home, Square, BedDouble, Bath, ChevronLeft, ChevronRight, Eye
 } from 'lucide-react';
 
 // أيقونات SVG بسيطة للأزرار
@@ -21,7 +21,7 @@ const AdCard = ({ ad, isPublic = false }) => {
         return '';
     };
     
-    const formatNumber = (num) => num ? num.toLocaleString('en-US') : 'غير محدد';
+    const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
     
     const prevSlide = (e) => {
         e.stopPropagation();
@@ -51,6 +51,10 @@ const AdCard = ({ ad, isPublic = false }) => {
             <Link to={`/ad/${ad.id}`} className="ad-card-clickable-area">
                 <div className="ad-card-image">
                     <img src={ad.imageUrls[currentIndex]} alt={ad.title} />
+                    <div className="ad-card-views">
+                        <Eye size={16} />
+                        <span>{formatNumber(ad.views)}</span>
+                    </div>
                     
                     {/* 5. إضافة الأسهم والنقاط (ستظهر فقط إذا كان هناك أكثر من صورة) */}
                     {ad.imageUrls.length > 1 && (
