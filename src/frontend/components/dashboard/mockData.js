@@ -82,3 +82,34 @@ export const realEstateAdsData = [
         location: 'دمشق، الصالحية', status: 'مؤجر', propertyType: 'محل تجاري', area: 50, bedrooms: 0, bathrooms: 1,
     }
 ];
+
+// src/frontend/components/dashboard/mockData.js
+
+// --- ADD THIS AT THE END OF THE FILE ---
+export const userReviewsData = {
+    averageRating: 4.7,
+    totalReviews: 3,
+    reviews: [
+        {
+            id: 1,
+            reviewerName: 'أحمد',
+            rating: 5,
+            comment: 'بائع محترم وصادق، السيارة كانت تماماً كما في الوصف. أنصح بالتعامل معه.',
+            date: '20 سبتمبر 2025'
+        },
+        {
+            id: 2,
+            reviewerName: 'سارة',
+            rating: 4.5,
+            comment: 'تجربة جيدة جداً، كان هناك تأخير بسيط في التسليم ولكن العقار كان رائعاً.',
+            date: '15 أغسطس 2025'
+        },
+        {
+            id: 3,
+            reviewerName: 'خالد',
+            rating: 4,
+            comment: 'كل شيء كان جيداً.',
+            date: '5 يوليو 2025'
+        }
+    ]
+};

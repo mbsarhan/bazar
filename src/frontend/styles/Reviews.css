@@ -1,0 +1,120 @@
+/* src/frontend/styles/Reviews.css (Final Version with LTR Stars) */
+
+.reviews-page-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* --- Star Rating Component Styles --- */
+.star-rating {
+    display: flex;
+    gap: 2px;
+    /* --- THIS IS THE FIX --- */
+    /* This forces the stars inside this container to align left-to-right */
+    direction: ltr;
+}
+
+.half-star {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+}
+
+/* This half-star logic is for LTR, which is now correct */
+.half-star::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0; /* Hide the right half of the star */
+    width: 50%;
+    height: 100%;
+    background-color: var(--color-bg-card); /* Use the card's background color to hide */
+    z-index: 1;
+}
+
+/* --- Average Rating Summary Styles --- */
+.average-rating-summary {
+    background-color: var(--color-bg-card);
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+}
+
+.average-rating-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.average-rating-header h2 {
+    margin: 0;
+}
+
+.average-rating-header p {
+    margin: 0;
+    color: #666;
+}
+
+.average-rating-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.average-rating-number {
+    font-size: 3rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+/* --- Individual Review Card Styles --- */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-card {
+    background-color: var(--color-bg-card);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border-subtle);
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.reviewer-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+}
+
+.review-date {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.review-comment {
+    margin: 0;
+    line-height: 1.7;
+    font-style: italic;
+    color: #555;
+    padding-right: 10px;
+    border-right: 3px solid var(--color-border-subtle);
+}
