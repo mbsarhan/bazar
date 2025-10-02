@@ -102,8 +102,6 @@ const AdCard = ({ ad, isPublic = false }) => {
                                 <div className="spec-item"><Home size={16} /><span>{ad.propertyType}</span></div>
                                 <div className="spec-item"><Square size={16} /><span>{ad.area} م²</span></div>
                                 <div className="spec-item"><MapPin size={16} /><span>{ad.location}</span></div>
-                                <div className="spec-item"><BedDouble size={16} /><span>{ad.bedrooms} غرف نوم</span></div>
-                                <div className="spec-item"><Bath size={16} /><span>{ad.bathrooms} حمامات</span></div>
                             </>
                         )}
                     </div>
