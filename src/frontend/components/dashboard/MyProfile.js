@@ -1,14 +1,28 @@
 // src/frontend/components/dashboard/MyProfile.js
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import Modal from './Modal';
 import '../../styles/forms.css'; // Reusing global form styles
 import '../../styles/MyProfile.css'; // New specific styles for this page
+import { useAuth } from '../../context/AuthContext';
 
 const MyProfile = () => {
-    const [firstName, setFirstName] = useState('اسم');
-    const [lastName, setLastName] = useState('المستخدم');
-    const [email, setEmail] = useState("user@example.com");
-    const [phone, setPhone] = useState("0912345678"); // 1. Add phone state
+    const { user } = useAuth();
+
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (user) {
+            setFirstName(user.fname || '');
+            setLastName(user.lname || '');
+            setEmail(user.email || '');
+            setPhone(user.phone || ''); 
+            setIsLoading(false);
+        }
+    }, [user]);
 
     // --- State for Modals ---
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
@@ -241,6 +255,15 @@ const MyProfile = () => {
             );
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="profile-page-wrapper">
+                <div className="content-header"><h1>معلوماتي الشخصية</h1></div>
+                <p>جاري تحميل البيانات...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="profile-page-wrapper"> 
