@@ -1,6 +1,6 @@
 // src/frontend/components/dashboard/MyProfile.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Modal from './Modal';
 import '../../styles/forms.css';
@@ -8,16 +8,17 @@ import '../../styles/MyProfile.css';
 
 const MyProfile = () => {
     const { user } = useAuth();
-    const navigate = useNavigate(); // Hook for navigation
+    const navigate = useNavigate();
 
-    // State for editable info
+    // --- State for editable info (Name) ---
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
 
-    // State for password verification modal
+    // --- State for the Password Verification Modal ---
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     
+    // --- State for Feedback ---
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -36,13 +37,19 @@ const MyProfile = () => {
         setSuccessMessage('تم تحديث الاسم بنجاح!');
     };
 
-    // This function handles the password verification
+    // This is the "Gateway" function
     const handlePasswordVerification = () => {
         setError('');
-        // SIMULATION: Check password
-        if (currentPassword === 'password') { // Use a dummy password for now
+        if (!currentPassword) {
+            setError('يرجى إدخال كلمة المرور.');
+            return;
+        }
+        
+        // SIMULATION: In a real app, you would verify this password against the backend
+        if (currentPassword === 'password') { 
             setIsPasswordModalOpen(false);
-            // On success, navigate to the new security page
+            setCurrentPassword(''); // Clear password field
+            // ON SUCCESS: Navigate to the new, unlocked security page
             navigate('/dashboard/security-settings');
         } else {
             setError('كلمة المرور غير صحيحة.');
@@ -52,12 +59,12 @@ const MyProfile = () => {
     return (
         <div className="profile-page-wrapper">
             <div className="content-header">
-                <h1>معلوماتي الشخصية</h1>
+                <h1>ملفي الشخصي</h1>
             </div>
 
             {successMessage && <div className="success-message" style={{marginBottom: '20px'}}>{successMessage}</div>}
 
-            {/* --- Simple Profile Information Form --- */}
+            {/* --- Profile Information Form --- */}
             <div className="profile-form-container">
                 <form onSubmit={handleInfoSubmit}>
                     <fieldset>
@@ -77,13 +84,13 @@ const MyProfile = () => {
                 </form>
             </div>
 
-            {/* --- Security Section --- */}
+            {/* --- Security Section with ONE Button --- */}
             <div className="profile-form-container">
                 <fieldset>
                     <legend>معلومات الأمان</legend>
                     <div className="form-group">
                         <label>البريد الإلكتروني، رقم الهاتف، وكلمة المرور</label>
-                        <p className="security-note">لتغيير معلوماتك الحساسة، ستحتاج إلى تأكيد كلمة المرور الخاصة بك.</p>
+                        <p className="security-note">لتغيير معلوماتك الحساسة، ستحتاج إلى تأكيد كلمة المرور الخاصة بك أولاً.</p>
                         <button type="button" className="change-btn" onClick={() => setIsPasswordModalOpen(true)}>
                             تعديل معلومات الأمان
                         </button>
