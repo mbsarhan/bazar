@@ -6,13 +6,17 @@ import '../../styles/MyProfile.css'; // New specific styles for this page
 import { useAuth } from '../../context/AuthContext';
 
 const MyProfile = () => {
-    const { user } = useAuth();
+
+    const { user, updatePassword } = useAuth();
+
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+
+
 
     useEffect(() => {
         if (user) {
@@ -105,19 +109,28 @@ const MyProfile = () => {
         }
     };
 
-    const handlePasswordSubmit = () => {
-        clearMessages(true); // Clear messages inside the modal
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            setError('يرجى ملء جميع حقول كلمة المرور.');
-            return;
+    const handlePasswordSubmit = async () => {
+        clearMessages(true); // Clear previous messages in the modal
+
+        try {
+            // Prepare data in the format the API expects
+            const passwordData = {
+                current_password: currentPassword,
+                password: newPassword,
+                password_confirmation: confirmPassword,
+            };
+
+            // Call the context function
+            const result = await updatePassword(passwordData);
+
+            // On success
+            setSuccessMessage(result.message || 'تم تغيير كلمة المرور بنجاح!');
+            closePasswordModal();
+
+        } catch (error) {
+            // On failure (e.g., validation error from Laravel)
+            setError(error.message);
         }
-        if (newPassword !== confirmPassword) {
-            setError('كلمتا المرور الجديدتان غير متطابقتين.');
-            return;
-        }
-        console.log('Changing password...');
-        setSuccessMessage('تم تغيير كلمة المرور بنجاح!');
-        closePasswordModal();
     };
 
     const handlePhoneChangeFlow = () => {
@@ -380,3 +393,7 @@ const MyProfile = () => {
 };
 
 export default MyProfile;
+
+
+
+///sadasdasdasdasdsadasd
