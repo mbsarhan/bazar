@@ -29,6 +29,9 @@ class UpdatePasswordRequest extends FormRequest
                 'required',
                 'string',
                 'confirmed', // Ensures 'password_confirmation' field matches.
+                // --- ADD THIS NEW RULE ---
+                // It ensures the new password is not the same as the current one.
+                'different:current_password',
                 Password::min(8)
                     ->mixedCase()
                     ->numbers(),
