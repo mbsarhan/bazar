@@ -59,18 +59,18 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    //  public function sendEmailVerificationNotification()
-    // {
-    //     $code = random_int(100000, 999999);
-    //     $expiresAt = now()->addMinutes(10); // Standardize to 10 minutes
+     public function sendEmailVerificationNotification()
+    {
+        $code = random_int(100000, 999999);
+        $expiresAt = now()->addMinutes(10); 
 
-    //     $this->forceFill([
-    //         'verification_code' => $code,
-    //         'verification_code_expires_at' => $expiresAt,
-    //     ])->save();
+        $this->forceFill([
+            'verification_code' => $code,
+            'verification_code_expires_at' => $expiresAt,
+        ])->save();
 
-    //     $this->notify(new VerifyEmailWithOtp($code));
-    // }
+        $this->notify(new VerifyEmailWithOtp($code));
+    }
 
 
        public function advertisements()

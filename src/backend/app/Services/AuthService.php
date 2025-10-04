@@ -6,20 +6,15 @@ use Exception;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use App\Notifications\VerifyEmailWithOtp;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\Events\Registered; // You might still need this if you manually fire it later
+
 
 class AuthService
 {
-    /**
-     * Handle user registration
-     */
+
     public function register(array $data): array
     {
         try {
-            $verificationCode = rand(100000, 999999);
             $user = User::create([
                 'fname'                        => $data['fname'],
                 'lname'                        => $data['lname'],
@@ -29,21 +24,12 @@ class AuthService
                 'admin'                        => false,
                 'review'                       => 0,
                 'total_view'                   => 0,
-                'verification_code'            => $verificationCode,
-                'verification_code_expires_at' => now()->addMinutes(10),
             ]);
-
-        Mail::raw("Your verification code is: {$verificationCode}", function ($message) use ($user) {
-        $message->to($user->email)
-                ->subject('Email Verification Code');
-        });
             
         $message = 'تمت عملية تسجيل المستخدم بنجاح.'; // Default success message
 
         if ($user->email) {
-                // $user->sendEmailVerificationNotification();
-                // $user->notify(new VerifyEmailWithOtp($verificationCode));
-                //  event(new Registered($user)); هذه اذا اردنا ان يكون التحقق بضغطة زر وليس عن طريق الرقم
+                $user->sendEmailVerificationNotification();
                 $message = 'تمت عملية تسجيل المستخدم بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك';
             }
 
@@ -53,6 +39,7 @@ class AuthService
 
             return [
                 'message' => $message,
+                'access_token' => $token,
             ];
         } catch (Exception $e) {
             Log::error('Register failed', [

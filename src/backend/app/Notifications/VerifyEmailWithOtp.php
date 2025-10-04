@@ -2,17 +2,15 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
 
-class VerifyEmailWithOtp extends Notification implements ShouldQueue
+class VerifyEmailWithOtp extends Notification 
 {
-    use Queueable;
-
+    
+    
     public $verificationCode;
-
+    //use 'implements ShouldQueue' and in the body 'use Queueable' for mor perfomance
     /**
      * Create a new notification instance.
      */

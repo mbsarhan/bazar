@@ -28,11 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user'])->name('user');
 });
 
-Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
-        ->name('verification.verify');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/email/verify/resend', [VerificationController::class, 'resend'])
          ->name('verification.resend')
          ->middleware('throttle:6,1'); // Limit resends
 });
+
+// Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+//         ->name('verification.verify');
