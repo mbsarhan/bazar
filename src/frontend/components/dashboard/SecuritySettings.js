@@ -83,6 +83,11 @@ const SecuritySettings = () => {
         return `${name.substring(0, 1)}***@${domain}`;
     };
 
+    const obscurePhone = (phoneStr) => {
+        if(!phoneStr) return '';
+        return `09*****${phoneStr.substring(7,10)}`;
+    }
+
     return (
         <div className="profile-page-wrapper">
             <div className="content-header">
@@ -103,7 +108,7 @@ const SecuritySettings = () => {
                     <div className="option-icon"><Phone size={24} /></div>
                     <div className="option-details">
                         <h3>رقم الهاتف</h3>
-                        <p className="current-value">{phone}</p>
+                        <p className="current-value">{obscurePhone(phone)}</p>
                     </div>
                     <button className="change-btn" onClick={() => setIsPhoneModalOpen(true)}>تعديل</button>
                 </div>
