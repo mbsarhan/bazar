@@ -43,7 +43,7 @@ class AuthService
         if ($user->email) {
                 // $user->sendEmailVerificationNotification();
                 // $user->notify(new VerifyEmailWithOtp($verificationCode));
-                 event(new Registered($user)); 
+                //  event(new Registered($user)); هذه اذا اردنا ان يكون التحقق بضغطة زر وليس عن طريق الرقم
                 $message = 'تمت عملية تسجيل المستخدم بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك';
             }
 
