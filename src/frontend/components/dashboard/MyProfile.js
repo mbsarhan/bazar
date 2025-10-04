@@ -50,7 +50,7 @@ const MyProfile = () => {
             setIsPasswordModalOpen(false);
             setCurrentPassword(''); // Clear password field
             // ON SUCCESS: Navigate to the new, unlocked security page
-            navigate('/dashboard/security-settings');
+            navigate('/dashboard/my-profile/security-settings');
         } else {
             setError('كلمة المرور غير صحيحة.');
         }

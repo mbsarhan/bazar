@@ -52,7 +52,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardOverview />} />
             <Route path="my-profile" element={<MyProfile />} />
-            <Route path="security-settings" element={<SecuritySettings />} />
+            <Route path="my-profile/security-settings" element={<SecuritySettings />} />
             <Route path="car-ads" element={<MyCarAds />} />
             <Route path="real-estate-ads" element={<MyRealEstateAds />} />
             <Route path="reviews" element={<Reviews />} />
