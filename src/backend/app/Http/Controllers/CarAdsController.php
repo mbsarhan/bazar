@@ -36,7 +36,7 @@ class CarAdsController extends Controller
      */
     public function show(CarAds $carAds)
     {
-        //
+
     }
 
     /**

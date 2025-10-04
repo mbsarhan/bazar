@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('lname');
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('verification_code', 6)->nullable(); 
+            $table->timestamp('verification_code_expires_at')->nullable();
             $table->string('phone')->unique()->nullable();
             $table->string('password');
             $table->boolean('admin');
