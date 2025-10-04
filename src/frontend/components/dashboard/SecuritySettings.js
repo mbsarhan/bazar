@@ -1,50 +1,101 @@
-// src/frontend/components/dashboard/SecuritySettings.js
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Modal from './Modal';
-import { Mail, Phone, Lock } from 'lucide-react'; // Icons for our list
+import { Mail, Phone, Lock } from 'lucide-react';
 import '../../styles/forms.css';
-import '../../styles/MyProfile.css'; // We will add the new styles here
+import '../../styles/MyProfile.css';
 
 const SecuritySettings = () => {
     const { user } = useAuth();
 
-    // --- State for Modals (we will reuse our existing logic) ---
-    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
-    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-    const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+    // --- State for Display ---
+    const [email, setEmail] = useState(user?.email || 'user@example.com');
+    const [phone, setPhone] = useState(user?.phone || '0912345678');
     
-    // ... (All the other state variables for the modal flows remain the same)
-    const [email, setEmail] = useState(user?.email || '');
-    const [phone, setPhone] = useState(user?.phone_number || '');
-    // ... etc.
+    // --- State for Modals ---
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-    // ... (All handler functions: handleEmailChangeFlow, handlePasswordSubmit, etc. remain the same)
-    // You can copy them from your previous version of MyProfile.js if needed.
-    const handleEmailChangeFlow = () => { console.log("Handling Email Change..."); };
-    const handlePasswordSubmit = () => { console.log("Handling Password Change..."); };
-    const handlePhoneChangeFlow = () => { console.log("Handling Phone Change..."); };
-    const closeEmailModal = () => setIsEmailModalOpen(false);
-    const closePasswordModal = () => setIsPasswordModalOpen(false);
-    const closePhoneModal = () => setIsPhoneModalOpen(false);
+    // --- State for Modal Forms ---
+    const [newEmail, setNewEmail] = useState('');
+    const [newPhone, setNewPhone] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    
+    // --- State for Feedback ---
+    const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
+    // --- Handlers for each simple, one-step modal ---
+    const handleEmailUpdate = () => {
+        setError('');
+        if (!newEmail || !newEmail.includes('@')) {
+            setError('يرجى إدخال بريد إلكتروني صالح.');
+            return;
+        }
+        // SIMULATION: API call to update email, then trigger verification
+        console.log("Updating email to:", newEmail);
+        setEmail(newEmail);
+        setSuccessMessage('تم تحديث البريد الإلكتروني بنجاح (قد تحتاج إلى التحقق).');
+        closeEmailModal();
+    };
 
-    // --- Helper function to partially hide email for display ---
-    const obscureEmail = (email) => {
-        const [name, domain] = email.split('@');
-        if (!name || !domain) return email;
+    const handlePhoneUpdate = () => {
+        setError('');
+        if (!newPhone || newPhone.length < 9) {
+            setError('يرجى إدخال رقم هاتف صالح.');
+            return;
+        }
+        // SIMULATION: API call to update phone, then trigger verification
+        console.log("Updating phone to:", newPhone);
+        setPhone(newPhone);
+        setSuccessMessage('تم تحديث رقم الهاتف بنجاح (قد تحتاج إلى التحقق).');
+        closePhoneModal();
+    };
+
+    const handlePasswordUpdate = () => {
+        setError('');
+        if (!newPassword || !confirmPassword) {
+            setError('يرجى ملء حقلي كلمة المرور.');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setError('كلمتا المرور غير متطابقتين.');
+            return;
+        }
+        // SIMULATION: API call to update password
+        console.log("Updating password...");
+        setSuccessMessage('تم تغيير كلمة المرور بنجاح!');
+        closePasswordModal();
+    };
+
+    // --- Modal close handlers ---
+    const closeEmailModal = () => { setIsEmailModalOpen(false); setNewEmail(''); setError(''); };
+    const closePhoneModal = () => { setIsPhoneModalOpen(false); setNewPhone(''); setError(''); };
+    const closePasswordModal = () => { setIsPasswordModalOpen(false); setNewPassword(''); setConfirmPassword(''); setError(''); };
+
+    const obscureEmail = (emailStr) => {
+        if (!emailStr) return '';
+        const [name, domain] = emailStr.split('@');
+        if (!name || !domain) return emailStr;
         return `${name.substring(0, 1)}***@${domain}`;
     };
+
+    const obscurePhone = (phoneStr) => {
+        if(!phoneStr) return '';
+        return `09*****${phoneStr.substring(7,10)}`;
+    }
 
     return (
         <div className="profile-page-wrapper">
             <div className="content-header">
                 <h1>إعدادات الأمان</h1>
             </div>
+            {successMessage && <div className="success-message" style={{marginBottom: '20px'}}>{successMessage}</div>}
 
-            {/* --- The NEW List-Based Layout --- */}
             <div className="security-options-list">
-                {/* Email Option */}
                 <div className="security-option-item">
                     <div className="option-icon"><Mail size={24} /></div>
                     <div className="option-details">
@@ -53,18 +104,14 @@ const SecuritySettings = () => {
                     </div>
                     <button className="change-btn" onClick={() => setIsEmailModalOpen(true)}>تعديل</button>
                 </div>
-
-                {/* Phone Option */}
                 <div className="security-option-item">
                     <div className="option-icon"><Phone size={24} /></div>
                     <div className="option-details">
                         <h3>رقم الهاتف</h3>
-                        <p className="current-value">{phone}</p>
+                        <p className="current-value">{obscurePhone(phone)}</p>
                     </div>
                     <button className="change-btn" onClick={() => setIsPhoneModalOpen(true)}>تعديل</button>
                 </div>
-
-                {/* Password Option */}
                 <div className="security-option-item">
                     <div className="option-icon"><Lock size={24} /></div>
                     <div className="option-details">
@@ -75,16 +122,39 @@ const SecuritySettings = () => {
                 </div>
             </div>
 
-            {/* --- Modals (These are now triggered by the buttons above) --- */}
-            {/* Note: The logic inside these modals remains the same as your previous MyProfile.js file */}
-            <Modal isOpen={isEmailModalOpen} onClose={closeEmailModal} onConfirm={handleEmailChangeFlow} title="تغيير البريد الإلكتروني">
-                {/* ... JSX for email change flow ... */}
+            {/* --- SIMPLE, ONE-STEP MODALS --- */}
+            <Modal isOpen={isEmailModalOpen} onClose={closeEmailModal} onConfirm={handleEmailUpdate} title="تعديل البريد الإلكتروني">
+                {error && isEmailModalOpen && <div className="error-message">{error}</div>}
+                <div className="form-group">
+                    <label>البريد الإلكتروني الجديد</label>
+                    <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+                </div>
             </Modal>
-            <Modal isOpen={isPhoneModalOpen} onClose={closePhoneModal} onConfirm={handlePhoneChangeFlow} title="تغيير رقم الهاتف">
-                {/* ... JSX for phone change flow ... */}
+
+            <Modal isOpen={isPhoneModalOpen} onClose={closePhoneModal} onConfirm={handlePhoneUpdate} title="تعديل رقم الهاتف">
+                {error && isPhoneModalOpen && <div className="error-message">{error}</div>}
+                <div className="form-group">
+                    <label>رقم الهاتف الجديد</label>
+                    <input type="tel" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
+                </div>
             </Modal>
-             <Modal isOpen={isPasswordModalOpen} onClose={closePasswordModal} onConfirm={handlePasswordSubmit} title="تغيير كلمة المرور">
-                {/* ... JSX for password change flow ... */}
+
+             <Modal isOpen={isPasswordModalOpen} onClose={closePasswordModal} onConfirm={handlePasswordUpdate} title="تغيير كلمة المرور">
+                {error && isPasswordModalOpen && <div className="error-message">{error}</div>}
+                <div className="form-group">
+                    <label>كلمة المرور الجديدة</label>
+                    <div className="input-with-icon">
+                        <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} autoComplete="new-password"/>
+                        <span className={`password-toggle-icon ${showPassword ? 'visible' : 'hidden'}`} onClick={() => setShowPassword(!showPassword)}></span>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label>تأكيد كلمة المرور الجديدة</label>
+                    <div className="input-with-icon">
+                        <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password"/>
+                        <span className={`password-toggle-icon ${showPassword ? 'visible' : 'hidden'}`} onClick={() => setShowPassword(!showPassword)}></span>
+                    </div>
+                </div>
             </Modal>
         </div>
     );
