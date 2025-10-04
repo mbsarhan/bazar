@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController; // Add this line
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CarAdController; // <-- 1. IMPORT
 
 /*
 |--------------------------------------------------------------------------
@@ -26,4 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user'])->name('user');
         // --- 2. ADD THIS NEW ROUTE FOR UPDATING THE PASSWORD ---
     Route::post('/user/password', [UserController::class, 'updatePassword']);
+    // --- 2. ADD THIS NEW ROUTE ---
+    Route::post('/car-ads', [CarAdController::class, 'store']);
 });

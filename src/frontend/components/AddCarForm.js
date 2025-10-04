@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAds } from '../context/AdContext'; // <-- 1. IMPORT THE NEW HOOK
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
 
@@ -14,18 +15,20 @@ const UploadIcon = () => (
 
 const AddCarForm = () => {
     const navigate = useNavigate();
+    const { createCarAd } = useAds(); // <-- 2. GET THE FUNCTION FROM THE CONTEXT
+    // This state object is now perfect. Do not change it.
     const [formData, setFormData] = useState({
-        dealType: 'بيع',
+        transaction_type: 'بيع',
         manufacturer: '',
         model: '',
-        condition: 'مستعملة',
-        transmission: 'أوتوماتيك',
-        fuelType: 'بنزين',
-        year: '',
-        mileage: '',
+        status: 'مستعملة',
+        gear: 'أوتوماتيك',
+        fule_type: 'بانزين',
+        model_year: '',
+        distance_traveled: '',
         price: '',
-        isNegotiable: false,
-        province: 'دمشق',
+        negotiable_check: false,
+        governorate: 'دمشق',
         city: '',
         description: '',
     });
@@ -43,6 +46,7 @@ const AddCarForm = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        // Map frontend names to backend names
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
         // إزالة الخطأ من الحقل عند بدء الكتابة فيه
         if (errors[name]) {
@@ -81,18 +85,17 @@ const AddCarForm = () => {
         setExtraImages(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
         setErrors({});
-
         const newErrors = {};
 
         // التحقق من الحقول النصية الإلزامية
         if (!formData.manufacturer) newErrors.manufacturer = true;
         if (!formData.model) newErrors.model = true;
-        if (!formData.year) newErrors.year = true;
-        if (!formData.mileage) newErrors.mileage = true;
+        if (!formData.model_year) newErrors.model_year = true;
+        if (!formData.distance_traveled) newErrors.distance_traveled = true;
         if (!formData.price) newErrors.price = true;
         if (!formData.city) newErrors.city = true;
 
@@ -109,10 +112,45 @@ const AddCarForm = () => {
             window.scrollTo(0, 0);
             return;
         }
+        // --- Build the FormData object ---
+        const adData = new FormData();
 
-        console.log('بيانات الإعلان:', { ...formData, mandatoryImages, extraImages });
-        alert('تم إرسال الإعلان للمراجعة بنجاح!');
-        navigate('/dashboard');
+        // Append all text/number/boolean fields
+        // --- THIS IS THE FIX ---
+        // We will loop through the formData and handle the boolean conversion.
+        for (const key in formData) {
+            if (key === 'negotiable_check') {
+                // If the key is our checkbox, convert the boolean to '1' or '0'
+                adData.append(key, formData[key] ? '1' : '0');
+            } else {
+                // For all other fields, append the value as is.
+                adData.append(key, formData[key]);
+            }
+        }
+
+        // Append mandatory image files
+        for (const key in mandatoryImages) {
+            if (mandatoryImages[key]) {
+                adData.append(key, mandatoryImages[key]);
+            }
+        }
+        
+        // Append extra image files as an array
+        extraImages.forEach((file) => {
+            adData.append('extra_images[]', file);
+        });
+
+        // --- Call the API ---
+        try {
+            const result = await createCarAd(adData);
+            alert(result.message); // Show success message from the server
+            navigate('/dashboard'); // Redirect on success
+        } catch (error) {
+            // THE FIX: Set the error message as a plain string.
+            // The API error.message already contains newline characters (\n).
+            setErrorMessage(error.message);
+            window.scrollTo(0, 0); // Scroll to top to show the error
+        }
     };
 
     const dealTypes = ['بيع', 'إيجار'];
@@ -150,16 +188,25 @@ const AddCarForm = () => {
         <div className="form-container wide-form">
             <h2>أضف إعلان سيارة جديد</h2>
             <p className="form-subtitle">املأ التفاصيل التالية لنشر إعلانك</p>
+            {/* 
+              --- THIS IS THE CORRECTED JSX ---
+              We render the error message directly and use CSS `white-space`
+              to respect the newline characters from the API error.
+            */}
 
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
+            {errorMessage && (
+                <div className="error-message" style={{ whiteSpace: 'pre-line' }}>
+                    {errorMessage}
+                </div>
+            )}
 
             <form onSubmit={handleSubmit}>
                 <fieldset>
                     <legend>المعلومات الأساسية</legend>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="dealType">نوع الصفقة *</label>
-                            <select id="dealType" name="dealType" value={formData.dealType} onChange={handleChange}>
+                            <label htmlFor="transaction_type">نوع الصفقة *</label>
+                            <select id="transaction_type" name="transaction_type" value={formData.transaction_type} onChange={handleChange}>
                                 {dealTypes.map(type => <option key={type} value={type}>{type}</option>)}
                             </select>
                         </div>
@@ -172,12 +219,12 @@ const AddCarForm = () => {
                             <input type="text" id="model" name="model" value={formData.model} onChange={handleChange} className={errors.model ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="year">سنة الصنع *</label>
-                            <input type="number" id="year" name="year" value={formData.year} onChange={handleChange} placeholder="مثال: 2022" className={errors.year ? 'input-error' : ''} />
+                            <label htmlFor="model_year">سنة الصنع *</label>
+                            <input type="number" id="model_year" name="model_year" value={formData.model_year} onChange={handleChange} placeholder="مثال: 2022" className={errors.model_year ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="condition">الحالة</label>
-                            <select id="condition" name="condition" value={formData.condition} onChange={handleChange}>{conditions.map(c => <option key={c} value={c}>{c}</option>)}</select>
+                            <label htmlFor="status">الحالة</label>
+                            <select id="status" name="status" value={formData.status} onChange={handleChange}>{conditions.map(c => <option key={c} value={c}>{c}</option>)}</select>
                         </div>
                     </div>
                 </fieldset>
@@ -187,23 +234,23 @@ const AddCarForm = () => {
                     <legend>المواصفات الفنية</legend>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="transmission">ناقل الحركة *</label>
-                            <select id="transmission" name="transmission" value={formData.transmission} onChange={handleChange}
-                                className={errors.transmission ? 'input-error' : ''}>
+                            <label htmlFor="gear">ناقل الحركة *</label>
+                            <select id="gear" name="gear" value={formData.gear} onChange={handleChange}
+                                className={errors.gear ? 'input-error' : ''}>
                                 {transmissions.map(t => <option key={t} value={t}>{t}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="fuelType">نوع الوقود *</label>
-                            <select id="fuelType" name="fuelType" value={formData.fuelType} onChange={handleChange}
-                                className={errors.fuelType ? 'input-error' : ''}>
+                            <label htmlFor="fule_type">نوع الوقود *</label>
+                            <select id="fule_type" name="fule_type" value={formData.fule_type} onChange={handleChange}
+                                className={errors.fule_type ? 'input-error' : ''}>
                                 {fuelTypes.map(f => <option key={f} value={f}>{f}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="mileage">المسافة المقطوعة (كم) *</label>
-                            <input type="number" id="mileage" name="mileage" value={formData.mileage} onChange={handleChange}
-                                placeholder="مثال: 50000" className={errors.mileage ? 'input-error' : ''} />
+                            <label htmlFor="distance_traveled">المسافة المقطوعة (كم) *</label>
+                            <input type="number" id="distance_traveled" name="distance_traveled" value={formData.distance_traveled} onChange={handleChange}
+                                placeholder="مثال: 50000" className={errors.distance_traveled ? 'input-error' : ''} />
                         </div>
                     </div>
                 </fieldset>
@@ -216,13 +263,13 @@ const AddCarForm = () => {
                             <label htmlFor="price">السعر (دولار أمريكي) *</label>
                             <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                             <div className="checkbox-group">
-                                <input type="checkbox" id="isNegotiable" name="isNegotiable" checked={formData.isNegotiable} onChange={handleChange} />
-                                <label htmlFor="isNegotiable">السعر قابل للتفاوض</label>
+                                <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
+                                <label htmlFor="negotiable_check">السعر قابل للتفاوض</label>
                             </div>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="province">المحافظة *</label>
-                            <select id="province" name="province" value={formData.province} onChange={handleChange}>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select>
+                            <label htmlFor="governorate">المحافظة *</label>
+                            <select id="governorate" name="governorate" value={formData.governorate} onChange={handleChange}>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="city">المدينة / المنطقة *</label>
