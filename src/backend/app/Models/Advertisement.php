@@ -13,6 +13,7 @@ class Advertisement extends Model
         'price',
         'description',
         'transaction_type',
+        'ad_status', // <-- ADD THIS LINE
         'governorate',
         'city',
         'views_count',

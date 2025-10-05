@@ -32,9 +32,34 @@ export const AdProvider = ({ children }) => {
 
         return result;
     };
+    /**
+     * NEW FUNCTION: Fetches the car ads for the logged-in user.
+     */
+    const getMyCarAds = async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) throw new Error('User not authenticated.');
 
+        const response = await fetch(`${API_URL}/user/car-ads`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to fetch ads.');
+        }
+
+        // The API now returns a 'data' key because we used a Resource Collection
+        return result.data;
+    };
+
+     // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd }}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds}}>
             {children}
         </AdContext.Provider>
     );

@@ -87,4 +87,20 @@ class CarAdService
             }
         }
     }
+    /**
+     * Get all car ads for a specific user.
+     */
+    public function getAdsForUser(User $user)
+    {
+        // 1. Start with the Advertisement model
+        return Advertisement::where('owner_id', $user->id)
+            // 2. Only get ads that have car details (this filters out real estate ads)
+            ->has('carDetails')
+            // 3. Eager-load the necessary relationships to prevent N+1 query problems
+            ->with(['carDetails', 'carDetails.ImagesForCar'])
+            // 4. Order by the most recently created
+            ->latest()
+            // 5. Get the results
+            ->get();
+    }
 }

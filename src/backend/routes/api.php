@@ -27,6 +27,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user'])->name('user');
         // --- 2. ADD THIS NEW ROUTE FOR UPDATING THE PASSWORD ---
     Route::post('/user/password', [UserController::class, 'updatePassword']);
+    // --- ADD THE NEW ROUTE and keep the existing one for creating ---
+    Route::get('/user/car-ads', [CarAdController::class, 'indexByUser']);
     // --- 2. ADD THIS NEW ROUTE ---
     Route::post('/car-ads', [CarAdController::class, 'store']);
 });
