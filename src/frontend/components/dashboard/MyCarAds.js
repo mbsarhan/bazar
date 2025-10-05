@@ -9,6 +9,10 @@ const [ads, setAds] = useState([]);
 const [isLoading, setIsLoading] = useState(true);
 const [error, setError] = useState(null);
 const { getMyCarAds } = useAds(); // 3. Get the function from the context
+
+
+
+
 useEffect(() => {
     const fetchAds = async () => {
         try {
@@ -22,6 +26,11 @@ useEffect(() => {
         }
     };fetchAds();
 }, []); // The empty array [] ensures this runs only once on mount
+
+
+
+
+
 // 5. Render content based on the state
 if (isLoading) {
     return <p>جاري تحميل الإعلانات...</p>;
@@ -39,7 +48,8 @@ return (
         <div className="ads-list-container">
             {ads.length > 0 ? (
                 ads.map(ad => (
-                    <AdCard key={ad.id} ad={ad} />
+                    <AdCard key={ad.id} ad={ad}
+                            />
                 ))
             ) : (
                 <p>ليس لديك أي إعلانات سيارات منشورة حالياً.</p>

@@ -56,6 +56,7 @@ export const AdProvider = ({ children }) => {
         // The API now returns a 'data' key because we used a Resource Collection
         return result.data;
     };
+    
 
      // Add the new function to the provider's value
     return (
