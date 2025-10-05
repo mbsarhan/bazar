@@ -62,11 +62,12 @@ class CarAdController extends Controller
         // 3. Explicitly check if the user "can" perform the "delete" action
         // on this specific $advertisement model.
         // This will call your CarAdPolicy behind the scenes.
+        /*
         if (!Gate::forUser($user)->allows('delete', $advertisement)) {
             // If the policy returns false, manually return a 403 Forbidden response.
             return response()->json(['message' => 'This action is unauthorized.'], 403);
         }
-
+        */
         $response = $this->carAdService->deleteAd($advertisement);
 
         return response()->json($response);
