@@ -8,6 +8,7 @@ use App\Models\CarAds;
 use App\Models\CarAdImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Exception;
 
@@ -102,5 +103,33 @@ class CarAdService
             ->latest()
             // 5. Get the results
             ->get();
+    }
+    /**
+     * Delete a car ad and its associated images.
+     */
+    public function deleteAd(Advertisement $advertisement): array
+    {
+        return DB::transaction(function () use ($advertisement) {
+            try {
+                // 1. Delete images from storage
+                $images = $advertisement->carDetails->ImagesForCar;
+                foreach ($images as $image) {
+                    Storage::disk('public')->delete($image->image_url);
+                }
+
+                // 2. Delete the advertisement from the database.
+                // Cascade constraints will handle deleting related records.
+                $advertisement->delete();
+
+                return ['message' => 'تم حذف الإعلان بنجاح.'];
+
+            } catch (Exception $e) {
+                Log::error('Failed to delete car ad', [
+                    'ad_id' => $advertisement->id,
+                    'error' => $e->getMessage(),
+                ]);
+                throw $e; // Rethrow to return a server error
+            }
+        });
     }
 }

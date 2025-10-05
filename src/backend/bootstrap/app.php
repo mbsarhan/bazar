@@ -27,4 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    // --- THIS IS THE CORRECT WAY TO ADD THE PROVIDER ---
+    // It is chained directly onto the Application configuration object
+    // before the ->create() method is called.
+    ->withProviders([
+        App\Providers\AuthServiceProvider::class,
+    ])->create();

@@ -31,4 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/car-ads', [CarAdController::class, 'indexByUser']);
     // --- 2. ADD THIS NEW ROUTE ---
     Route::post('/car-ads', [CarAdController::class, 'store']);
+    // --- ADD THIS NEW ROUTE FOR DELETING ---
+    Route::delete('/car-ads/{advertisement}', [CarAdController::class, 'destroy']);
 });
