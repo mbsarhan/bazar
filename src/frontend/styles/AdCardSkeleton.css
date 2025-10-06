@@ -1,0 +1,88 @@
+/* src/frontend/styles/AdCardSkeleton.css (LinkedIn Shimmer Style) */
+
+.ad-card-skeleton {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 16px;
+    overflow: hidden; /* This is crucial for the shimmer effect */
+    display: flex;
+    flex-direction: column;
+}
+
+/* This is the base style for all shimmering elements */
+.skeleton {
+    background-color: #f0f0f0; /* The base color of the placeholder */
+    position: relative;
+    overflow: hidden;
+}
+
+/* This is the shimmering animation */
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* The shimmer is a moving gradient */
+    background: linear-gradient(
+        to right, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.6) 50%, 
+        transparent 100%
+    );
+    /* Start the shimmer off-screen to the left */
+    transform: translateX(-100%);
+    /* Define the animation */
+    animation: shimmer 1.5s infinite;
+}
+
+/* The keyframes that move the gradient from left to right */
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+
+/* --- Defining the shapes of the placeholders --- */
+
+.shimmer-image {
+    height: 200px;
+}
+
+.skeleton-details {
+    padding: 20px;
+}
+
+.shimmer-line {
+    height: 1rem;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.shimmer-line.title {
+    width: 70%;
+    height: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.shimmer-line.price {
+    width: 40%;
+    height: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.skeleton-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.shimmer-line.spec {
+    height: 0.85rem;
+    width: 80%;
+    margin-bottom: 0;
+}
