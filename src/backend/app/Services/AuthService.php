@@ -2,38 +2,46 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 use Exception;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
 
 class AuthService
 {
-    /**
-     * Handle user registration
-     */
+
     public function register(array $data): array
     {
         try {
             $user = User::create([
-                'fname'       => $data['fname'],
-                'lname'       => $data['lname'],
-                'email'       => $data['email'] ?? null,
-                'phone'       => $data['phone'] ?? null,
-                'password'    => Hash::make($data['password']),
-                'admin'       => false,
-                'review'      => 0,
-                'total_view'  => 0,
+                'fname'                        => $data['fname'],
+                'lname'                        => $data['lname'],
+                'email'                        => $data['email'] ?? null,
+                'phone'                        => $data['phone'] ?? null,
+                'password'                     => Hash::make($data['password']),
+                'admin'                        => false,
+                'review'                       => 0,
+                'total_view'                   => 0,
             ]);
+            
+        $message = 'تمت عملية تسجيل المستخدم بنجاح.'; // Default success message
+
+        if ($user->email) {
+                $user->sendEmailVerificationNotification();
+                $message = 'تمت عملية تسجيل المستخدم بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك';
+            }
+
+
 
             $token = $user->createToken('authToken')->plainTextToken;
 
             return [
-                'message' => 'تمت عملية تسجيل المستخدم بنجاح',
+                'message' => $message,
+                'access_token' => $token,
             ];
         } catch (Exception $e) {
-            // Log the error for debugging
             Log::error('Register failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -47,13 +55,10 @@ class AuthService
         }
     }
 
-    /**
-     * Handle user login
-     */
-    public function login(array $data): array
+
+       public function login(array $data): array
     {
         try {
-            // --- THIS IS THE NEW LOGIC ---
             $credential = $data['credential'];
             $password = $data['password'];
 
@@ -74,16 +79,22 @@ class AuthService
                     'credential' => ['بيانات الاعتماد المقدمة غير صحيحة.'],
                 ]);
             }
+            
+            // Check this user has verify his email
+            if (! $user->hasVerifiedEmail()) {
+                throw ValidationException::withMessages([
+                    'credential' => ['الرجاء التحقق من بريدك الإلكتروني قبل تسجيل الدخول.'],
+                ]);
+            }
 
             $token = $user->createToken('authToken')->plainTextToken;
 
             return [
                 'message' => 'تمت عملية تسجيل الدخول بنجاح',
                 'access_token' => $token,
-                'user' => $user, // It's good practice to return the user object on login
+                'user' => $user, 
             ];
         } catch (ValidationException $e) {
-            // This allows Laravel's default handling of validation errors (422 response)
             throw $e;
         } catch (Exception $e) {
             Log::error('Login failed', ['error' => $e->getMessage()]);

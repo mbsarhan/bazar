@@ -3,13 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Http\Controllers\UserRatingsController;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Notifications\VerifyEmailWithOtp;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail 
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -30,6 +31,8 @@ class User extends Authenticatable
         'admin',
         'review',
         'total_view',
+        'verification_code',         
+        'verification_code_expires_at',
     ];
 
     /**
@@ -51,8 +54,22 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'verification_code_expires_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+     public function sendEmailVerificationNotification()
+    {
+        $code = random_int(100000, 999999);
+        $expiresAt = now()->addMinutes(10); 
+
+        $this->forceFill([
+            'verification_code' => $code,
+            'verification_code_expires_at' => $expiresAt,
+        ])->save();
+
+        $this->notify(new VerifyEmailWithOtp($code));
     }
 
 
@@ -73,4 +90,3 @@ class User extends Authenticatable
 
   
 }
-//asdasdasddasas/asdasdsadasdasdasd
