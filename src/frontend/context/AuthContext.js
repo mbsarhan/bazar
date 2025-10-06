@@ -122,6 +122,40 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    /**
+     * NEW FUNCTION: Updates the user's password via the API.
+     * @param {object} passwordData - { current_password, password, password_confirmation }
+     */
+    const updatePassword = async (passwordData) => {
+        const currentToken = localStorage.getItem('authToken');
+        if (!currentToken) {
+            throw new Error('User is not authenticated.');
+        }
+
+        const response = await fetch(`${API_URL}/user/password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${currentToken}`,
+            },
+            body: JSON.stringify(passwordData),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            // This will catch validation errors from Laravel (e.g., wrong current_password)
+            let errorMessage = result.message;
+            if (result.errors) {
+                errorMessage = Object.values(result.errors).flat().join('\n');
+            }
+            throw new Error(errorMessage || 'Failed to update password.');
+        }
+
+        return result; // Return the success response
+    };
+
     // Make sure the rest of your file (like the 'value' object and return statement) is correct.
 // The 'value' object should look like this:
 const value = {
@@ -129,6 +163,7 @@ const value = {
     token,
     login,
     logout, // The new async logout function
+    updatePassword, // <-- ADD THIS
     isDashboardCollapsed,
     setIsDashboardCollapsed
 };
@@ -140,3 +175,8 @@ const value = {
 export const useAuth = () => {
     return useContext(AuthContext);
 };
+
+
+
+
+///sadasdasdasdasdsadasd

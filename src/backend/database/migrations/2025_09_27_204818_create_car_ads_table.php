@@ -16,6 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('ads_id') ->constrained('advertisements')->onDelete('cascade');
             $table->string('manufacturer');
+            $table->string('model');
             $table->year('model_year'); 
             $table->enum('status', ['جديدة', 'مستعملة', 'متضررة'])->default('مستعملة');
             $table->enum('gear', ['عادي', 'أوتوماتيك', 'الإثنان معا']);
