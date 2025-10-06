@@ -24,6 +24,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
 
+Route::get('/car-ads/{id}', [CarAdsController::class,'show']);
 // Protected routes (require Sanctum authentication)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

@@ -105,6 +105,20 @@ class CarAdService
             // 5. Get the results
             ->get();
     }
+     public function getAdById($ad_id)
+    {
+        try
+        {
+            $ad = Advertisement::where('id', $ad_id)->get();
+            return $ad;
+        }
+        catch(Exception $e)
+        {
+            Log::error('Error show CarAd info : '.$e->getMessage());
+            throw new Exception($e->getMessage());
+        }
+    }
+
     public function deleteCarAd(Advertisement $ad): bool // 2. TYPE-HINT the correct model
     {
         /*

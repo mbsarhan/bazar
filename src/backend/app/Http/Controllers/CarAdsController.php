@@ -64,9 +64,10 @@ class CarAdsController extends Controller
      * Display the specified resource.
      */
     
-    public function show(CarAds $carAds)
+    public function show($ad_id)
     {
-
+        $ad = $this->carAdService->getAdById($ad_id) ;
+        return $ad ;
     }
 
     /**
