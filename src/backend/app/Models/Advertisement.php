@@ -10,6 +10,7 @@ class Advertisement extends Model
 
     protected $fillable = [
         'owner_id',
+        'title',
         'price',
         'description',
         'transaction_type',

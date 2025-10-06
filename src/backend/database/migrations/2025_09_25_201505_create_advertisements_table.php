@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('advertisements', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
             $table->timestamps();
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->decimal('price')->default(0.0);

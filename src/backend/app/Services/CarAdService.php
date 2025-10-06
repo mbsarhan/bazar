@@ -22,6 +22,7 @@ class CarAdService
                 // 1. Create the base Advertisement
                 $advertisement = Advertisement::create([
                     'owner_id'         => $user->id,
+                    'title'            => $data['manufacturer']." ".$data['model']." ".$data['model_year'],
                     'price'            => $data['price'],
                     'description'      => $data['description'] ?? '',
                     'transaction_type' => $data['transaction_type'],
