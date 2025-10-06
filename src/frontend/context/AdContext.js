@@ -56,11 +56,36 @@ export const AdProvider = ({ children }) => {
         // The API now returns a 'data' key because we used a Resource Collection
         return result.data;
     };
-    
+    /**
+     * NEW FUNCTION: Deletes a specific car ad by its ID.
+     */
+    const deleteCarAd = async (adId) => {
+        const token = localStorage.getItem('authToken');
+        if (!token) throw new Error('User not authenticated.');
+
+        // The endpoint is now DELETE /api/car-ads/{adId}
+        const response = await fetch(`${API_URL}/car-ads/${adId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            // This will catch errors, including the 403 Forbidden error from the policy
+            throw new Error(result.message || 'Failed to delete ad.');
+        }
+
+        return result;
+    };
+
 
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd}}>
             {children}
         </AdContext.Provider>
     );

@@ -9,6 +9,7 @@ use App\Models\CarAdImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage; // 1. IMPORT
 use Exception;
 
 class CarAdService
@@ -102,5 +103,38 @@ class CarAdService
             ->latest()
             // 5. Get the results
             ->get();
+    }
+    public function deleteCarAd(Advertisement $ad): bool // 2. TYPE-HINT the correct model
+    {
+        /*
+        // code with ABD before the latest Ai way
+        try{
+            $Ad = User::findOrFail($carAd_id) ;
+            return $Ad->delete();
+
+        }catch(Exception $e){
+            Log::error('Error Deleting Car AD : ' . $e->getMessage()) ;
+        }
+        */
+        return DB::transaction(function () use ($ad) {
+            try {
+                // 3. Delete associated images from storage
+                $ad->load(['carDetails', 'carDetails.ImagesForCar']);
+
+                if ($ad->carDetails && $ad->carDetails->ImagesForCar) {
+                    foreach ($ad->carDetails->ImagesForCar as $image) {
+                        Storage::disk('public')->delete($image->image_url);
+                    }
+                }
+
+                // 4. Delete the advertisement record from the database.
+                // Cascading deletes will handle the rest.
+                return $ad->delete();
+
+            } catch (Exception $e) {
+                Log::error('Error Deleting Car Ad', ['ad_id' => $ad->id, 'error' => $e->getMessage()]);
+                return false;
+            }
+        });
     }
 }

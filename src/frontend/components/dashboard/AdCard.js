@@ -13,7 +13,7 @@ const ViewIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="non
 
 
 // Receive the 'onDelete' prop
-const AdCard = ({ ad, isPublic = false}) => {
+const AdCard = ({ ad, isPublic = false,onDelete}) => {
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const getStatusClass = (status) => {
@@ -114,7 +114,7 @@ const AdCard = ({ ad, isPublic = false}) => {
                 <div className="ad-card-actions">
                     <button className="action-btn view-btn"><ViewIcon /> عرض</button>
                     <button className="action-btn edit-btn"><EditIcon /> تعديل</button>
-                    <button className="action-btn delete-btn"><DeleteIcon /> حذف</button>
+                    <button className="action-btn delete-btn" onClick={onDelete}><DeleteIcon /> حذف</button>
                 </div>
             )}
         </div>
