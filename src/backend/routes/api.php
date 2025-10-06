@@ -24,17 +24,13 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
 
+Route::get('/car-ads/{id}', [CarAdsController::class,'show']);
 // Protected routes (require Sanctum authentication)
 Route::middleware('auth:sanctum')->group(function () {
-
-
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/user', [AuthController::class, 'user'])->name('user');
         // --- 2. ADD THIS NEW ROUTE FOR UPDATING THE PASSWORD ---
     Route::post('/user/password', [UserController::class, 'updatePassword']);
-
-
-
     Route::resource('CarAds', CarAdsController::class);
     // --- ADD THE NEW ROUTE and keep the existing one for creating ---
     Route::get('/user/car-ads', [CarAdsController::class, 'index']);
