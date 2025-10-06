@@ -66,6 +66,4 @@ class VerificationController extends Controller
         return response()->json($result, 200);
     }
 
-    // Keep the commented out 'verify' method if you intend to use it later,
-    // but its logic would also move to the service.
 }

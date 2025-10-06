@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VerificationController;
-use App\Http\Controllers\AuthController; // Add this line
+use App\Http\Controllers\AuthController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
          ->name('verification.resend')
          ->middleware('throttle:6,1'); // Limit resends
 });
+
 
 // Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
 //         ->name('verification.verify');
