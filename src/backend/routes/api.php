@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\CarAdsController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\RealestateAdsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,10 +43,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/car-ads', [CarAdsController::class, 'store']);
     Route::delete('/car-ads/{ad}', [CarAdsController::class,'destroy']);
 
-
+  
+  
+    // Route::resource('realestate-ads', RealestateAdsController::class)->only(['show']);  
     
 });
 
+Route::resource('realestate-ads', RealestateAdsController::class);    
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/email/verify/resend', [VerificationController::class, 'resend'])
