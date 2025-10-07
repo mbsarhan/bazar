@@ -1,30 +1,28 @@
-// src/components/dashboard/AdCard.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-    GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench, 
-    Home, Square, ChevronLeft, ChevronRight, Eye
+    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, 
+    GitCommitVertical, Fuel, Wrench, Home, Square, BedDouble, 
+    Eye, Edit, Trash2, ExternalLink
 } from 'lucide-react';
 
-// أيقونات SVG بسيطة للأزرار
-const EditIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>;
-const DeleteIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>;
-const ViewIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>;
+// Re-defining these here for completeness as simple functional components
+const EditIcon = () => <Edit size={16} />;
+const DeleteIcon = () => <Trash2 size={16} />;
+const ViewIcon = () => <ExternalLink size={16} />;
 
-
-// Receive the 'onDelete' prop
-const AdCard = ({ ad, isPublic = false,onDelete}) => {
-
+const AdCard = ({ ad, isPublic = false, onDelete }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+
     const getStatusClass = (status) => {
         if (status === 'فعال') return 'status-active';
         if (status === 'قيد المراجعة') return 'status-pending';
         if (status === 'مباع' || status === 'مؤجر') return 'status-sold';
         return '';
     };
-    
+
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
-    
+
     const prevSlide = (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -33,7 +31,6 @@ const AdCard = ({ ad, isPublic = false,onDelete}) => {
         setCurrentIndex(newIndex);
     };
 
-    // Logic for NEXT slide
     const nextSlide = (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -48,46 +45,75 @@ const AdCard = ({ ad, isPublic = false,onDelete}) => {
         setCurrentIndex(slideIndex);
     };
 
+    // --- Advanced Dynamic Dots Logic ---
+    const getVisibleDots = () => {
+        const total = ad.imageUrls.length;
+        if (total <= 3) {
+            return Array.from({ length: total }, (_, i) => ({ index: i, size: 'normal' }));
+        }
+
+        if (currentIndex === 0 || currentIndex === 1) {
+            return [{ index: 0, size: 'normal' }, { index: 1, size: 'normal' }, { index: 2, size: 'normal' }];
+        }
+        if (currentIndex >= 2 && currentIndex <= total - 3) {
+            return [
+                { index: currentIndex - 1, size: 'small' },
+                { index: currentIndex, size: 'normal' },
+                { index: currentIndex + 1, size: 'small' }
+            ];
+        }
+        if (currentIndex === total - 2 || currentIndex === total - 1) {
+            return [
+                { index: total - 3, size: 'normal' },
+                { index: total - 2, size: 'normal' },
+                { index: total - 1, size: 'normal' }
+            ];
+        }
+        return [];
+    };
+
+    // Stop propagation on delete button to prevent navigation
+    const handleDeleteClick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onDelete();
+    };
+
+
     return (
         <div className="ad-card">
             <Link to={`/ad/${ad.id}`} className="ad-card-clickable-area">
                 <div className="ad-card-image">
                     <img src={ad.imageUrls[currentIndex]} alt={ad.title} />
+                    
                     <div className="ad-card-views">
                         <Eye size={16} />
                         <span>{formatNumber(ad.views)}</span>
                     </div>
-                    
-                    {/* 5. إضافة الأسهم والنقاط (ستظهر فقط إذا كان هناك أكثر من صورة) */}
+
                     {ad.imageUrls.length > 1 && (
                         <>
-                            {/* الأسهم */}
                             <button className="nav-arrow left" onClick={prevSlide}><ChevronLeft size={24} /></button>
                             <button className="nav-arrow right" onClick={nextSlide}><ChevronRight size={24} /></button>
                             
-                            {/* النقاط */}
                             <div className="pagination-dots">
-                                {ad.imageUrls.map((_, index) => (
+                                {getVisibleDots().map((dotInfo) => (
                                     <div
-                                        key={index}
-                                        className={`dot ${currentIndex === index ? 'active' : ''}`}
-                                        onClick={(e) => goToSlide(e, index)}
+                                        key={dotInfo.index}
+                                        className={`dot ${currentIndex === dotInfo.index ? 'active' : ''} ${dotInfo.size === 'small' ? 'small' : ''}`}
+                                        onClick={(e) => goToSlide(e, dotInfo.index)}
                                     />
                                 ))}
                             </div>
                         </>
                     )}
-                    {!isPublic && (
-                        <span className={`ad-card-status ${getStatusClass(ad.status)}`}>
-                            {ad.status}
-                        </span>
-                    )}
+
+                    {!isPublic && ( <span className={`ad-card-status ${getStatusClass(ad.status)}`}>{ad.status}</span> )}
                 </div>
                 <div className="ad-card-details">
                     <h3>{ad.title}</h3>
                     <p className="ad-card-price">{ad.price}</p>
                     <div className="ad-card-specs">
-                        {/* Car Specs */}
                         {ad.year && (
                             <>
                                 <div className="spec-item"><Wrench size={16} /><span>{ad.condition}</span></div>
@@ -98,12 +124,12 @@ const AdCard = ({ ad, isPublic = false,onDelete}) => {
                                 <div className="spec-item"><Fuel size={16} /><span>{ad.fuelType}</span></div>
                             </>
                         )}
-                        {/* Real Estate Specs */}
                         {ad.propertyType && (
                             <>
                                 <div className="spec-item"><Home size={16} /><span>{ad.propertyType}</span></div>
-                                <div className="spec-item"><Square size={16} /><span>{ad.area} م²</span></div>
                                 <div className="spec-item"><MapPin size={16} /><span>{ad.location}</span></div>
+                                <div className="spec-item"><Square size={16} /><span>{ad.area} م²</span></div>
+                                <div className="spec-item"><BedDouble size={16} /><span>{ad.bedrooms} غرف نوم</span></div>
                             </>
                         )}
                     </div>
@@ -114,7 +140,7 @@ const AdCard = ({ ad, isPublic = false,onDelete}) => {
                 <div className="ad-card-actions">
                     <button className="action-btn view-btn"><ViewIcon /> عرض</button>
                     <button className="action-btn edit-btn"><EditIcon /> تعديل</button>
-                    <button className="action-btn delete-btn" onClick={onDelete}><DeleteIcon /> حذف</button>
+                    <button className="action-btn delete-btn" onClick={handleDeleteClick}><DeleteIcon /> حذف</button>
                 </div>
             )}
         </div>
