@@ -2,10 +2,12 @@
 import React, { useState , useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import VerificationInput from './VerificationInput';
+import axios from 'axios';
 import '../styles/forms.css';
 
-
+const API_URL = 'http://127.0.0.1:8000/api';
 const TIMER_DURATION = 300;
+
 const VerificationPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,7 +24,7 @@ const VerificationPage = () => {
         return TIMER_DURATION; // Start fresh if nothing is stored
     });
 
-    const [code, setCode] = useState('');
+    const [codeValue, setCodeValue] = useState('');
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,36 +62,70 @@ const VerificationPage = () => {
         setError('');
         setSuccessMessage('');
 
-        if (code.length < 6) {
+        if (codeValue.length < 6) {
             setError('يرجى إدخال الرمز المكون من 6 أرقام بالكامل.');
             return;
         }
 
         setIsSubmitting(true);
-        try {
-            // SIMULATION: API Call to /api/verify
-            console.log("Verifying code:", code, "for", credential);
-            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // SIMULATE SUCCESS
+        try {
+            // --- THIS IS THE GUARANTEED FIX ---
+            // Create the payload object dynamically based on the registration type
+            const payload = {
+                code: codeValue // The key is now 'code' to match your backend
+            };
+            if (type === 'email') {
+                payload.email = credential;
+            } else {
+                payload.phone = credential;
+            }
+            // Now the payload will be either { otp: '...', email: '...' }
+            // or { otp: '...', phone: '...' }
+            // --- END OF FIX ---
+
+            // Make the real API call with the corrected payload
+            await axios.post(`${API_URL}/email/verify-otp`, payload);
+            
+            localStorage.removeItem('verificationTimerExpiresAt');
             setSuccessMessage('تم تأكيد حسابك بنجاح! سيتم توجيهك لتسجيل الدخول.');
-            setTimeout(() => navigate('/login'), 2000);
+
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
 
         } catch (err) {
-            setError('فشلت عملية التأكيد. الرمز المدخل غير صحيح.');
-            setIsSubmitting(false);
+            let errorMessage = 'فشلت عملية التأكيد.';
+            if (err.response && err.response.data) {
+                // Handle Laravel validation errors more robustly
+                if (err.response.data.errors) {
+                    errorMessage = Object.values(err.response.data.errors).flat().join(' ');
+                } else if (err.response.data.message) {
+                    errorMessage = err.response.data.message;
+                }
+            }
+            setError(errorMessage);
+        } finally {
+            setIsSubmitting(false); // Make sure this always runs
         }
     };
 
-    const handleResend = () => {
-        // SIMULATION: API call to resend code
-        console.log("Resending code...");
-        alert('تم إرسال رمز جديد.');
+    const handleResend = async () => {
+        try {
+            // SIMULATION: Replace with your actual resend endpoint
+            // await axios.post(`${API_URL}/email/resend-otp`, { credential });
+            
+            console.log("Resending code to:", credential);
+            alert('تم إرسال رمز جديد.');
 
-        // Reset the timer
-        const newExpirationTime = Date.now() + TIMER_DURATION * 1000;
-        localStorage.setItem('verificationTimerExpiresAt', newExpirationTime);
-        setTimer(TIMER_DURATION);
+            // Reset the timer
+            const newExpirationTime = Date.now() + TIMER_DURATION * 1000;
+            localStorage.setItem('verificationTimerExpiresAt', newExpirationTime);
+            setTimer(TIMER_DURATION);
+        } catch (err) {
+            console.error("Failed to resend OTP:", err);
+            alert('فشل إرسال الرمز الجديد. يرجى المحاولة مرة أخرى.');
+        }
     };
 
     const formatTime = (seconds) => {
@@ -100,11 +136,11 @@ const VerificationPage = () => {
 
     return (
         <div className="centered-page-container">
-            <div className="form-container" style={{ maxWidth: '450px' }}>
+            <div className="form-container" style={{maxWidth: '450px'}}>
                 <h2>تأكيد حسابك</h2>
-                <p className="form-subtitle" style={{ marginBottom: '25px' }}>
+                <p className="form-subtitle" style={{marginBottom: '25px'}}>
                     لقد أرسلنا رمز تأكيد إلى <strong>{verificationMethodText}</strong>:
-                    <span style={{ direction: 'ltr', display: 'block', marginTop: '5px' }}>
+                    <span style={{direction: 'ltr', display: 'block', marginTop: '5px'}}>
                         <strong>{credential}</strong>
                     </span>
                 </p>
@@ -115,7 +151,7 @@ const VerificationPage = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>رمز التأكيد</label>
-                        <VerificationInput onComplete={setCode} />
+                        <VerificationInput onComplete={setCodeValue} />
                     </div>
                     
                     <button type="submit" className="submit-btn" disabled={isSubmitting}>

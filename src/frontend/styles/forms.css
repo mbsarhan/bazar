@@ -219,3 +219,22 @@ body {
     color: #666;
     margin: 0;
 }
+
+.link-style-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'Cairo', sans-serif; /* Use the main font */
+    font-size: 14px; /* Match the font size of .form-link */
+    
+    /* Use the same green color as your other links */
+    color: #56c256; 
+    
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.link-style-btn:hover {
+    text-decoration: underline;
+}
