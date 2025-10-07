@@ -1,0 +1,35 @@
+/* src/frontend/styles/VerificationInput.css (Final Version) */
+
+.otp-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    direction: ltr;
+}
+
+/* This rule has the corrected size */
+input.otp-input {
+    /* --- THIS IS THE SIZE FIX --- */
+    width: 60px !important;
+    height: 60px !important;
+
+    /* --- FONT AND BORDER --- */
+    font-size: 1.8rem; /* Slightly larger font for a larger box */
+    font-weight: 600;
+    border: 1px solid var(--color-border-subtle) !important; /* Original border style */
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+    
+    /* --- GUARANTEED CENTERING --- */
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    direction: ltr !important;
+    text-align: center !important;
+    line-height: 58px !important; /* Adjusted for the new height and border */
+}
+
+input.otp-input:focus {
+    outline: none !important;
+    border-color: var(--color-accent-primary) !important;
+    box-shadow: 0 0 0 3px rgba(144, 238, 144, 0.3) !important;
+}

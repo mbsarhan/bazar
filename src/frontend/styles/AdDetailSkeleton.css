@@ -1,0 +1,58 @@
+/* src/frontend/styles/AdDetailSkeleton.css */
+
+/* --- Re-using the shimmer animation --- */
+/* You can move this to a global file to avoid repetition */
+@keyframes shimmer {
+    100% { transform: translateX(100%); }
+}
+.shimmer-line, .shimmer-image {
+    background-color: #f0f0f0;
+    position: relative;
+    overflow: hidden;
+}
+.shimmer-line::after, .shimmer-image::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%);
+    transform: translateX(-100%);
+    animation: shimmer 1.5s infinite;
+}
+
+/* --- Layout of the skeleton page --- */
+.ad-detail-skeleton-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.skeleton-header {
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.skeleton-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+@media (max-width: 900px) {
+    .skeleton-content { grid-template-columns: 1fr; }
+}
+
+.shimmer-image.large {
+    width: 100%;
+    height: 500px; /* Taller image for detail page */
+    border-radius: 16px;
+}
+
+.shimmer-line {
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+.shimmer-line.full { width: 80%; height: 2.5rem; }
+.shimmer-line.medium { width: 30%; height: 1.8rem; margin-top: 10px; }
+.shimmer-line.small { width: 50%; height: 1.5rem; margin-bottom: 20px; }
+.shimmer-line.short { width: 60%; }
+.shimmer-line.second-header { margin-top: 30px; }

@@ -40,6 +40,18 @@ class CarAdResource extends JsonResource
             'transmission' => $this->carDetails->gear,
             'fuelType'     => $this->carDetails->fule_type,
             'condition'    => $this->carDetails->status,
+            // --- 1. ADD THE DESCRIPTION FIELD ---
+            'description'  => $this->description,
+
+            // --- 2. ADD THE OWNER (SELLER) INFORMATION ---
+            // The 'owner' relationship was already eager-loaded in the controller.
+            'owner'        => [
+                'name' => "{$this->owner->fname} {$this->owner->lname}",
+                'phone' => "{$this->owner->phone}",
+                // You can add more owner details here if needed later, like phone number
+            ],
+
+
             // --- THE CORRECTED IMAGE URL GENERATION ---
             'imageUrls'    => $this->whenLoaded('carDetails', function () use ($baseUrl) {
                 return $this->carDetails->ImagesForCar->map(function ($image) use ($baseUrl) {

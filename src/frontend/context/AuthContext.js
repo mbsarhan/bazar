@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import api from '../api'; // <-- 1. IMPORT OUR NEW AXIOS CLIENT
 
 // The URL of your Laravel API backend
-const API_URL = 'http://127.0.0.1:8000/api';
 
 const AuthContext = createContext(null);
 
@@ -19,28 +19,14 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             const fetchUserData = async () => {
                 try {
-                    const response = await fetch(`${API_URL}/user`, {
-                        headers: {
-                            'Accept': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        // This happens if the token is old or invalid
-                        throw new Error('Invalid session, please log in again.');
-                    }
-
-                    const userData = await response.json();
-                    setUser(userData); // Set the user in our state
+                    // Use the axios client. The token is added automatically!
+                    const response = await api.get('/user');
+                    setUser(response.data);
 
                 } catch (error) {
                     console.error("Auto-login failed:", error);
-                    // If the token is bad, log the user out
-                    logout();
                 }
             };
-
             fetchUserData();
         }
     }, [token]); // This hook re-runs only if the token changes
@@ -50,38 +36,12 @@ export const AuthProvider = ({ children }) => {
      * It will be called from your Login.js component.
      */
     const login = async (credentials) => {
-        // --- THIS IS THE KEY CHANGE HERE ---
-        // Your Login.js component is already sending { credential, password }
-        // So we can directly use 'credential' here.
-        const loginPayload = {
-            credential: credentials.credential, // Send the credential as is
-            password: credentials.password
-        };
-
-        const response = await fetch(`${API_URL}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify(loginPayload),
-        });
-
-        const result = await response.json();
-
-        // This part is crucial for showing validation errors from the service
-        if (!response.ok) {
-            let errorMessage = result.message;
-            if (result.errors && result.errors.credential) {
-                errorMessage = result.errors.credential[0]; // Get the specific error message
-            }
-            throw new Error(errorMessage || 'Login failed.');
-        }
-
-        // --- On Success ---
-        setUser(result.user); // Set the user data
-        setToken(result.access_token); // Set the token in our state
-        localStorage.setItem('authToken', result.access_token); // Save the token to local storage
+        const loginPayload = { credential: credentials.credential, password: credentials.password };
+        // Use axios. The base URL is already set.
+        const response = await api.post('/login', loginPayload);
+        setUser(response.data.user);
+        setToken(response.data.access_token);
+        localStorage.setItem('authToken', response.data.access_token);
     };
 
     /**
@@ -90,70 +50,36 @@ export const AuthProvider = ({ children }) => {
      * then cleans up the client-side state.
      */
     const logout = async () => {
-        // We need the token to tell the server which session to end.
-        const currentToken = localStorage.getItem('authToken');
-        
-        // If for some reason there's no token, just clean up and exit.
-        if (!currentToken) {
-            setUser(null);
-            setToken(null);
-            return;
-        }
-
         try {
-            // Make the POST request to the /api/logout endpoint
-            await fetch(`${API_URL}/logout`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    // This is the most important part: sending the user's token
-                    'Authorization': `Bearer ${currentToken}`,
-                },
-            });
-
+            // Use axios. The token is added automatically!
+            await api.post('/logout');
         } catch (error) {
-            console.error("API logout failed, but logging out locally anyway:", error);
+            console.error("API logout failed, but logging out locally anyway.", error);
         } finally {
-            // This 'finally' block runs whether the API call succeeds or fails.
-            // This ensures the user is always logged out on the frontend.
             setUser(null);
             setToken(null);
             localStorage.removeItem('authToken');
         }
     };
 
+    // --- 2. ADD THE NEW FUNCTIONS FOR PASSWORD MANAGEMENT ---
+
     /**
-     * NEW FUNCTION: Updates the user's password via the API.
-     * @param {object} passwordData - { current_password, password, password_confirmation }
+     * Verifies the user's current password.
+     */
+    const verifyPassword = async (password) => {
+        // The token is added automatically by the interceptor.
+        const response = await api.post('/user/verify-password', { password });
+        return response.data; // Return the success message
+    };
+
+    /**
+     * Updates the user's password.
      */
     const updatePassword = async (passwordData) => {
-        const currentToken = localStorage.getItem('authToken');
-        if (!currentToken) {
-            throw new Error('User is not authenticated.');
-        }
-
-        const response = await fetch(`${API_URL}/user/password`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${currentToken}`,
-            },
-            body: JSON.stringify(passwordData),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            // This will catch validation errors from Laravel (e.g., wrong current_password)
-            let errorMessage = result.message;
-            if (result.errors) {
-                errorMessage = Object.values(result.errors).flat().join('\n');
-            }
-            throw new Error(errorMessage || 'Failed to update password.');
-        }
-
-        return result; // Return the success response
+        // passwordData will be { password, password_confirmation }
+        const response = await api.post('/user/password', passwordData);
+        return response.data; // Return the success message
     };
 
     // Make sure the rest of your file (like the 'value' object and return statement) is correct.
@@ -163,6 +89,7 @@ const value = {
     token,
     login,
     logout, // The new async logout function
+    verifyPassword, // <-- 3. EXPOSE THE NEW FUNCTIONS
     updatePassword, // <-- ADD THIS
     isDashboardCollapsed,
     setIsDashboardCollapsed

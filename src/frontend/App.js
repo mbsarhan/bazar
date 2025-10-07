@@ -14,6 +14,7 @@ import HomePage from './components/HomePage';
 import AdDetailPage from './components/AdDetailPage';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import VerificationPage from './components/VerificationPage';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import AddAdChoice from './components/AddAdChoice';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/ad/:adId" element={<AdDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/verify-account" element={<VerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/add-ad" element={<AddAdChoice />} />

@@ -1,5 +1,6 @@
+// src/frontend/components/SignUp.js
 import React, { useState } from 'react';
-import { Link,useNavigate,useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/forms.css';
 
 const SignUp = () => {
@@ -8,29 +9,26 @@ const SignUp = () => {
     const [credential, setCredential] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState(''); // This will now always be a string
-    const [success, setSuccess] = useState('');
+    const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate(); //commented for wating
-
-    const location = useLocation();
-    const from = location.state?.redirectTo || '/login';
+    const [isSubmitting, setIsSubmitting] = useState(false); // Added for button state
+    const navigate = useNavigate();
 
     const api_url = 'http://127.0.0.1:8000/api';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        setSuccess('');
 
         if (password !== confirmPassword) {
-            setError('كلمتا المرور غير متطابقتين.'); // Set as a plain string
+            setError('كلمتا المرور غير متطابقتين.');
             return;
         }
 
         const isEmail = credential.includes('@');
-        const email = isEmail ? credential : '';
-        const phone = !isEmail ? credential : '';
+        const registrationType = isEmail ? 'email' : 'phone';
+        const email = isEmail ? credential : null; // Use null for empty fields for backend clarity
+        const phone = !isEmail ? credential : null;
 
         const formData = {
             fname: firstName,
@@ -41,6 +39,7 @@ const SignUp = () => {
             password_confirmation: confirmPassword,
         };
 
+        setIsSubmitting(true);
         try {
             const response = await fetch(`${api_url}/register`, {
                 method: 'POST',
@@ -56,16 +55,24 @@ const SignUp = () => {
             if (!response.ok) {
                 let errorMessage = result.message || 'فشل إنشاء الحساب.';
                 if (result.errors) {
-                    errorMessage = Object.values(result.errors).flat().join('\n'); // Join with newline characters instead of <br>
+                    errorMessage = Object.values(result.errors).flat().join('\n');
                 }
                 throw new Error(errorMessage);
             }
 
-            setSuccess('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.');
-            navigate(from, { replace: true });
+            // --- THIS IS THE CORRECTED LOGIC ---
+            // On successful registration, navigate to the verification page
+            navigate('/verify-account', { 
+                state: { 
+                    credential: credential,
+                    type: registrationType 
+                } 
+            });
 
         } catch (err) {
-            setError(err.message); // Set the error as a plain string
+            setError(err.message);
+        } finally {
+            setIsSubmitting(false); // Re-enable the button
         }
     };
 
@@ -73,12 +80,11 @@ const SignUp = () => {
         <div className="centered-page-container">
             <div className="form-container">
                 <h2>إنشاء حساب جديد</h2>
-                {/* We render the error directly inside a div, using CSS for formatting */}
                 {error && <div className="error-message" style={{ whiteSpace: 'pre-line' }}>{error}</div>}
-                {success && <div className="success-message">{success}</div>}
+                
+                {/* Removed the success message as we are navigating away */}
 
                 <form onSubmit={handleSubmit}>
-                    {/* The rest of your form JSX remains exactly the same */}
                     <div className="form-row">
                         <div className="form-group">
                             <label htmlFor="firstName">الاسم الأول</label>
@@ -107,7 +113,9 @@ const SignUp = () => {
                             <span className={`password-toggle-icon ${showPassword ? 'visible' : 'hidden'}`} onClick={() => setShowPassword(!showPassword)}></span>
                         </div>
                     </div>
-                    <button type="submit" className="submit-btn">إنشاء حساب</button>
+                    <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                        {isSubmitting ? 'جاري الإنشاء...' : 'إنشاء حساب'}
+                    </button>
                 </form>
                 <div className="form-link">
                     لديك حساب بالفعل؟ <Link to="/login">سجل الدخول</Link>
