@@ -17,17 +17,22 @@ const VerificationInput = ({ onComplete }) => {
         onComplete(newOtp.join(""));
 
         // Focus next input
-        if (element.nextSibling) {
+        if (element.value && element.nextSibling) {
             element.nextSibling.focus();
         }
     };
 
     const handleKeyDown = (e, index) => {
-        // Handle backspace
-        if (e.key === "Backspace" && !otp[index] && e.target.previousSibling) {
-            e.target.previousSibling.focus();
+        // If the user hits backspace
+        if (e.key === "Backspace") {
+            // If the current input has a value, it will be cleared by the default browser action.
+            // If the current input is already empty, then we move focus to the previous sibling.
+            if (!otp[index] && e.target.previousSibling) {
+                e.target.previousSibling.focus();
+            }
         }
     };
+
 
     const handlePaste = (e) => {
         const value = e.clipboardData.getData("text");
