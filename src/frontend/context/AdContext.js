@@ -56,6 +56,29 @@ export const AdProvider = ({ children }) => {
         // The API now returns a 'data' key because we used a Resource Collection
         return result.data;
     };
+    const getAdById = async (adId) => {
+
+
+        const token = localStorage.getItem('authToken');
+        if (!token) throw new Error('User not authenticated.');
+
+
+        const response = await fetch(`${API_URL}/car-ads/${adId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || 'Failed to fetch the ad.');
+        }
+
+        // The API now returns a 'data' key because we used a Resource Collection
+        return result.data;
+    }
     /**
      * NEW FUNCTION: Deletes a specific car ad by its ID.
      */
@@ -85,7 +108,7 @@ export const AdProvider = ({ children }) => {
 
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById}}>
             {children}
         </AdContext.Provider>
     );

@@ -24,22 +24,21 @@ const AdDetailPage = () => {
             // Reset state on new adId
             setIsLoading(true);
             setError(null);
-            setAd(null);
+            
 
             try {
-                // The adId from the URL is a string, so we parse it to a number
+                // The API call to get a single item does not have a wrapping 'data' key
                 const data = await getAdById(parseInt(adId, 10));
-                setAd(data);
+                // We need to access result.data from the API response
+                setAd(data); // <-- THE FIX
             } catch (err) {
                 setError(err.message);
             } finally {
                 setIsLoading(false);
             }
         };
-
         fetchAd();
     }, [adId, getAdById]); // Re-run if adId or the function changes
-
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
 
     // --- 6. RENDER STATES ---
@@ -106,7 +105,7 @@ const AdDetailPage = () => {
                     <p className="ad-detail-description">{ad.description || 'لا يوجد وصف متاح.'}</p>
                     <div className="seller-info">
                         <h4>معلومات المعلن</h4>
-                        <p>اسم المعلن: <strong>{ad.user?.name || 'مستخدم بازار'}</strong></p>
+                        <p>اسم المعلن: <strong>{ad.owner?.name || 'مستخدم بازار'}</strong></p>
                         <button className="submit-btn">إظهار رقم الهاتف</button>
                     </div>
                 </div>
