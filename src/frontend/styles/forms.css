@@ -213,3 +213,9 @@ body {
     font-size: 0.9rem !important;
     z-index: 9999 !important; /* Ensure it's on top of everything */
 }
+
+.timer-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
