@@ -24,14 +24,11 @@ class UpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'current_password' => ['required', 'current_password'], // Securely checks against the authenticated user's password.
+            // The 'current_password' and 'different' rules are no longer needed here.
             'password' => [
                 'required',
                 'string',
-                'confirmed', // Ensures 'password_confirmation' field matches.
-                // --- ADD THIS NEW RULE ---
-                // It ensures the new password is not the same as the current one.
-                'different:current_password',
+                'confirmed', // Still checks for 'password_confirmation' field
                 Password::min(8)
                     ->mixedCase()
                     ->numbers(),
