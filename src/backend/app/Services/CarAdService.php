@@ -109,12 +109,15 @@ class CarAdService
     {
         try
         {
-            $ad = Advertisement::where('id', $ad_id)->get();
+            // Use findOrFail to get a single model or throw a 404 error if not found.
+            // Eager-load the relationships to prevent N+1 query problems.
+            $ad = Advertisement::with(['carDetails', 'carDetails.ImagesForCar', 'owner']) // Eager-load the owner info
+                               ->findOrFail($ad_id);
             return $ad;
         }
         catch(Exception $e)
         {
-            Log::error('Error show CarAd info : '.$e->getMessage());
+            Log::error('Error showing CarAd info : '.$e->getMessage());
             throw new Exception($e->getMessage());
         }
     }
