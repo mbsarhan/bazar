@@ -16,6 +16,7 @@ const AddRealEstateForm = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
+        title: '',
         transactionType: 'بيع',
         propertyType: 'شقة',
         province: 'دمشق',
@@ -131,6 +132,7 @@ const AddRealEstateForm = () => {
         const newErrors = {};
 
         // التحقق من كل حقل في النموذج
+        if (!formData.title) newErrors.title = true;
         if (!formData.city) newErrors.city = true;
         if (!formData.address) newErrors.address = true;
         if (!formData.area) newErrors.area = true;
@@ -168,6 +170,22 @@ const AddRealEstateForm = () => {
 
             <form onSubmit={handleSubmit}>
                 {/* --- تحديث جميع الحقول لتكون إلزامية --- */}
+                <fieldset>
+                    <legend>عنوان الإعلان</legend>
+                    <div className="form-group">
+                        <label htmlFor="title">عنوان الإعلان *</label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleChange}
+                            placeholder="مثال: شقة فخمة بإطلالة رائعة في المالكي"
+                            className={errors.title ? 'input-error' : ''}
+                        />
+                    </div>
+                </fieldset>
+                
                 <fieldset>
                     <legend>معلومات أساسية</legend>
                     <div className="form-grid">
