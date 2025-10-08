@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\CarAdsController;
+use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
 
@@ -49,7 +50,10 @@ Route::middleware('auth:sanctum')->group(function () {
   
     // Route::resource('realestate-ads', RealestateAdsController::class)->only(['show']);  
     
-    Route::resource('realestate-ads', RealestateAdsController::class);    
+    Route::resource('realestate-ads', RealestateAdsController::class);   
+    
+    Route::post('/user/email/request-change', [EmailChangeController::class, 'requestChange']);
+    Route::post('/user/email/verify-change', [EmailChangeController::class, 'verifyChange'])->middleware('throttle:3,5');
 });
 
 // Route::resource('realestate-ads', RealestateAdsController::class)->only('show');
