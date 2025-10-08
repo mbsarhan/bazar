@@ -9,7 +9,8 @@ import '../../styles/MyProfile.css';
 const API_URL = 'http://127.0.0.1:8000/api';
 
 const SecuritySettings = () => {
-    const { user } = useAuth();
+    // --- 1. Get the new updatePassword function from the context ---
+    const { user, updatePassword } = useAuth();
 
     // --- State for Display ---
     const [email, setEmail] = useState(user?.email || 'user@example.com');
@@ -137,20 +138,35 @@ const SecuritySettings = () => {
         closePhoneModal();
     };
 
-    const handlePasswordUpdate = () => {
+    // --- 2. Replace the old handlePasswordUpdate with this new async version ---
+    const handlePasswordUpdate = async () => {
         setError('');
-        if (!newPassword || !confirmPassword) {
-            setError('يرجى ملء حقلي كلمة المرور.');
-            return;
-        }
+        setSuccessMessage('');
+
         if (newPassword !== confirmPassword) {
             setError('كلمتا المرور غير متطابقتين.');
             return;
         }
-        // SIMULATION: API call to update password
-        console.log("Updating password...");
-        setSuccessMessage('تم تغيير كلمة المرور بنجاح!');
-        closePasswordModal();
+
+        try {
+            const passwordData = {
+                password: newPassword,
+                password_confirmation: confirmPassword,
+            };
+
+            // Call the context function
+            const result = await updatePassword(passwordData);
+            
+            // On success
+            setSuccessMessage(result.message || 'تم تغيير كلمة المرور بنجاح!');
+            closePasswordModal();
+            
+
+        } catch (err) {
+            // Axios places validation errors inside error.response.data
+            const errorMessage = err.response?.data?.errors?.password?.[0] || 'فشل تحديث كلمة المرور.';
+            setError(errorMessage);
+        }
     };
 
     const closePhoneModal = () => { setIsPhoneModalOpen(false); setNewPhone(''); setError(''); };

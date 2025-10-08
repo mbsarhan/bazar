@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import { 
     ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, 
     GitCommitVertical, Fuel, Wrench, Home, Square, BedDouble, 
@@ -12,6 +12,8 @@ const DeleteIcon = () => <Trash2 size={16} />;
 const ViewIcon = () => <ExternalLink size={16} />;
 
 const AdCard = ({ ad, isPublic = false, onDelete }) => {
+
+    const navigate = useNavigate();
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const getStatusClass = (status) => {
@@ -71,6 +73,13 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
         }
         return [];
     };
+    
+    const handleShowClick = (e) => {
+    
+        
+        navigate(`/ad/${ad.id}`);
+
+    } ;
 
     // Stop propagation on delete button to prevent navigation
     const handleDeleteClick = (e) => {
@@ -138,7 +147,7 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
 
             {!isPublic && (
                 <div className="ad-card-actions">
-                    <button className="action-btn view-btn"><ViewIcon /> عرض</button>
+                    <button className="action-btn view-btn" onClick={handleShowClick}><ViewIcon /> عرض</button>
                     <button className="action-btn edit-btn"><EditIcon /> تعديل</button>
                     <button className="action-btn delete-btn" onClick={handleDeleteClick}><DeleteIcon /> حذف</button>
                 </div>

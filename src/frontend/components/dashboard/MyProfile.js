@@ -7,16 +7,18 @@ import '../../styles/forms.css';
 import '../../styles/MyProfile.css';
 
 const MyProfile = () => {
-    const { user } = useAuth();
+    const { user, verifyPassword } = useAuth();
     const navigate = useNavigate();
 
     // --- State for editable info (Name) ---
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
 
+
     // --- State for the Password Verification Modal ---
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
+
     
     // --- State for Feedback ---
     const [error, setError] = useState('');
@@ -38,21 +40,28 @@ const MyProfile = () => {
     };
 
     // This is the "Gateway" function
-    const handlePasswordVerification = () => {
+    const handlePasswordVerification = async () => {
         setError('');
         if (!currentPassword) {
             setError('يرجى إدخال كلمة المرور.');
             return;
         }
         
-        // SIMULATION: In a real app, you would verify this password against the backend
-        if (currentPassword === 'password') { 
+        try {
+            // Call the context function
+            await verifyPassword(currentPassword);
+            
+            // If the above line does not throw an error, verification was successful.
             setIsPasswordModalOpen(false);
-            setCurrentPassword(''); // Clear password field
-            // ON SUCCESS: Navigate to the new, unlocked security page
+            setCurrentPassword('');
+            
+            // Navigate to the security settings page
             navigate('/dashboard/my-profile/security-settings');
-        } else {
-            setError('كلمة المرور غير صحيحة.');
+
+        } catch (err) {
+            // Axios places validation errors inside error.response.data
+            const errorMessage = err.response?.data?.errors?.password?.[0] || 'كلمة المرور غير صحيحة.';
+            setError(errorMessage);
         }
     };
 
