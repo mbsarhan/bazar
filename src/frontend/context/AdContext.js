@@ -123,12 +123,23 @@ export const AdProvider = ({ children }) => {
         return response.data;
     };
 
+
+    /**
+     * NEW: Fetches the real estate ads for the logged-in user.
+     */
+    const getMyRealEstateAds = async () => {
+        // The axios client automatically adds the auth token.
+        const response = await api.get('/user/realestate-ads');
+        // A resource collection is wrapped in a 'data' key by Laravel.
+        return response.data.data;
+    };
+
     
 
 
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById,createRealEstateAd}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds}}>
             {children}
         </AdContext.Provider>
     );
