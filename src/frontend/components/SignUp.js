@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/forms.css';
+import api from '../api';
+
+const TIMER_DURATION = 120;
 
 const SignUp = () => {
     const [firstName, setFirstName] = useState('');
@@ -13,8 +16,6 @@ const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false); // Added for button state
     const navigate = useNavigate();
-
-    const api_url = 'http://127.0.0.1:8000/api';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -41,27 +42,16 @@ const SignUp = () => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch(`${api_url}/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            // Using your api instance for the registration call
+            await api.post('/register', formData);
 
-            const result = await response.json();
+            // --- THIS IS THE GUARANTEED FIX ---
+            // 1. On successful registration, immediately set the timer's expiration time.
+            const newExpirationTime = Date.now() + TIMER_DURATION * 1000;
+            localStorage.setItem('verificationTimerExpiresAt', newExpirationTime);
+            // --- END OF FIX ---
 
-            if (!response.ok) {
-                let errorMessage = result.message || 'فشل إنشاء الحساب.';
-                if (result.errors) {
-                    errorMessage = Object.values(result.errors).flat().join('\n');
-                }
-                throw new Error(errorMessage);
-            }
-
-            // --- THIS IS THE CORRECTED LOGIC ---
-            // On successful registration, navigate to the verification page
+            // 2. Navigate to the verification page, passing the necessary state
             navigate('/verify-account', { 
                 state: { 
                     credential: credential,
@@ -70,9 +60,17 @@ const SignUp = () => {
             });
 
         } catch (err) {
-            setError(err.message);
+            let errorMessage = 'فشل إنشاء الحساب.';
+            if (err.response?.data) {
+                if (err.response.data.errors) {
+                    errorMessage = Object.values(err.response.data.errors).flat().join('\n');
+                } else if (err.response.data.message) {
+                    errorMessage = err.response.data.message;
+                }
+            }
+            setError(errorMessage);
         } finally {
-            setIsSubmitting(false); // Re-enable the button
+            setIsSubmitting(false);
         }
     };
 

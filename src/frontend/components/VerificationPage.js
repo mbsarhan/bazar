@@ -1,60 +1,49 @@
-// src/frontend/components/VerificationPage.js
-import React, { useState , useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import api from '../api';
 import VerificationInput from './VerificationInput';
-import axios from 'axios';
 import '../styles/forms.css';
 
-const API_URL = 'http://127.0.0.1:8000/api';
-const TIMER_DURATION = 300;
+const TIMER_DURATION = 120; // 2 minutes to match backend throttle
 
 const VerificationPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // --- 1. Determine the verification type from the passed state ---
-    const { credential, type } = location.state || {}; // e.g., type = 'email' or 'phone'
-
-    const [timer, setTimer] = useState(() => {
-        const expirationTime = localStorage.getItem('verificationTimerExpiresAt');
-        if (expirationTime) {
-            const remaining = Math.round((parseInt(expirationTime, 10) - Date.now()) / 1000);
-            return remaining > 0 ? remaining : 0;
-        }
-        return TIMER_DURATION; // Start fresh if nothing is stored
-    });
-
-    const [codeValue, setCodeValue] = useState('');
+    const { credential, type } = location.state || {};
+    
+    const [code, setCode] = useState('');
+    const [timer, setTimer] = useState(0);
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isResending, setIsResending] = useState(false);
 
     useEffect(() => {
-        // If there's no stored timer on mount, create one.
-        if (!localStorage.getItem('verificationTimerExpiresAt')) {
-            const newExpirationTime = Date.now() + TIMER_DURATION * 1000;
-            localStorage.setItem('verificationTimerExpiresAt', newExpirationTime);
-        }
+        let intervalId = null;
 
-        // Countdown interval
-        const intervalId = setInterval(() => {
-            const expirationTime = parseInt(localStorage.getItem('verificationTimerExpiresAt'), 10);
-            const remaining = Math.round((expirationTime - Date.now()) / 1000);
-
-            if (remaining > 0) {
-                setTimer(remaining);
+        const checkTimer = () => {
+            const expirationTime = localStorage.getItem('verificationTimerExpiresAt');
+            if (expirationTime) {
+                const remaining = Math.round((parseInt(expirationTime, 10) - Date.now()) / 1000);
+                if (remaining > 0) {
+                    setTimer(remaining);
+                } else {
+                    setTimer(0);
+                    localStorage.removeItem('verificationTimerExpiresAt');
+                }
             } else {
+                // If, for any reason, no timer exists, show the resend button.
                 setTimer(0);
-                localStorage.removeItem('verificationTimerExpiresAt'); // Clean up expired timer
-                clearInterval(intervalId);
             }
-        }, 1000);
+        };
 
-        // Cleanup function to clear interval on component unmount
+        checkTimer(); // Check immediately on load
+        intervalId = setInterval(checkTimer, 1000); // Check every second
+
         return () => clearInterval(intervalId);
-    }, []); // Run only once on mount
+    }, []); // Run only once
 
-    // This determines what text to show the user
     const verificationMethodText = type === 'email' ? 'بريدك الإلكتروني' : 'رقم هاتفك';
 
     const handleSubmit = async (e) => {
@@ -62,30 +51,21 @@ const VerificationPage = () => {
         setError('');
         setSuccessMessage('');
 
-        if (codeValue.length < 6) {
+        if (code.length < 6) {
             setError('يرجى إدخال الرمز المكون من 6 أرقام بالكامل.');
             return;
         }
 
         setIsSubmitting(true);
-
         try {
-            // --- THIS IS THE GUARANTEED FIX ---
-            // Create the payload object dynamically based on the registration type
-            const payload = {
-                code: codeValue // The key is now 'code' to match your backend
-            };
+            const payload = { code };
             if (type === 'email') {
                 payload.email = credential;
             } else {
                 payload.phone = credential;
             }
-            // Now the payload will be either { otp: '...', email: '...' }
-            // or { otp: '...', phone: '...' }
-            // --- END OF FIX ---
 
-            // Make the real API call with the corrected payload
-            await axios.post(`${API_URL}/email/verify-otp`, payload);
+            await api.post('/email/verify-otp', payload);
             
             localStorage.removeItem('verificationTimerExpiresAt');
             setSuccessMessage('تم تأكيد حسابك بنجاح! سيتم توجيهك لتسجيل الدخول.');
@@ -96,8 +76,7 @@ const VerificationPage = () => {
 
         } catch (err) {
             let errorMessage = 'فشلت عملية التأكيد.';
-            if (err.response && err.response.data) {
-                // Handle Laravel validation errors more robustly
+            if (err.response?.data) {
                 if (err.response.data.errors) {
                     errorMessage = Object.values(err.response.data.errors).flat().join(' ');
                 } else if (err.response.data.message) {
@@ -106,25 +85,38 @@ const VerificationPage = () => {
             }
             setError(errorMessage);
         } finally {
-            setIsSubmitting(false); // Make sure this always runs
+            setIsSubmitting(false);
         }
     };
 
     const handleResend = async () => {
-        try {
-            // SIMULATION: Replace with your actual resend endpoint
-            // await axios.post(`${API_URL}/email/resend-otp`, { credential });
-            
-            console.log("Resending code to:", credential);
-            alert('تم إرسال رمز جديد.');
+        if (timer > 0 || isResending) return;
 
-            // Reset the timer
+        setError('');
+        setSuccessMessage(''); // Clear success message on resend
+        setIsResending(true);
+        try {
+            const payload = {};
+            if (type === 'email') {
+                payload.email = credential;
+            } else {
+                payload.phone = credential;
+            }
+
+            await api.post('/email/verify-otp/resend', payload);
+            
+            setSuccessMessage('تم إرسال رمز جديد بنجاح.');
+
             const newExpirationTime = Date.now() + TIMER_DURATION * 1000;
             localStorage.setItem('verificationTimerExpiresAt', newExpirationTime);
             setTimer(TIMER_DURATION);
+
         } catch (err) {
             console.error("Failed to resend OTP:", err);
-            alert('فشل إرسال الرمز الجديد. يرجى المحاولة مرة أخرى.');
+            const errorMessage = err.response?.data?.message || 'فشل إرسال الرمز الجديد. يرجى المحاولة مرة أخرى.';
+            setError(errorMessage);
+        } finally {
+            setIsResending(false);
         }
     };
 
@@ -151,7 +143,7 @@ const VerificationPage = () => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>رمز التأكيد</label>
-                        <VerificationInput onComplete={setCodeValue} />
+                        <VerificationInput onComplete={setCode} />
                     </div>
                     
                     <button type="submit" className="submit-btn" disabled={isSubmitting}>
@@ -163,8 +155,8 @@ const VerificationPage = () => {
                     {timer > 0 ? (
                         <p className="timer-text">يمكنك إعادة إرسال الرمز بعد: {formatTime(timer)}</p>
                     ) : (
-                        <button className="link-style-btn" onClick={handleResend}>
-                            إعادة إرسال الرمز
+                        <button className="link-style-btn" onClick={handleResend} disabled={isResending}>
+                            {isResending ? 'جاري الإرسال...' : 'إعادة إرسال الرمز'}
                         </button>
                     )}
                 </div>

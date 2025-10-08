@@ -44,7 +44,7 @@ const AddRealEstateForm = () => {
     const [errors, setErrors] = useState({});
 
 
-    const imageInputRef = useRef(null);
+    // const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
     const fileInputRef = useRef(null);
 
