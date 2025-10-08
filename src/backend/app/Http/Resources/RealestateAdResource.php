@@ -18,6 +18,7 @@ class RealestateAdResource extends JsonResource
             'location' => "{$this->governorate}, {$this->city}",
             'status' => $this->ad_status,
             'description' => $this->description,
+            'title'=> $this->title,
             'owner' => [
                 'name' => "{$this->owner->fname} {$this->owner->lname}",
             ],

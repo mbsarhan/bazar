@@ -23,6 +23,7 @@ class StoreRealestateAdRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'title' => ['required', 'string','max:50'],
             'transaction_type' => ['required', 'string', Rule::in(['بيع', 'إيجار', 'استثمار'])],
             'realestate_type'    => ['required', 'string'],
             'governorate'      => ['required', 'string'],

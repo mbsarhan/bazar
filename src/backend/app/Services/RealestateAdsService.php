@@ -76,6 +76,7 @@ class RealestateAdsService{
             try {
                 $advertisement = Advertisement::create([
                     'owner_id'         => $user->id,
+                    'title'            => $data['title'],
                     'price'            => $data['price'],
                     'description'      => $data['description'],
                     'transaction_type' => $data['transaction_type'],
