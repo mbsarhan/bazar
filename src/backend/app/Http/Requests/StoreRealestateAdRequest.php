@@ -23,35 +23,23 @@ class StoreRealestateAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'            => ['required', 'string', 'max:255'],
-            'price'            => ['required', 'numeric', 'min:0'],
-            'description'      => ['nullable', 'string', 'max:1000'],
-            'transaction_type' => ['required', 'string', Rule::in(['بيع', 'أجار', 'استثمار'])],
-            'ad_status'        => ['required', 'string', Rule::in(['فعال', 'قيد المراجعة', 'مباع', 'مؤجر'])], 
-            'governorate'      => ['required', 'string', Rule::in('القامشلي','درعا','السويداء','ريف دمشق','دمشق','حمص','حماة','اللاذقية','طرطوس','حلب','إدلب','دير الزور','الرقة','الحسكة')],
+            'transaction_type' => ['required', 'string', Rule::in(['بيع', 'إيجار', 'استثمار'])],
+            'realestate_type'    => ['required', 'string'],
+            'governorate'      => ['required', 'string'],
             'city'             => ['required', 'string', 'max:255'],
-            // 'currency_type'    => ['required', 'string', Rule::in(['SYP', 'USD', 'EUR'])], 
-            // 'views_count' will be set by the system, not directly by user input
-
-            // Real Estate Specific Fields
-            'realestate_type'    => ['required', 'string'], 
-            'detailed_address'   => ['required', 'string', 'max:500'], 
-            'realestate_size'    => ['required', 'numeric', 'min:1'], 
-            'bedroom_num'        => ['nullable', 'integer', 'min:0'], 
-            'bathroom_num'       => ['nullable', 'integer', 'min:0'], 
+            'detailed_address'   => ['required', 'string', 'max:500'],
+            'realestate_size'    => ['required', 'numeric', 'min:1'],
+            'bedroom_num'        => ['nullable', 'integer', 'min:0'],
+            'bathroom_num'       => ['nullable', 'integer', 'min:0'],
             'floor_num'          => ['nullable', 'integer'],
-            'building_status'    => ['required', 'string', Rule::in(['جاهز', 'على الهيكل', 'قيد الإنشاء'])], 
-            'cladding_condition' => ['required', 'string'], 
-            'negotiable_check'   => ['required', 'boolean'], 
-
-            // Media Uploads
-            'front'           => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
-            'back'            => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'side1'           => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'side2'           => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'extra_images'    => 'nullable|array',
-            'extra_images.*'  => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'video'            => ['required', 'file', 'mimes:mp4,mov,avi,wmv', 'max:20480'], // Single video, max 20MB
+            'building_status'    => ['required', 'string'],
+            'cladding_condition' => ['required', 'string'],
+            'price'            => ['required', 'numeric', 'min:0'],
+            'negotiable_check'   => ['required', 'boolean'],
+            'description'      => ['required', 'string', 'max:5000'],
+            'images'           => 'required|array|min:2',
+            'images.*'         => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'video'            => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:20480'],
         ];
     }
 

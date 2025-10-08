@@ -70,100 +70,62 @@ class RealestateAdsService{
     }
 
 
-     public function createRealEstateAd(User $user, array $data): array
+     public function createAd(User $user, array $data): Advertisement
     {
         return DB::transaction(function () use ($user, $data) {
             try {
-                // 1. Create the base Advertisement
                 $advertisement = Advertisement::create([
                     'owner_id'         => $user->id,
-                    'title'            => $data['title'],
                     'price'            => $data['price'],
-                    'description'      => $data['description'] ?? null,
+                    'description'      => $data['description'],
                     'transaction_type' => $data['transaction_type'],
-                    'ad_status'        => $data['ad_status'],        // New field
                     'governorate'      => $data['governorate'],
                     'city'             => $data['city'],
-                    'views_count'      => 0,                          // New field, initialized to 0
-                    'currency_type'    => $data['currency_type'],    // New field
+                    'ad_status'        => 'قيد المراجعة',
                 ]);
 
-                // 2. Create the Real Estate Ad specific details
-                $realestateAd = RealestateAds::create([
-                    'ads_id'              => $advertisement->id,      // Updated to 'ads_id' based on your model
-                    'realestate_type'     => $data['realestate_type'], // New field
-                    'detailed_address'    => $data['detailed_address'], // New field
-                    'realestate_size'     => $data['realestate_size'],  // New field
-                    'bedroom_num'         => $data['bedroom_num'] ?? null, // New field
-                    'bathroom_num'        => $data['bathroom_num'] ?? null, // New field
-                    'floor_num'           => $data['floor_num'] ?? null,    // New field
-                    'building_status'     => $data['building_status'],    // New field
-                    'cladding_condition'  => $data['cladding_condition'], // New field
-                    'negotiable_check'    => $data['negotiable_check'],   // New field
-                    // 'video_url' will be handled by uploadVideo function
-                ]);
-
-                // 3. Handle Image Uploads
-                $this->uploadImages($realestateAd, $data);
-                
-
-                // 4. Handle Video Upload (if present)
+                $videoPath = null;
                 if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
-                    $videoPath = $this->uploadVideo($advertisement, $data['video']);
-                    // Update the realestateAd with the video URL
-                    $realestateAd->update(['video_url' => Storage::url($videoPath)]);
+                    $videoPath = $data['video']->store('videos/real-estate', 'public');
                 }
 
-                return [
-                    'message' => 'تم إنشاء إعلانك بنجاح وسيكون متاحاً بعد المراجعة.',
-                    'ad_id'   => $advertisement->id,
-                    'status'  => $advertisement->ad_status // Return status for confirmation
-                ];
+                $realestateAd = RealestateAds::create([
+                    'ads_id'              => $advertisement->id,
+                    'realestate_type'     => $data['realestate_type'],
+                    'detailed_address'    => $data['detailed_address'],
+                    'realestate_size'     => $data['realestate_size'],
+                    'bedroom_num'         => $data['bedroom_num'] ?? null,
+                    'bathroom_num'        => $data['bathroom_num'] ?? null,
+                    'floor_num'           => $data['floor_num'] ?? null,
+                    'building_status'     => $data['building_status'],
+                    'cladding_condition'  => $data['cladding_condition'],
+                    'negotiable_check'    => $data['negotiable_check'],
+                    'video_url'           => $videoPath,
+                ]);
+
+                $this->uploadImages($realestateAd, $data['images']);
+
+                return $advertisement;
 
             } catch (Exception $e) {
-                Log::error('Failed to create real estate ad', [
-                    'user_id' => $user->id,
-                    'data'    => $data,
-                    'error'   => $e->getMessage(),
-                    'trace'   => $e->getTraceAsString(),
-                ]);
-                throw $e; // Transaction will automatically roll back
+                Log::error('Failed to create real estate ad', ['error' => $e->getMessage()]);
+                throw $e;
             }
         });
     }
 
 
-    protected function uploadImages(RealestateAds $realestateAd, array $data): void
+    // This method now accepts the images array directly
+    private function uploadImages(RealestateAds $realestateAd, array $images): void
     {
-        // Combine mandatory and extra images for processing
-        $imagesToUpload = [
-            'photo1' => $data['photo1'] ?? null,
-            'photo2'  => $data['photo2'] ?? null,
-        ];
-
-        // Process mandatory images
-        foreach ($imagesToUpload as $imageFile) {
-            if ($imageFile) {
-                $path = $imageFile->store('images/real-estates', 'public');
-                RealestateImage::create([
-                    'realestate_ad_id' => $realestateAd->id,
-                    'image_url' => $path,
-                ]);
-            }
-        }
-        
-        // Process extra images if they exist
-        if (!empty($data['extra_images'])) {
-            foreach ($data['extra_images'] as $imageFile) {
-                $path = $imageFile->store('images/real-estates', 'public');
-                RealestateImage::create([
-                    'car_ad_id' => $realestateAd->id,
-                    'image_url' => $path,
-                ]);
-            }
+        foreach ($images as $imageFile) {
+            $path = $imageFile->store('images/real-estate', 'public');
+            RealestateImage::create([
+                'realestate_ad_id' => $realestateAd->id,
+                'image_url' => $path,
+            ]);
         }
     }
-
 
 
      protected function uploadVideo(Advertisement $advertisement, UploadedFile $video_file): string
