@@ -21,20 +21,34 @@ class RealestateAdsController extends Controller
     public function index(Request $request)
     {
         
-        $userId = $request->user()->id;
+       // 1. Defensively check if the user is authenticated.
+        $user = $request->user();
+
+        if (!$user) {
+            // Since this function is designed to return *user-specific* ads, 
+            // we must require authentication. We return 401 if no user is found.
+            return response()->json([
+                'message' => 'Authorization required to view user-specific advertisements.',
+                'error' => 'Unauthenticated'
+            ], 401);
+        }
+
+        // 2. If the user exists, safely get their ID.
+        $userId = $user->id;
 
         try {
-            // 2. Call the service method, passing the user ID to fetch their specific ads
+            // 3. Call the service method, passing the user ID to fetch their specific ads
             $ads = $this->realestateAdsService->getAdsForUser($userId);
 
-            // 3. Return the list of ads with a 200 OK status
+            // 4. Return the list of ads with a 200 OK status
             return response()->json([
                 'message' => 'Real Estate Ads retrieved successfully.',
                 'ads' => $ads
             ], 200);
 
         } catch (Exception $e) {
-            // 4. Handle any generic error thrown by the service (logged in service)
+            // 5. Handle any generic error thrown by the service
+            // Note: Service logs the detailed error internally.
             return response()->json([
                 'message' => 'Failed to retrieve ads due to a server error.',
                 'error' => $e->getMessage()
@@ -62,6 +76,7 @@ class RealestateAdsController extends Controller
      */
     public function show(int $id)
     {
+            try {
             // Call the service method to find the ad, increment view, and handle internal errors
             $ad = $this->realestateAdsService->showAd($id);
 
@@ -70,6 +85,21 @@ class RealestateAdsController extends Controller
                 'message' => 'Ad retrieved successfully.',
                 'ad' => $ad
             ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            // Handle 404 Not Found exception thrown by the service
+            return response()->json([
+                'message' => $e->getMessage(),
+                'error' => 'Not Found'
+            ], 404);
+
+        } catch (Exception $e) {
+            // Handle any other generic error thrown by the service
+            return response()->json([
+                'message' => 'Failed to retrieve ad due to a server error.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
     
 

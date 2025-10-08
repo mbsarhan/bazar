@@ -49,9 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
   
     // Route::resource('realestate-ads', RealestateAdsController::class)->only(['show']);  
     
+    Route::resource('realestate-ads', RealestateAdsController::class);    
 });
 
-Route::resource('realestate-ads', RealestateAdsController::class);    
+// Route::resource('realestate-ads', RealestateAdsController::class)->only('show');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/email/verify/resend', [VerificationController::class, 'resend'])
