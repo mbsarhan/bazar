@@ -23,31 +23,15 @@ class RealestateAdsController extends Controller
      */
     public function index(Request $request)
     {
-        
-       // 1. Defensively check if the user is authenticated.
+        try {
+            // Get the authenticated user from the request object
         $user = $request->user();
 
-        if (!$user) {
-            // Since this function is designed to return *user-specific* ads, 
-            // we must require authentication. We return 401 if no user is found.
-            return response()->json([
-                'message' => 'Authorization required to view user-specific advertisements.',
-                'error' => 'Unauthenticated'
-            ], 401);
-        }
+        // Call the service to get the ads
+        $ads = $this->realestateAdsService->getAdsForUser($user);
 
-        // 2. If the user exists, safely get their ID.
-        $userId = $user->id;
-
-        try {
-            // 3. Call the service method, passing the user ID to fetch their specific ads
-            $ads = $this->realestateAdsService->getAdsForUser($userId);
-
-            // 4. Return the list of ads with a 200 OK status
-            return response()->json([
-                'message' => 'Real Estate Ads retrieved successfully.',
-                'ads' => $ads
-            ], 200);
+        // Return the data formatted as a collection by our API Resource
+        return RealestateAdResource::collection($ads);
 
         } catch (Exception $e) {
             // 5. Handle any generic error thrown by the service

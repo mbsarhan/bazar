@@ -17,16 +17,17 @@ class RealestateAdResource extends JsonResource
             'price' => number_format($this->price) . ' ل.س',
             'location' => "{$this->governorate}, {$this->city}",
             'status' => $this->ad_status,
+            'views' => $this->views_count,
             'description' => $this->description,
             'title'=> $this->title,
+            'propertyType' => $this->realEstateDetails->realestate_type,
+            'area' => $this->realEstateDetails->realestate_size,
+            'bedrooms' =>$this->realEstateDetails->bedroom_num,
             'owner' => [
                 'name' => "{$this->owner->fname} {$this->owner->lname}",
+                'phone' => "{$this->owner->phone}",
             ],
-            'details' => $this->whenLoaded('realEstateDetails', [
-                'type' => $this->realEstateDetails->realestate_type,
-                'area' => $this->realEstateDetails->realestate_size,
-                // Add other details you need
-            ]),
+            
             'imageUrls' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
                 return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");
             }),
