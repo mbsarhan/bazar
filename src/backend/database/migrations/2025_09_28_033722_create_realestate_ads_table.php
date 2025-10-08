@@ -15,16 +15,16 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->foreignId('ads_id')->constrained('advertisements')->onDelete('cascade');
-            $table->string('realestate_type');
+            $table->enum('realestate_type',['شقة','فيلا','محل تجاري','مكتب','أرض','مزرعة','شاليه','مستودع','سوق تجاري'])->default( 'شقة');
             $table->string('detailed_address');
             $table->decimal('realestate_size');
             $table->unsignedSmallInteger('bedroom_num')->default(0);
             $table->unsignedSmallInteger('bathroom_num')->default(0);
             $table->unsignedSmallInteger('floor_num')->default(0);
             $table->enum('building_status', ['جاهز', 'على الهيكل', 'قيد الإنشاء'])->default('جاهز');
-            $table->string('cladding_condition');
+            $table->enum('cladding_condition', ['جيد', 'جيد جداً', 'سوبر ديلوكس','عادي','بحاجة لتجديد',''])->default('جيد');
             $table->boolean('negotiable_check')->default(false);
-            $table->string('video_url');
+            $table->string('video_url')->nullable();
             $table->unique('ads_id'); 
 
         });

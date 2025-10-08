@@ -51,7 +51,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
   
   
+    // Real-Estate Management
+    Route::post('/realestate-ads', [RealestateAdsController::class, 'store']);
+    //Route::resource('realestate-ads', RealestateAdsController::class);    
     // Route::resource('realestate-ads', RealestateAdsController::class)->only(['show']);  
+
+
     
-    Route::resource('realestate-ads', RealestateAdsController::class);    
 });
