@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use App\Models\Advertisement;
 use App\Models\RealestateAds;
 use App\Services\RealestateAdsService;
 use App\Http\Requests\StoreRealestateAdRequest;
@@ -137,8 +138,17 @@ class RealestateAdsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RealestateAds $realestateAds)
+    public function destroy(Request $request,Advertisement $ad)
     {
-        //
+        // 4. Call the service to perform the deletion
+        $success = $this->realestateAdsService->deleteRealEstateAd($ad);
+
+        if ($success) {
+            return response()->json(['message' => 'تم حذف الإعلان بنجاح.']);
+        }
+
+        return response()->json(['message' => 'فشل حذف الإعلان.'], 500);
+
     }
+    
 }

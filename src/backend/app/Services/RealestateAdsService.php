@@ -171,7 +171,7 @@ class RealestateAdsService{
         try {
             $fileName = uniqid('ad_video_') . '.' . $video_file->getClientOriginalExtension();
             // Store the video in a specific directory (e.g., 'realestate_ads/{ad_id}/videos')
-            $path = $video_file->storeAs("realestate_ads/{$advertisement->id}/videos", $fileName, 'public');
+            $path = $video_file->storeAs("videos/real-estate", $fileName, 'public');
 
             if (!$path) {
                 throw new Exception("Failed to store video file.");
@@ -185,5 +185,37 @@ class RealestateAdsService{
             ]);
             throw $e; // Re-throw to ensure transaction rollback
         }
+    }
+
+
+    public function deleteRealEstateAd(Advertisement $ad): bool // 2. TYPE-HINT the correct model
+    {
+        return DB::transaction(function () use ($ad) {
+            try {
+                // 3. Delete associated images from storage
+                $ad->load(['realEstateDetails', 'realEstateDetails.ImageForRealestate']);
+
+                if ($ad->realEstateDetails && $ad->realEstateDetails->ImageForRealestate) {
+                    foreach ($ad->realEstateDetails->ImageForRealestate as $image) {
+                        Storage::disk('public')->delete($image->image_url);
+                    }
+                }
+
+                // --- 3.2: Delete associated Video file from storage ---
+                // بما أن video_url هو حقل مباشر على RealestateAds، فإننا نتحقق منه ونحذفه
+                if ($ad->realEstateDetails && $ad->realEstateDetails->video_url) {
+                    // $ad->realEstateDetails هو نموذج RealestateAds
+                    Storage::disk('public')->delete($ad->realEstateDetails->video_url); 
+                }
+
+                // 4. Delete the advertisement record from the database.
+                // Cascading deletes will handle the rest.
+                return $ad->delete();
+
+            } catch (Exception $e) {
+                Log::error('Error Deleting RealEstate Ad', ['ad_id' => $ad->id, 'error' => $e->getMessage()]);
+                return false;
+            }
+        });
     }
 }
