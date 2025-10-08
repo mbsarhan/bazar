@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use App\Models\Advertisement;
 use App\Models\RealestateAds;
 use App\Services\RealestateAdsService;
+use App\Http\Requests\StoreRealestateAdRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RealestateAdsController extends Controller
@@ -66,9 +68,23 @@ class RealestateAdsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRealestateAdRequest $request)
     {
-        //
+        $user = $request->user();
+
+        try {
+            // Call the new service method
+            $response = $this->realestateAdsService->createRealEstateAd($user, $request->validated());
+
+            return response()->json($response, 201); // 201 Created
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create real estate advertisement.',
+                'error' => $e->getMessage(), // Consider hiding in production
+            ], 500); // 500 Internal Server Error
+        }
+    
     }
 
     /**
@@ -122,8 +138,17 @@ class RealestateAdsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RealestateAds $realestateAds)
+    public function destroy(Request $request,Advertisement $ad)
     {
-        //
+        // 4. Call the service to perform the deletion
+        $success = $this->realestateAdsService->deleteRealEstateAd($ad);
+
+        if ($success) {
+            return response()->json(['message' => 'تم حذف الإعلان بنجاح.']);
+        }
+
+        return response()->json(['message' => 'فشل حذف الإعلان.'], 500);
+
     }
+    
 }
