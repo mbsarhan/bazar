@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Modal from './Modal';
+import axios from 'axios';
 import { Mail, Phone, Lock } from 'lucide-react';
 import '../../styles/forms.css';
 import '../../styles/MyProfile.css';
+
+const API_URL = 'http://127.0.0.1:8000/api';
 
 const SecuritySettings = () => {
     const { user } = useAuth();
@@ -14,11 +17,14 @@ const SecuritySettings = () => {
     
     // --- State for Modals ---
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [emailChangeStep, setEmailChangeStep] = useState(1); // 1: Enter new email, 2: Enter code
+    const [newEmail, setNewEmail] = useState('');
+    const [otpCode, setOtpCode] = useState('');
+    
     const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
     // --- State for Modal Forms ---
-    const [newEmail, setNewEmail] = useState('');
     const [newPhone, setNewPhone] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,19 +33,95 @@ const SecuritySettings = () => {
     // --- State for Feedback ---
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // --- Handlers for each simple, one-step modal ---
-    const handleEmailUpdate = () => {
+    const handleEmailChangeFlow = async () => {
         setError('');
-        if (!newEmail || !newEmail.includes('@')) {
-            setError('يرجى إدخال بريد إلكتروني صالح.');
-            return;
+        setIsSubmitting(true);
+
+        // --- Step 1: Request an OTP for the new email address ---
+        if (emailChangeStep === 1) {
+            try {
+                if (!newEmail || !newEmail.includes('@')) {
+                    throw new Error('يرجى إدخال بريد إلكتروني صالح.');
+                }
+                // SIMULATION: Call your backend to send the OTP to `newEmail`
+                // await axios.post(`${API_URL}/user/email/send-otp`, { email: newEmail });
+                console.log(`Simulating sending OTP to ${newEmail}`);
+                alert(`للتجربة، تم إرسال الرمز "123456" إلى ${newEmail}`);
+
+                // On success, move to the next step
+                setEmailChangeStep(2);
+
+            } catch (err) {
+                const errorMessage = err.response?.data?.message || err.message || 'حدث خطأ ما.';
+                setError(errorMessage);
+            }
+        } 
+        
+        // --- Step 2: Verify the OTP using your existing route ---
+        else if (emailChangeStep === 2) {
+            try {
+                if (!otpCode) {
+                    throw new Error('يرجى إدخال رمز التأكيد.');
+                }
+                
+                // This is the payload your existing API route expects
+                const payload = { 
+                    email: newEmail, 
+                    code: otpCode 
+                };
+
+                // Use the exact same API route we used on the verification page
+                await axios.post(`${API_URL}/email/verify-otp`, payload);
+
+                // On final success:
+                setEmail(newEmail);
+                setSuccessMessage('تم تغيير البريد الإلكتروني بنجاح!');
+                closeEmailModal();
+
+            } catch (err) {
+                const errorMessage = err.response?.data?.message || err.message || 'الرمز غير صحيح أو انتهت صلاحيته.';
+                setError(errorMessage);
+            }
         }
-        // SIMULATION: API call to update email, then trigger verification
-        console.log("Updating email to:", newEmail);
-        setEmail(newEmail);
-        setSuccessMessage('تم تحديث البريد الإلكتروني بنجاح (قد تحتاج إلى التحقق).');
-        closeEmailModal();
+        setIsSubmitting(false);
+    };
+
+    const closeEmailModal = () => {
+        setIsEmailModalOpen(false);
+        setTimeout(() => { 
+            setEmailChangeStep(1); 
+            setNewEmail(''); 
+            setOtpCode(''); 
+            setError(''); 
+        }, 300);
+    };
+
+    // --- This function renders the correct content inside the email modal ---
+    const renderEmailModalContent = () => {
+        if (emailChangeStep === 1) {
+            return (
+                <>
+                    <p>الرجاء إدخال عنوان بريدك الإلكتروني الجديد. سنرسل لك رمز تأكيد إليه.</p>
+                    <div className="form-group">
+                        <label>البريد الإلكتروني الجديد</label>
+                        <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+                    </div>
+                </>
+            );
+        }
+        if (emailChangeStep === 2) {
+            return (
+                <>
+                    <p>لقد أرسلنا رمز تأكيد إلى <strong>{newEmail}</strong>. الرجاء إدخاله أدناه.</p>
+                    <div className="form-group">
+                        <label>رمز التأكيد</label>
+                        <input type="text" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} />
+                    </div>
+                </>
+            );
+        }
     };
 
     const handlePhoneUpdate = () => {
@@ -71,8 +153,6 @@ const SecuritySettings = () => {
         closePasswordModal();
     };
 
-    // --- Modal close handlers ---
-    const closeEmailModal = () => { setIsEmailModalOpen(false); setNewEmail(''); setError(''); };
     const closePhoneModal = () => { setIsPhoneModalOpen(false); setNewPhone(''); setError(''); };
     const closePasswordModal = () => { setIsPasswordModalOpen(false); setNewPassword(''); setConfirmPassword(''); setError(''); };
 
@@ -123,12 +203,15 @@ const SecuritySettings = () => {
             </div>
 
             {/* --- SIMPLE, ONE-STEP MODALS --- */}
-            <Modal isOpen={isEmailModalOpen} onClose={closeEmailModal} onConfirm={handleEmailUpdate} title="تعديل البريد الإلكتروني">
+            <Modal 
+                isOpen={isEmailModalOpen} 
+                onClose={closeEmailModal} 
+                onConfirm={handleEmailChangeFlow} 
+                title="تغيير البريد الإلكتروني"
+                confirmDisabled={isSubmitting}
+            >
                 {error && isEmailModalOpen && <div className="error-message">{error}</div>}
-                <div className="form-group">
-                    <label>البريد الإلكتروني الجديد</label>
-                    <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
-                </div>
+                {renderEmailModalContent()}
             </Modal>
 
             <Modal isOpen={isPhoneModalOpen} onClose={closePhoneModal} onConfirm={handlePhoneUpdate} title="تعديل رقم الهاتف">

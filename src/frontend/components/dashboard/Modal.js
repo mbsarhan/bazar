@@ -1,17 +1,15 @@
-// src/components/dashboard/Modal.js
+// src/frontend/components/dashboard/Modal.js
 import React from 'react';
-import '../../styles/Modal.css'; // ملف أنماط جديد للمودال
+import '../../styles/Modal.css';
 
-const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
+// 1. Accept the new 'confirmDisabled' prop, with a default value of false
+const Modal = ({ isOpen, onClose, onConfirm, title, children, confirmDisabled = false }) => {
     if (!isOpen) {
         return null;
     }
 
     return (
-        // 1. الطبقة الخلفية (Overlay)
         <div className="modal-overlay" onClick={onClose}>
-            {/* 2. صندوق المودال نفسه */}
-            {/* e.stopPropagation() يمنع إغلاق المودال عند الضغط داخله */}
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h3>{title}</h3>
@@ -24,8 +22,14 @@ const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
                     <button className="modal-btn modal-btn-cancel" onClick={onClose}>
                         إلغاء
                     </button>
-                    <button className="modal-btn modal-btn-confirm" onClick={onConfirm}>
-                        تأكيد
+                    {/* 2. Apply the 'disabled' attribute to the button based on the prop */}
+                    <button 
+                        className="modal-btn modal-btn-confirm" 
+                        onClick={onConfirm}
+                        disabled={confirmDisabled}
+                    >
+                        {/* 3. Optional: Change button text while disabled */}
+                        {confirmDisabled ? 'جاري...' : 'تأكيد'}
                     </button>
                 </div>
             </div>
