@@ -28,7 +28,11 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
+Route::post('/email/verify-otp/resend', [VerificationController::class, 'resend'])
+     ->name('verification.resend')
+     ->middleware('throttle:1,2'); // Limit resends to 1 request every 2 minutes
 
+     
 // Protected routes (require Sanctum authentication)
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -48,22 +52,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
   
   
+    // Real-Estate Management
+    Route::post('/realestate-ads', [RealestateAdsController::class, 'store']);
+    //Route::resource('realestate-ads', RealestateAdsController::class);    
     // Route::resource('realestate-ads', RealestateAdsController::class)->only(['show']);  
+
+
     
-    Route::resource('realestate-ads', RealestateAdsController::class);   
-    
-    Route::post('/user/email/request-change', [EmailChangeController::class, 'requestChange']);
-    Route::post('/user/email/verify-change', [EmailChangeController::class, 'verifyChange'])->middleware('throttle:3,5');
 });
-
-// Route::resource('realestate-ads', RealestateAdsController::class)->only('show');
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/email/verify/resend', [VerificationController::class, 'resend'])
-         ->name('verification.resend')
-         ->middleware('throttle:6,1'); // Limit resends
-});
-
-
-// Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
-//         ->name('verification.verify');

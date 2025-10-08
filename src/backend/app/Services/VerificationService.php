@@ -62,21 +62,28 @@ class VerificationService
         return ['message' => 'تم التحقق من الإيميل بنجاح'];
     }
 
-    public function resendVerification(User $user): array
+    public function resendVerification(RegisterRequest $request): array
     {
-        // If user has no email, they cannot request email verification
-        if (! $user->email) {
-            throw ValidationException::withMessages([
-                'email' => ['You do not have an email address to verify.'],
-            ])->status(400);
-        }
+        // 1. Validate that the email was actually sent
+        $request->validate([
+            'email' => $request->email,
+        ]);
 
-        // If email is already verified
+        // 2. Find the user by the email provided from the frontend
+        $user = User::where('email', $request->email)->first();
+
+        // 3. Perform the checks on the user you found
+        if (! $user) {
+            // Don't tell the user if the email exists or not for security
+            // Just return a generic success message
+            return ['message' => 'If an account with that email exists, a new verification link has been sent.'];
+        }
+    
         if ($user->hasVerifiedEmail()) {
             return ['message' => 'Email already verified.'];
         }
 
-        // Send new verification link (this will generate a new OTP, save it, and send the email)
+        // 4. Send the notification
         $user->sendEmailVerificationNotification();
 
         return ['message' => 'Verification link sent! Please check your email.'];

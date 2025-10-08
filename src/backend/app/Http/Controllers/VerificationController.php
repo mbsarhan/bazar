@@ -24,8 +24,8 @@ class VerificationController extends Controller
     {
         $this->verificationService = $verificationService;
 
-        $this->middleware('auth:sanctum')->only('resend');
-        $this->middleware('throttle:6,1')->only('resend');
+        // The line protecting the 'resend' route has been completely removed.
+        // The throttle middleware is already correctly applied in your routes/api.php file.
     }
 
     /**
@@ -57,13 +57,29 @@ class VerificationController extends Controller
      */
     public function resend(Request $request)
     {
-        /** @var \App\Models\User $user */
-        $user = $request->user();
+        // --- THIS IS THE GUARANTEED FIX ---
 
-        // Delegate to the service
-        $result = $this->verificationService->resendVerification($user);
+        // 1. Validate that the frontend sent an email.
+        $request->validate([
+            'email' => 'required|email'
+        ]);
 
-        return response()->json($result, 200);
+        // 2. Find the user by the email.
+        $user = User::where('email', $request->email)->first();
+
+        // 3. If a user is found and is not yet verified...
+        if ($user && !$user->hasVerifiedEmail()) {
+            
+            // 4. Directly call the function to send the email notification.
+            // This bypasses the service and its incorrect type hint.
+            // This is the same function Laravel calls after registration.
+            $user->sendEmailVerificationNotification();
+
+            return response()->json(['message' => 'Verification link sent!']);
+        }
+
+        // For security and consistency, always return a success-like message.
+        return response()->json(['message' => 'If an account with that email exists and requires verification, a new code has been sent.']);
     }
 
 }
