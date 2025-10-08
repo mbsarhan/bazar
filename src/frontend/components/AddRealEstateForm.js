@@ -201,21 +201,6 @@ const AddRealEstateForm = () => {
                         />
                     </div>
                 </fieldset>
-                <fieldset>
-                    <legend>عنوان الإعلان</legend>
-                    <div className="form-group">
-                        <label htmlFor="title">عنوان الإعلان *</label>
-                        <input
-                            type="text"
-                            id="title"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            placeholder="مثال: شقة فخمة بإطلالة رائعة في المالكي"
-                            className={errors.title ? 'input-error' : ''}
-                        />
-                    </div>
-                </fieldset>
                 
                 <fieldset>
                     <legend>معلومات أساسية</legend>
