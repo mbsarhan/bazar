@@ -157,7 +157,7 @@ class RealestateAdsService{
             foreach ($data['extra_images'] as $imageFile) {
                 $path = $imageFile->store('images/real-estates', 'public');
                 RealestateImage::create([
-                    'car_ad_id' => $realestateAd->id,
+                    'realestate_ad_id' => $realestateAd->id,
                     'image_url' => $path,
                 ]);
             }
