@@ -20,6 +20,7 @@ const AddRealEstateForm = () => {
 
     // --- All of your state from your original file ---
     const [formData, setFormData] = useState({
+        title: '',
         transactionType: 'بيع',
         propertyType: 'شقة',
         province: 'دمشق',
@@ -94,6 +95,7 @@ const AddRealEstateForm = () => {
 
 
         // التحقق من كل حقل في النموذج
+        if (!formData.title) newErrors.title = true;
         if (!formData.city) newErrors.city = true;
         if (!formData.address) newErrors.address = true;
         if (!formData.area) newErrors.area = true;
@@ -116,6 +118,7 @@ const AddRealEstateForm = () => {
         
         // Map frontend camelCase names to backend snake_case names
         const nameMap = {
+            title:'title',
             transactionType: 'transaction_type',
             propertyType: 'realestate_type',
             province: 'governorate',
@@ -183,6 +186,21 @@ const AddRealEstateForm = () => {
             {errorMessage && <div className="error-message" style={{ whiteSpace: 'pre-line' }}>{errorMessage}</div>}
 
             <form onSubmit={handleSubmit}>
+                <fieldset>
+                    <legend>عنوان الإعلان</legend>
+                    <div className="form-group">
+                        <label htmlFor="title">عنوان الإعلان *</label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleChange}
+                            placeholder="مثال: شقة فخمة بإطلالة رائعة في المالكي"
+                            className={errors.title ? 'input-error' : ''}
+                        />
+                    </div>
+                </fieldset>
                 <fieldset>
                     <legend>معلومات أساسية</legend>
                     <div className="form-grid">
@@ -307,3 +325,4 @@ const AddRealEstateForm = () => {
 };
 
 export default AddRealEstateForm;
+
