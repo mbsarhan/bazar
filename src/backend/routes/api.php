@@ -58,5 +58,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::resource('realestate-ads', RealestateAdsController::class)->only(['show']);  
 
 
+ 
     
+    Route::post('/user/email/request-change', [EmailChangeController::class, 'requestChange']);
+    Route::post('/user/email/verify-change', [EmailChangeController::class, 'verifyChange'])->middleware('throttle:3,5');
 });
