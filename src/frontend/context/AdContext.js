@@ -1,4 +1,5 @@
 import React, { createContext, useContext } from 'react';
+import api from '../api'; // Use the central axios client
 
 const AdContext = createContext(null);
 const API_URL = 'http://127.0.0.1:8000/api';
@@ -105,10 +106,29 @@ export const AdProvider = ({ children }) => {
         return result;
     };
 
+   /**
+     * NEW: Creates a new Real Estate Ad using AXIOS.
+     * @param {FormData} adFormData - The complete form data including files.
+     */
+    const createRealEstateAd = async (adFormData) => {
+        // Our api.js client automatically adds the Auth token.
+        // For file uploads with FormData, we must tell axios to set the correct multipart header.
+        const response = await api.post('/realestate-ads', adFormData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        
+        // Axios automatically provides the data in the .data property
+        return response.data;
+    };
+
+    
+
 
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById,createRealEstateAd}}>
             {children}
         </AdContext.Provider>
     );

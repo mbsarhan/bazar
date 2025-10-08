@@ -9,6 +9,7 @@ use App\Models\RealestateAds;
 use App\Services\RealestateAdsService;
 use App\Http\Requests\StoreRealestateAdRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Http\Resources\RealestateAdResource; // Import the resource
 
 class RealestateAdsController extends Controller
 {
@@ -70,21 +71,13 @@ class RealestateAdsController extends Controller
      */
     public function store(StoreRealestateAdRequest $request)
     {
-        $user = $request->user();
+        $advertisement = $this->realestateAdsService->createAd($request->user(), $request->validated());
 
-        try {
-            // Call the new service method
-            $response = $this->realestateAdsService->createRealEstateAd($user, $request->validated());
-
-            return response()->json($response, 201); // 201 Created
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to create real estate advertisement.',
-                'error' => $e->getMessage(), // Consider hiding in production
-            ], 500); // 500 Internal Server Error
-        }
-    
+        // Return a success response using the new resource
+        return (new RealestateAdResource($advertisement))
+                ->additional(['message' => 'تم إنشاء إعلانك بنجاح وسيكون متاحاً بعد المراجعة.'])
+                ->response()
+                ->setStatusCode(201);
     }
 
     /**
