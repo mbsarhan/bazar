@@ -42,28 +42,20 @@ class RealestateAdsService{
     }
 
 
-    public function getAdsForUser($userId)
+    public function getAdsForUser(User $user)
     {
         try {
             // 1. Fetch Advertisements owned by the user that have Real Estate Details.
-            $ads = Advertisement::where('owner_id', $userId)
-                ->whereHas('realEstateDetails')
-                ->with([
-                    // 2. Eager load the realEstateDetails relationship
-                    'realEstateDetails' => function ($query) {
-                        // CRITICAL: Select only the necessary columns for the relationship:
-                        // 'id' (Primary key of RealestateAds for nested relation)
-                        // 'ads_id' (Foreign key back to the Advertisement model)
-                        $query->select('id', 'ads_id')
-                            // 3. Eager load the nested images relationship
-                            ->with('ImageForRealestate');
-                    },
-                ])
-                ->get();
+            $ads = Advertisement::where('owner_id', $user->id)
+                ->has('realEstateDetails') // Ensure it's a real estate ad
+            // Eager-load all necessary relationships for the API Resource
+            ->with(['realEstateDetails.ImageForRealestate', 'owner'])
+            ->latest() // Order by newest first
+            ->get();
 
             return $ads;
         } catch (Exception $e) {
-            Log::error("Error retrieving user's real estate ads (User ID: {$userId}): " . $e->getMessage());
+            Log::error("Error retrieving user's real estate ads (User ID: {$user->id}): " . $e->getMessage());
             // Rethrow the exception to be handled by the controller
             throw new Exception("Failed to retrieve user's real estate ads.");
         }
