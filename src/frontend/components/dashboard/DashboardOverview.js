@@ -18,7 +18,6 @@ import { useDashboard } from '../../context/DashboardContext'; // <-- 1. IMPORT
 
 import { ar } from 'date-fns/locale'; 
 import { subDays, format } from 'date-fns';
-import { carAdsData, realEstateAdsData } from './mockData';
 
 const cursorFollowPositioner = function(items) {
     // The event is the last argument
@@ -148,18 +147,6 @@ const DashboardOverview = () => {
         fetchViewData();
     }, [timeRange]); // The dependency array now includes `timeRange`
 
-    // --- 1. Calculate Statistics ---
-    const carStats = {
-        active: carAdsData.filter(ad => ad.status === 'فعال').length,
-        pending: carAdsData.filter(ad => ad.status === 'قيد المراجعة').length,
-        sold: carAdsData.filter(ad => ad.status === 'مباع').length,
-    };
-    const realEstateStats = {
-        active: realEstateAdsData.filter(ad => ad.status === 'فعال').length,
-        pending: realEstateAdsData.filter(ad => ad.status === 'قيد المراجعة').length,
-        sold: realEstateAdsData.filter(ad => ad.status === 'مؤجر').length,
-    };
-
     // --- 2. Prepare Chart Data (Mock Data for Views) ---
     const chartOptions = {
         responsive: true,
@@ -219,12 +206,15 @@ const DashboardOverview = () => {
     };
 
     const chartData = useMemo(() => {
+        // This calculation depends on the 'timeRange' state
         const labels = timeRange === 'weeks' ? generate7DayWeeks() : generateLast7Days();
+        
         return {
             labels: labels,
             datasets: [ {
                 label: 'المشاهدات',
-                data: viewData, // Use the real data from our state
+                // This part of the calculation depends on the 'viewData' state
+                data: viewData, 
                 fill: true,
                 backgroundColor: (context) => {
                     const ctx = context.chart.ctx;
@@ -240,7 +230,8 @@ const DashboardOverview = () => {
                 tension: 0.4,
             } ],
         };
-    }, [viewData], [timeRange]); // Dependency array: only re-run when viewData is updated
+    // The dependency array now correctly includes BOTH 'viewData' and 'timeRange'
+    }, [viewData, timeRange]);
 
     return (
         <div>
