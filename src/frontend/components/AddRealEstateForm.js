@@ -40,6 +40,7 @@ const AddRealEstateForm = () => {
     const [videoFile, setVideoFile] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(0); // This can be used in the future
     const [isUploading, setIsUploading] = useState(false); // This can be used in the future
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [errors, setErrors] = useState({});
     const imageInputRef = useRef(null);
@@ -152,20 +153,21 @@ const AddRealEstateForm = () => {
             submissionData.append('video', videoFile);
         }
         
+        setIsSubmitting(true);
         // --- Call the API ---
         try {
             const result = await createRealEstateAd(submissionData);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
             alert(result.message);
-            navigate('/dashboard');
-        } catch (error) {
-            const message = error.response?.data?.message || 'An error occurred.';
-            const validationErrors = error.response?.data?.errors;
-            let displayError = message;
-            if (validationErrors) {
-                displayError = Object.values(validationErrors).flat().join('\n');
-            }
-            setErrorMessage(displayError);
-            window.scrollTo(0, 0);
+            navigate('/dashboard/real-estate-ads');
+
+        } catch (err) {
+            console.error("Failed to create ad:", err);
+            setErrorMessage(err.response?.data?.message || 'فشل نشر الإعلان.');
+        } finally {
+            // --- 3. Set submitting back to false ---
+            setIsSubmitting(false);
         }
     };
 
@@ -317,8 +319,8 @@ const AddRealEstateForm = () => {
                     </div>
                 </fieldset>
 
-                <button type="submit" className="submit-btn" disabled={isUploading}>
-                    {isUploading ? 'جاري رفع الفيديو...' : 'نشر الإعلان'}
+                <button type="submit" className="submit-btn" disabled={isUploading || isSubmitting}>
+                    {isSubmitting ? 'جاري النشر...' : (isUploading ? 'جاري رفع الفيديو...' : 'نشر إعلان العقار')}
                 </button>
             </form>
         </div>

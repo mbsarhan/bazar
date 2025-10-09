@@ -1,6 +1,5 @@
 // src/frontend/components/dashboard/MyRealEstateAds.js
 import React, { useState, useEffect } from 'react';
-import { realEstateAdsData } from './mockData'; // 1. Use mockData import
 import AdCard from './AdCard';
 import AdCardSkeleton from './AdCardSkeleton';
 import { useAds } from '../../context/AdContext';
