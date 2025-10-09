@@ -34,6 +34,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'total_view',
         'verification_code',         
         'verification_code_expires_at',
+        'pending_email', 
+        'pending_email_verification_code', 
+        'pending_email_expires_at', 
     ];
 
     /**
@@ -56,6 +59,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'verification_code_expires_at' => 'datetime',
+            'pending_email_expires_at' => 'datetime',
             'password' => 'hashed',
             'name_last_updated_at' => 'datetime', // <-- 2. ADD TO CASTS
         ];

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\CarAdsController;
+use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\DashboardController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\DashboardController;
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+//Verify Email with Otp
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
 Route::post('/email/verify-otp/resend', [VerificationController::class, 'resend'])
      ->name('verification.resend')
@@ -63,4 +65,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     
+    //Update Email
+    Route::post('/user/email/request-change', [EmailChangeController::class, 'requestChange']);
+    Route::post('/user/email/verify-change', [EmailChangeController::class, 'verifyChange'])
+    ->middleware('throttle:3,5');
+    
+    Route::post('/user/email/resend-change', [EmailChangeController::class, 'resendChange'])
+    ->middleware('throttle:1,2');
 });
