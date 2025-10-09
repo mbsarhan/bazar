@@ -82,6 +82,26 @@ export const AuthProvider = ({ children }) => {
         return response.data; // Return the success message
     };
 
+
+    /**
+     * NEW: Updates the user's profile name.
+     * @param {object} profileData - { fname, lname }
+     */
+    const updateProfile = async (profileData) => {
+        // The axios client automatically adds the token.
+        // We use api.put to match the PUT route we created.
+        const response = await api.put('/user/profile', profileData);
+
+        // --- CRITICAL STEP ---
+        // On success, the API returns the full updated user object.
+        // We update our central 'user' state with this new object.
+        // This will automatically refresh the user's name everywhere in the app.
+        setUser(response.data);
+
+        // Return the response so the component knows it was successful.
+        return response.data;
+    };
+
     // Make sure the rest of your file (like the 'value' object and return statement) is correct.
 // The 'value' object should look like this:
 const value = {
@@ -91,6 +111,7 @@ const value = {
     logout, // The new async logout function
     verifyPassword, // <-- 3. EXPOSE THE NEW FUNCTIONS
     updatePassword, // <-- ADD THIS
+    updateProfile,
     isDashboardCollapsed,
     setIsDashboardCollapsed
 };

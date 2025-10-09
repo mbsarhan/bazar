@@ -6,7 +6,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException; // <-- IMPORT
+use Carbon\Carbon; // <-- 1. IMPORT CARBON FOR DATE MANIPULATION
 use Exception;
+use Ramsey\Uuid\Type\Integer;
 
 class UserService
 {
@@ -44,6 +46,41 @@ class UserService
             return [
                 'message' => 'حدث خطأ أثناء تحديث كلمة المرور.',
             ];
+        }
+    }
+    /**
+     * Update the user's profile information (e.g., name).
+     */
+    public function updateProfile(User $user, array $data): User
+    {
+        try {
+            // --- 2. ADD THE RATE LIMITING LOGIC ---
+            // Check if the name was updated within the last 7 days.
+            if ($user->name_last_updated_at && $user->name_last_updated_at->addDays(7)->isFuture()) {
+                // Calculate how many days are remaining.
+                $daysRemaining = floor(Carbon::now()->diffInDays($user->name_last_updated_at->addDays(7), false));
+
+                throw ValidationException::withMessages([
+                    // Use 'fname' as the key to display the error on the form.
+                    'fname' => "لا يمكنك تغيير اسمك مرة أخرى قبل مرور " . ($daysRemaining + 1) . " أيام.",
+                ]);
+            }
+
+            // --- 3. UPDATE THE USER'S INFO AND THE TIMESTAMP ---
+            $user->update([
+                'fname' => $data['fname'],
+                'lname' => $data['lname'],
+                'name_last_updated_at' => now(), // Set the timestamp to the current time
+            ]);
+
+            return $user;
+
+        } catch (ValidationException $e) {
+            // Rethrow validation exceptions to be handled by the controller
+            throw $e;
+        } catch (Exception $e) {
+            Log::error('Profile update failed', [ 'user_id' => $user->id, 'error' => $e->getMessage() ]);
+            throw $e;
         }
     }
 }

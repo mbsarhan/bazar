@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/user/verify-password', [UserController::class, 'verifyPassword']);
     Route::post('/user/password', [UserController::class, 'updatePassword']);
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
 
     
     // Car Ad Management

@@ -8,6 +8,7 @@ use App\Http\Requests\VerifyPasswordRequest; // <-- 1. IMPORT
 use App\Services\UserService;
 use Illuminate\Support\Facades\Hash; // <-- 2. IMPORT
 use Illuminate\Validation\ValidationException; // <-- 3. IMPORT
+use App\Http\Requests\UpdateProfileRequest; // <-- 1. IMPORT
 
 class UserController extends Controller
 {
@@ -54,5 +55,21 @@ class UserController extends Controller
         $response = $this->userService->updatePassword($user, $request->password);
 
         return response()->json($response);
+    }
+
+    
+    /**
+     * Update the authenticated user's profile information.
+     */
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        // The request class has already validated the data.
+        $user = $request->user();
+
+        // Call the service to perform the update.
+        $updatedUser = $this->userService->updateProfile($user, $request->validated());
+
+        // Return the updated user object.
+        return response()->json($updatedUser);
     }
 }
