@@ -7,7 +7,7 @@ import '../../styles/forms.css';
 import '../../styles/MyProfile.css';
 
 const MyProfile = () => {
-    const { user, verifyPassword } = useAuth();
+    const { user, verifyPassword , updateProfile} = useAuth();
     const navigate = useNavigate();
 
     // --- State for editable info (Name) ---
@@ -32,11 +32,41 @@ const MyProfile = () => {
         }
     }, [user]);
 
-    const handleInfoSubmit = (e) => {
+    const handleInfoSubmit = async (e) => {
         e.preventDefault();
-        // API call to update name
-        console.log("Updating name:", { firstName, lastName });
-        setSuccessMessage('تم تحديث الاسم بنجاح!');
+        setError(''); // Clear any old errors
+        setSuccessMessage(''); // Clear old success messages
+
+
+        // --- THIS IS THE NEW CHECK ---
+        // Compare the form state with the original user data from the context.
+        if (firstName.trim() === user.fname && lastName.trim() === user.lname) {
+            setError('لم تقم بإجراء أي تغيير على اسمك.');
+            return; // Stop the function here, do not call the API.
+        }
+
+
+
+        if (!firstName || !lastName) {
+            setError('الاسم الأول واسم العائلة حقول إلزامية.');
+            return;
+        }
+
+        try {
+            // Call the context function with the current state values
+            await updateProfile({
+                fname: firstName,
+                lname: lastName,
+            });
+
+            // On success
+            setSuccessMessage('تم تحديث الاسم بنجاح!');
+
+        } catch (err) {
+            // This will now also catch the rate-limiting error from the backend
+            const errorMessage = err.response?.data?.errors?.fname?.[0] || err.response?.data?.message || 'فشل تحديث الاسم.';
+            setError(errorMessage);
+        }
     };
 
     // This is the "Gateway" function
@@ -71,7 +101,10 @@ const MyProfile = () => {
                 <h1>ملفي الشخصي</h1>
             </div>
 
+
+            {/* Display both success and error messages */}
             {successMessage && <div className="success-message" style={{marginBottom: '20px'}}>{successMessage}</div>}
+            {error && <div className="error-message" style={{marginBottom: '20px'}}>{error}</div>}
 
             {/* --- Profile Information Form --- */}
             <div className="profile-form-container">

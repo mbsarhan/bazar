@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'fname',
         'lname',
+        'name_last_updated_at', // <-- 1. ADD TO FILLABLE
         'email',
         'phone',
         'password',
@@ -56,6 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'verification_code_expires_at' => 'datetime',
             'password' => 'hashed',
+            'name_last_updated_at' => 'datetime', // <-- 2. ADD TO CASTS
         ];
     }
 
