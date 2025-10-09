@@ -27,6 +27,7 @@ use App\Http\Controllers\RealestateAdsController;
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+//Verify Email with Otp
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
 Route::post('/email/verify-otp/resend', [VerificationController::class, 'resend'])
      ->name('verification.resend')
@@ -57,8 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/realestate-ads', [RealestateAdsController::class, 'index']);
 
 
- 
     
+    //Update Email
     Route::post('/user/email/request-change', [EmailChangeController::class, 'requestChange']);
-    Route::post('/user/email/verify-change', [EmailChangeController::class, 'verifyChange'])->middleware('throttle:3,5');
+    Route::post('/user/email/verify-change', [EmailChangeController::class, 'verifyChange'])
+    ->middleware('throttle:3,5');
+    
+    Route::post('/user/email/resend-change', [EmailChangeController::class, 'resendChange'])
+    ->middleware('throttle:1,2');
 });

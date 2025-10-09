@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Events\Verified;
+use App\Http\Requests\RegisterRequest;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request; // We'll pass parts of the request, not the whole object, for cleaner service logic.
 
 class VerificationService
