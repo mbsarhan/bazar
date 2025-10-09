@@ -7,7 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarAdsController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
-
+use App\Http\Controllers\DashboardController;
 
 
 
@@ -55,6 +55,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/realestate-ads', [RealestateAdsController::class, 'store']);
     Route::get('/user/realestate-ads', [RealestateAdsController::class, 'index']);
     Route::delete('/realestate-ads/{ad}', [RealestateAdsController::class, 'destroy']);
+
+
+    // --- DASHBOARD ROUTE ---
+    Route::get('/dashboard/statistics', [DashboardController::class, 'getStatistics']);
 
 
     

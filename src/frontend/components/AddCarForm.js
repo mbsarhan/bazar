@@ -41,8 +41,6 @@ const AddCarForm = () => {
     const [errorMessage, setErrorMessage] = useState(''); // لرسالة الخطأ العامة في الأعلى
     const [errors, setErrors] = useState({});
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const fileInputRef = useRef(null);
     const uploadMode = useRef(null); // لتحديد ما إذا كنا نرفع صورة إلزامية أم إضافية
 
@@ -142,21 +140,16 @@ const AddCarForm = () => {
             adData.append('extra_images[]', file);
         });
 
-        setIsSubmitting(true);
         // --- Call the API ---
         try {
             const result = await createCarAd(adData);
-            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-
-            alert(result.message);
-            navigate('/dashboard/car-ads');
-
-        } catch (err) {
-            console.error("Failed to create ad:", err);
-            setErrorMessage(err.response?.data?.message || 'فشل نشر الإعلان.');
-        } finally {
-            // --- 3. Set submitting back to false ---
-            setIsSubmitting(false);
+            alert(result.message); // Show success message from the server
+            navigate('/dashboard'); // Redirect on success
+        } catch (error) {
+            // THE FIX: Set the error message as a plain string.
+            // The API error.message already contains newline characters (\n).
+            setErrorMessage(error.message);
+            window.scrollTo(0, 0); // Scroll to top to show the error
         }
     };
 
@@ -339,9 +332,7 @@ const AddCarForm = () => {
                     multiple // السماح بتحديد عدة ملفات مرة واحدة للصور الإضافية
                 />
 
-                <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                    {isSubmitting ? 'جاري النشر...' : 'نشر الإعلان'}
-                </button>
+                <button type="submit" className="submit-btn">نشر الإعلان</button>
             </form>
         </div>
     );

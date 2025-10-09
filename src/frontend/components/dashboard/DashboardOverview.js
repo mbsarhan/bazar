@@ -14,6 +14,7 @@ import {
   Filler,
 } from 'chart.js';
 import { useAuth } from '../../context/AuthContext';
+import { useDashboard } from '../../context/DashboardContext'; // <-- 1. IMPORT
 
 import { ar } from 'date-fns/locale'; 
 import { subDays, format } from 'date-fns';
@@ -91,10 +92,41 @@ const DashboardOverview = () => {
     const { user } = useAuth();
     const userName = user ? user.fname : "المستخدم";
 
+    const { getDashboardStats } = useDashboard(); // <-- 2. GET THE FUNCTION
+    // --- 3. CREATE STATE for the statistics data ---
+    const [stats, setStats] = useState({
+        carStats: { active: 0, pending: 0, sold: 0 },
+        realEstateStats: { active: 0, pending: 0, sold: 0 },
+    });
+     const [statsLoading, setStatsLoading] = useState(true);
+
     const [timeRange, setTimeRange] = useState('weeks'); // 'weeks' or 'days'
 
     const [viewData, setViewData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
+
+    
+    
+    // --- 4. CREATE A SEPARATE useEffect for fetching statistics ---
+    useEffect(() => {
+        const fetchStats = async () => {
+            setStatsLoading(true);
+            try {
+                const data = await getDashboardStats();
+                setStats(data);
+            } catch (error) {
+                console.error("Failed to fetch dashboard stats:", error);
+                // Optionally set an error state here to show a message
+            } finally {
+                setStatsLoading(false);
+            }
+        };
+        fetchStats();
+    }, [getDashboardStats]);
+
+    
+
 
     useEffect(() => {
         const fetchViewData = async () => {
@@ -248,15 +280,15 @@ const DashboardOverview = () => {
             <h2 className="stats-header">إحصائيات السيارات</h2>
             <div className="stats-container">
                 <div className="stat-card stat-card-active">
-                    <h2>{carStats.active}</h2>
+                    <h2>{statsLoading ? '...' : stats.carStats.active}</h2>
                     <p>إعلانات سيارات نشطة</p>
                 </div>
                 <div className="stat-card stat-card-pending">
-                    <h2>{carStats.pending}</h2>
+                    <h2>{statsLoading ? '...' : stats.carStats.pending}</h2>
                     <p>إعلانات سيارات قيد المراجعة</p>
                 </div>
                 <div className="stat-card stat-card-sold">
-                    <h2>{carStats.sold}</h2>
+                    <h2>{statsLoading ? '...' : stats.carStats.sold}</h2>
                     <p>إعلانات سيارات مباعة أو مؤجرة</p>
                 </div>
             </div>
@@ -265,15 +297,15 @@ const DashboardOverview = () => {
             <h2 className="stats-header">إحصائيات العقارات</h2>
             <div className="stats-container">
                  <div className="stat-card stat-card-active">
-                    <h2>{realEstateStats.active}</h2>
+                    <h2>{statsLoading ? '...' : stats.realEstateStats.active}</h2>
                     <p>إعلانات عقارات نشطة</p>
                 </div>
                  <div className="stat-card stat-card-pending">
-                    <h2>{realEstateStats.pending}</h2>
+                    <h2>{statsLoading ? '...' : stats.realEstateStats.pending}</h2>
                     <p>إعلانات عقارات قيد المراجعة</p>
                 </div>
                  <div className="stat-card stat-card-sold">
-                    <h2>{realEstateStats.sold}</h2>
+                    <h2>{statsLoading ? '...' : stats.realEstateStats.sold}</h2>
                     <p>إعلانات عقارات مباعة أو مؤجرة</p>
                 </div>
             </div>
