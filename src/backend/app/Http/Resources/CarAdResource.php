@@ -30,7 +30,7 @@ class CarAdResource extends JsonResource
             // Combining fields to create the 'title' as requested
             'title'        => "{$this->carDetails->manufacturer} {$this->carDetails->model} {$this->carDetails->model_year}",
             // Formatting the price with a currency symbol
-            'price'        => number_format($this->price) . ' ل.س',
+            'price'        => number_format($this->price) . ' $',
             // Combining governorate and city for the 'location'
             'location'     => "{$this->governorate}, {$this->city}",
             'status'       => $this->ad_status,

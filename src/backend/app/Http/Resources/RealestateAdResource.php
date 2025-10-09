@@ -14,7 +14,7 @@ class RealestateAdResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'price' => number_format($this->price) . ' ل.س',
+            'price' => number_format($this->price) . ' $',
             'location' => "{$this->governorate}, {$this->city}",
             'status' => $this->ad_status,
             'views' => $this->views_count,

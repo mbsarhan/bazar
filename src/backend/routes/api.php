@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Real-Estate Management
     Route::post('/realestate-ads', [RealestateAdsController::class, 'store']);
     Route::get('/user/realestate-ads', [RealestateAdsController::class, 'index']);
+    Route::delete('/realestate-ads/{ad}', [RealestateAdsController::class, 'destroy']);
 
 
     
