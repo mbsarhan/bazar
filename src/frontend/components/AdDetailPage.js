@@ -5,7 +5,7 @@ import { useAds } from '../context/AdContext'; // 1. Use the context
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
 import { 
-    GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench, 
+    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench, 
     Home, Square, BedDouble, Bath 
 } from 'lucide-react';
 
@@ -17,20 +17,17 @@ const AdDetailPage = () => {
     const [ad, setAd] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     // 5. Use useEffect to fetch the specific ad data
     useEffect(() => {
         const fetchAd = async () => {
-            // Reset state on new adId
             setIsLoading(true);
             setError(null);
-            
-
+            setAd(null);
             try {
-                // The API call to get a single item does not have a wrapping 'data' key
                 const data = await getAdById(parseInt(adId, 10));
-                // We need to access result.data from the API response
-                setAd(data); // <-- THE FIX
+                setAd(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -38,8 +35,23 @@ const AdDetailPage = () => {
             }
         };
         fetchAd();
-    }, [adId, getAdById]); // Re-run if adId or the function changes
+    }, [adId, getAdById]);
+
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
+
+    const prevSlide = () => {
+        if (!ad) return;
+        const isFirstSlide = currentIndex === 0;
+        const newIndex = isFirstSlide ? ad.imageUrls.length - 1 : currentIndex - 1;
+        setCurrentIndex(newIndex);
+    };
+
+    const nextSlide = () => {
+        if (!ad) return;
+        const isLastSlide = currentIndex === ad.imageUrls.length - 1;
+        const newIndex = isLastSlide ? 0 : currentIndex + 1;
+        setCurrentIndex(newIndex);
+    };
 
     // --- 6. RENDER STATES ---
 
@@ -73,11 +85,34 @@ const AdDetailPage = () => {
                 <h1>{ad.title}</h1>
                 <span className="ad-detail-price">{ad.price}</span>
             </div>
+
             <div className="ad-detail-content">
                 <div className="ad-detail-image-gallery">
-                    {/* Assuming the first image is the main one */}
-                    <img src={ad.imageUrls[0]} alt={ad.title} className="main-image"/>
+                    <div className="main-image-container">
+                        <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image"/>
+                        {ad.imageUrls.length > 1 && (
+                            <>
+                                <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
+                                <button className="gallery-arrow right" onClick={prevSlide}><ChevronRight size={32} /></button>
+                            </>
+                        )}
+                    </div>
+                    {/* --- The Thumbnail Scroller --- */}
+                    {ad.imageUrls.length > 1 && (
+                        <div className="thumbnail-scroller">
+                            {ad.imageUrls.map((url, index) => (
+                                <div 
+                                    key={index}
+                                    className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`}
+                                    onClick={() => setCurrentIndex(index)}
+                                >
+                                    <img src={url} alt={`Thumbnail ${index + 1}`} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
+
                 <div className="ad-detail-info">
                     <h3>التفاصيل الأساسية</h3>
                     <div className="info-grid">

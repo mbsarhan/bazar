@@ -1,5 +1,3 @@
-/* src/styles/AdDetailPage.css */
-
 .ad-detail-container {
     max-width: 1100px;
     margin: 40px auto;
@@ -10,7 +8,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; /* للسماح بالالتفاف على الشاشات الصغيرة */
+    flex-wrap: wrap;
     gap: 20px;
     border-bottom: 1px solid var(--color-border-subtle);
     padding-bottom: 20px;
@@ -25,27 +23,136 @@
     font-size: 1.8rem;
     font-weight: 600;
     color: var(--color-accent-primary);
-    white-space: nowrap; /* لمنع كسر السعر إلى سطرين */
+    white-space: nowrap;
 }
 
 .ad-detail-content {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* قسم الصور يأخذ ضعف مساحة التفاصيل */
+    grid-template-columns: 2fr 1fr;
     gap: 40px;
 }
 
-/* التجاوب مع الشاشات الصغيرة */
 @media (max-width: 900px) {
     .ad-detail-content {
-        grid-template-columns: 1fr; /* عمود واحد فقط */
+        grid-template-columns: 1fr;
     }
+}
+
+/* ============================================= */
+/* Image Gallery Styles                          */
+/* ============================================= */
+
+.ad-detail-image-gallery {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #f0f0f0; /* Placeholder color */
 }
 
 .main-image {
     width: 100%;
-    border-radius: 16px;
+    aspect-ratio: 4 / 3; /* Maintain a consistent aspect ratio */
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.gallery-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.7); /* Match the card arrow background */
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333; /* Match the card arrow color */
+    z-index: 10;
+    opacity: 0;
+    /* Animate ALL properties for the glow effect */
+    transition: all 0.2s ease-in-out; 
+}
+
+.gallery-arrow.left {
+    left: 15px;
+}
+
+.gallery-arrow.right {
+    right: 15px;
+}
+
+.gallery-arrow:hover {
+    background-color: white;
+    box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
+}
+
+.main-image-container:hover .gallery-arrow {
+    opacity: 1;
+}
+
+.thumbnail-scroller {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    overflow-x: auto;
+    padding: 5px; /* Add padding so shadows aren't cut off */
+}
+
+/* Hiding the scrollbar for a cleaner look (optional but recommended) */
+.thumbnail-scroller::-webkit-scrollbar {
+    height: 8px;
+}
+.thumbnail-scroller::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.thumbnail-scroller::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.thumbnail-image {
+    width: 100px;
+    height: 75px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    flex-shrink: 0;
+    transition: all 0.2s ease-in-out;
+    opacity: 0.7;
+}
+
+.thumbnail-image:hover {
+    opacity: 1;
+    border-color: #aaa;
+}
+
+.thumbnail-image.active {
+    border-color: var(--color-accent-primary);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.thumbnail-image img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
 }
+
+
+/* ============================================= */
+/* Ad Info Styles                                */
+/* ============================================= */
 
 .ad-detail-info h3 {
     margin-top: 0;
@@ -60,11 +167,25 @@
     gap: 15px;
     margin-bottom: 30px;
 }
+
 .info-item {
     display: flex;
     justify-content: space-between;
+    background-color: var(--color-bg-page);
+    padding: 12px 15px;
+    border-radius: 8px;
+    align-items: center;
 }
+
+.info-item strong {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+}
+
 .info-item span {
+    font-weight: 600;
     color: #555;
 }
 
@@ -88,25 +209,8 @@
     text-align: center;
     padding-top: 50px;
 }
+
 .not-found a {
     margin-top: 20px;
     display: inline-block;
-}
-
-.info-item {
-    background-color: var(--color-bg-page);
-    padding: 12px 15px;
-    border-radius: 8px;
-    align-items: center; /* محاذاة عمودية للمحتوى */
-}
-
-.info-item strong {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* مسافة بين الأيقونة والنص */
-    color: #333;
-}
-
-.info-item span {
-    font-weight: 600; /* جعل القيمة بخط أغمق قليلاً */
 }
