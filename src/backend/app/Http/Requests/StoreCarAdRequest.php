@@ -33,12 +33,12 @@ class StoreCarAdRequest extends FormRequest
             'negotiable_check'  => 'required|boolean',
 
             // --- Image Uploads ---
-            'front'           => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
-            'back'            => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'side1'           => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'side2'           => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'front'           => 'required|image|mimes:jpeg,png,jpg|max:2048', // 2MB max
+            'back'            => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'side1'           => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'side2'           => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'extra_images'    => 'nullable|array',
-            'extra_images.*'  => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate each file in the array
+            'extra_images.*'  => 'image|mimes:jpeg,png,jpg|max:2048', // Validate each file in the array
         ];
     }
 }

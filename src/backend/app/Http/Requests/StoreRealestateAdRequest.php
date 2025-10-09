@@ -39,7 +39,7 @@ class StoreRealestateAdRequest extends FormRequest
             'negotiable_check'   => ['required', 'boolean'],
             'description'      => ['required', 'string', 'max:5000'],
             'images'           => 'required|array|min:2',
-            'images.*'         => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*'         => 'image|mimes:jpeg,png,jpg|max:2048',
             'video'            => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:20480'],
         ];
     }
