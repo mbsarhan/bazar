@@ -135,7 +135,7 @@ const DashboardOverview = () => {
             // const response = await axios.get(`/api/dashboard/views?range=${timeRange}`);
             console.log(`Fetching data for range: ${timeRange}`);
 
-            const dataLength = timeRange === 'weeks' ? 7 : 7; // Both are 7 for now
+            const dataLength = 7; // Both are 7 for now
             const fakeApiData = Array.from({ length: dataLength }, () => Math.floor(Math.random() * 200) + 50);
             
             setTimeout(() => {
