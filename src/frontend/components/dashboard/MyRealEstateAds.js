@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import AdCard from './AdCard';
 import AdCardSkeleton from './AdCardSkeleton';
+import Modal from './Modal'; // 1. Import your Modal component
 import { useAds } from '../../context/AdContext';
 // We are not using the context for now, so the import can be removed if you wish
 
@@ -9,7 +10,12 @@ const MyRealEstateAds = () => {
     const [ads, setAds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { getMyRealEstateAds } = useAds();
+    const { getMyRealEstateAds ,deleteRealEstateAd} = useAds();
+
+    // --- 3. Add state for the delete modal ---
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [adToDelete, setAdToDelete] = useState(null);
+    const [deleteError, setDeleteError] = useState('');
 
 
     useEffect(() => {
@@ -28,6 +34,31 @@ const MyRealEstateAds = () => {
 
         fetchAds();
     }, [getMyRealEstateAds]); // Runs once on mount
+
+
+    // --- 4. Create functions to handle the delete flow ---
+    const handleDeleteClick = (ad) => {
+        setAdToDelete(ad);
+        setDeleteError('');
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!adToDelete) return;
+
+        try {
+            await deleteRealEstateAd(adToDelete.id);
+            // On success, update the UI instantly
+            setAds(prevAds => prevAds.filter(ad => ad.id !== adToDelete.id));
+            setIsDeleteModalOpen(false);
+            setAdToDelete(null);
+        } catch (err) {
+            // Display any error from the API inside the modal
+            setDeleteError(err.response?.data?.message || 'Failed to delete the ad.');
+        }
+    };
+
+
 
     return (
         <div>
@@ -48,6 +79,7 @@ const MyRealEstateAds = () => {
                         <AdCard 
                             key={ad.id} 
                             ad={ad} 
+                            onDelete={() => handleDeleteClick(ad)}
                             // The onDelete prop is removed for now
                         />
                     ))
@@ -56,7 +88,17 @@ const MyRealEstateAds = () => {
                     <p>ليس لديك أي إعلانات عقارات منشورة حالياً.</p>
                 )}
             </div>
-            {/* The delete modal is removed for now */}
+            {/* --- 6. Add the confirmation modal to the JSX --- */}
+            <Modal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                title="تأكيد حذف الإعلان"
+            >
+                <p>هل أنت متأكد أنك تريد حذف هذا الإعلان؟ سيتم حذف جميع الصور والفيديوهات المرتبطة به بشكل دائم.</p>
+                {deleteError && <p className="error-message" style={{ marginTop: '15px' }}>{deleteError}</p>}
+            </Modal>
+
         </div>
     );
 };

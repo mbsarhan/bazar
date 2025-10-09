@@ -115,7 +115,7 @@ class RealestateAdsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request,Advertisement $ad)
+    public function destroy(Advertisement $ad)
     {
         // 4. Call the service to perform the deletion
         $success = $this->realestateAdsService->deleteRealEstateAd($ad);

@@ -134,12 +134,22 @@ export const AdProvider = ({ children }) => {
         return response.data.data;
     };
 
+
+    /**
+     * NEW: Deletes a specific Real Estate ad by its ID.
+     */
+    const deleteRealEstateAd = async (adId) => {
+        // The axios client automatically adds the token and handles errors.
+        const response = await api.delete(`/realestate-ads/${adId}`);
+        return response.data; // Return the success message
+    };
+
     
 
 
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd}}>
             {children}
         </AdContext.Provider>
     );
