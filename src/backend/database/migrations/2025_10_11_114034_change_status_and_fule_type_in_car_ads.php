@@ -11,20 +11,41 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('car_ads', function (Blueprint $table) {
-            $table->renameColumn('status','condition');
-            $table->renameColumn('fule_type','fuel_type');
-        });
+        DB::statement("
+            ALTER TABLE `car_ads`
+            CHANGE `status` `condition`
+            ENUM('جديدة','مستعملة','متضررة')
+            COLLATE 'utf8mb4_unicode_ci'
+            NOT NULL
+            DEFAULT 'مستعملة';
+        ");
+
+        DB::statement("
+            ALTER TABLE `car_ads`
+            CHANGE `fule_type` `fuel_type`
+            VARCHAR(255)
+            COLLATE 'utf8mb4_unicode_ci'
+            NULL;
+        ");
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('car_ads', function (Blueprint $table) {
-            $table->renameColumn('condition','status');
-            $table->renameColumn('fuel_type','fule_type');
-        });
+        DB::statement("
+            ALTER TABLE `car_ads`
+            CHANGE `condition` `status`
+            ENUM('جديدة','مستعملة','متضررة')
+            COLLATE 'utf8mb4_unicode_ci'
+            NOT NULL
+            DEFAULT 'مستعملة';
+        ");
+
+        DB::statement("
+            ALTER TABLE `car_ads`
+            CHANGE `fuel_type` `fule_type`
+            VARCHAR(255)
+            COLLATE 'utf8mb4_unicode_ci'
+            NULL;
+        ");
     }
 };

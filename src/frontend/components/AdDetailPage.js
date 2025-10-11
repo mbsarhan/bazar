@@ -116,7 +116,7 @@ const AdDetailPage = () => {
                 <div className="ad-detail-info">
                     <h3>التفاصيل الأساسية</h3>
                     <div className="info-grid">
-                        {ad.year && ( /* Car Details */
+                        {ad.model_year && ( /* Car Details */
                             <>
                                 <div className="info-item"><strong><Wrench size={16}/> الحالة:</strong> <span>{ad.condition}</span></div>
                                 <div className="info-item"><strong><Calendar size={16}/> سنة الصنع:</strong> <span>{ad.model_year}</span></div>
