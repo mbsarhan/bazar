@@ -60,6 +60,7 @@ function App() {
             <Route path="my-profile" element={<MyProfile />} />
             <Route path="my-profile/security-settings" element={<SecuritySettings />} />
             <Route path="car-ads" element={<MyCarAds />} />
+            <Route path="edit-car/:adId" element={<AddCarForm />} />
             <Route path="real-estate-ads" element={<MyRealEstateAds />} />
             <Route path="reviews" element={<Reviews />} />
           </Route>

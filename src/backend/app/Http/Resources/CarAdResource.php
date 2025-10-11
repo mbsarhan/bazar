@@ -26,26 +26,32 @@ class CarAdResource extends JsonResource
         // The '$this' variable refers to the Advertisement model instance.
         // We can access its relationships that we eager-loaded.
         return [
-            'id'           => $this->id,
+            'id'                => $this->id,
             // Combining fields to create the 'title' as requested
-            'title'        => "{$this->carDetails->manufacturer} {$this->carDetails->model} {$this->carDetails->model_year}",
+            'title'             => "{$this->carDetails->manufacturer} {$this->carDetails->model} {$this->carDetails->model_year}",
+            'manufacturer'      => $this->carDetails->manufacturer,
+            'model'             => $this->carDetails->model,
+            'model_year'        => $this->carDetails->model_year,
             // Formatting the price with a currency symbol
-            'price'        => number_format($this->price) . ' $',
+            'price'             => number_format($this->price),
             // Combining governorate and city for the 'location'
-            'location'     => "{$this->governorate}, {$this->city}",
-            'status'       => $this->ad_status,
-            'views'        => $this->views_count,
-            'year'         => $this->carDetails->model_year,
-            'mileage'      => $this->carDetails->distance_traveled,
-            'transmission' => $this->carDetails->gear,
-            'fuelType'     => $this->carDetails->fule_type,
-            'condition'    => $this->carDetails->status,
+            'location'          => "{$this->governorate}, {$this->city}",
+            'governorate'       => $this->governorate,
+            'city'              => $this->city,
+            'transaction_type'  => $this->carDetails->transaction_type,
+            'status'            => $this->ad_status,
+            'views'             => $this->views_count,
+            'distance_traveled' => number_format($this->carDetails->distance_traveled),
+            'negotiable_check'  => $this->carDetails->negotiable_check,
+            'gear'              => $this->carDetails->gear,
+            'fule_type'         => $this->carDetails->fule_type,
+            'condition'         => $this->carDetails->status,
             // --- 1. ADD THE DESCRIPTION FIELD ---
-            'description'  => $this->description,
+            'description'       => $this->description,
 
             // --- 2. ADD THE OWNER (SELLER) INFORMATION ---
             // The 'owner' relationship was already eager-loaded in the controller.
-            'owner'        => [
+            'owner'             => [
                 'name' => "{$this->owner->fname} {$this->owner->lname}",
                 'phone' => "{$this->owner->phone}",
                 // You can add more owner details here if needed later, like phone number
@@ -53,7 +59,7 @@ class CarAdResource extends JsonResource
 
 
             // --- THE CORRECTED IMAGE URL GENERATION ---
-            'imageUrls'    => $this->whenLoaded('carDetails', function () use ($baseUrl) {
+            'imageUrls'         => $this->whenLoaded('carDetails', function () use ($baseUrl) {
                 return $this->carDetails->ImagesForCar->map(function ($image) use ($baseUrl) {
                     // Manually construct the full, absolute URL.
                     // $image->image_url is 'images/cars/your-file.jpg'

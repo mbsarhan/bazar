@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // <-- 1. IMPORT THE NEW HOOK
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
@@ -15,13 +15,18 @@ const UploadIcon = () => (
 
 const AddCarForm = () => {
     const navigate = useNavigate();
-    const { createCarAd } = useAds(); // <-- 2. GET THE FUNCTION FROM THE CONTEXT
+    const { adId } = useParams(); // 2. Get the adId from the URL
+    const isEditMode = Boolean(adId); // 3. Determine if we are in Edit Mode
+
+
+    const { createCarAd, getAdById, updateCarAd } = useAds(); // Get functions from context
+
     // This state object is now perfect. Do not change it.
     const [formData, setFormData] = useState({
         transaction_type: 'بيع',
         manufacturer: '',
         model: '',
-        status: 'مستعملة',
+        condition: 'مستعملة',
         gear: 'أوتوماتيك',
         fule_type: 'بانزين',
         model_year: '',
@@ -37,9 +42,10 @@ const AddCarForm = () => {
         front: null, back: null, side1: null, side2: null,
     });
     const [extraImages, setExtraImages] = useState([]); // مصفوفة للصور الإضافية
-
     const [errorMessage, setErrorMessage] = useState(''); // لرسالة الخطأ العامة في الأعلى
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(isEditMode); // Start loading if in edit mode
 
     const fileInputRef = useRef(null);
     const uploadMode = useRef(null); // لتحديد ما إذا كنا نرفع صورة إلزامية أم إضافية
@@ -85,6 +91,43 @@ const AddCarForm = () => {
         setExtraImages(prev => prev.filter((_, i) => i !== index));
     };
 
+
+    // --- 4. NEW useEffect to fetch data in Edit Mode ---
+    useEffect(() => {
+        if (isEditMode) {
+            const fetchAdData = async () => {
+                try {
+                    const adData = await getAdById(adId);
+                    
+                    // Pre-populate the form with the fetched data
+                    setFormData({
+                        transaction_type: adData.transaction_type || 'بيع',
+                        manufacturer: adData.manufacturer || '',
+                        model: adData.model || '',
+                        condition: adData.condition || 'مستعملة',
+                        gear: adData.gear || 'أوتوماتيك',
+                        fule_type: adData.fule_type || 'بانزين',
+                        model_year: adData.model_year || '',
+                        distance_traveled: adData.distance_traveled ?? '',
+                        price: adData.price || '',
+                        negotiable_check: adData.negotiable_check === 1, // Convert 1/0 to true/false
+                        governorate: adData.governorate || 'دمشق',
+                        city: adData.city || '',
+                        description: adData.description || '',
+                    });
+                    // You would also handle pre-populating images here
+                    
+                } catch (err) {
+                    console.error("Failed to fetch ad data for editing:", err);
+                    setErrorMessage("فشل تحميل بيانات الإعلان.");
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchAdData();
+        }
+    }, [adId, getAdById, isEditMode]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
@@ -112,44 +155,53 @@ const AddCarForm = () => {
             window.scrollTo(0, 0);
             return;
         }
-        // --- Build the FormData object ---
-        const adData = new FormData();
-
-        // Append all text/number/boolean fields
-        // --- THIS IS THE FIX ---
-        // We will loop through the formData and handle the boolean conversion.
-        for (const key in formData) {
-            if (key === 'negotiable_check') {
-                // If the key is our checkbox, convert the boolean to '1' or '0'
-                adData.append(key, formData[key] ? '1' : '0');
-            } else {
-                // For all other fields, append the value as is.
-                adData.append(key, formData[key]);
-            }
-        }
-
-        // Append mandatory image files
-        for (const key in mandatoryImages) {
-            if (mandatoryImages[key]) {
-                adData.append(key, mandatoryImages[key]);
-            }
-        }
         
-        // Append extra image files as an array
-        extraImages.forEach((file) => {
-            adData.append('extra_images[]', file);
-        });
 
+        setIsSubmitting(true);
         // --- Call the API ---
         try {
-            const result = await createCarAd(adData);
-            alert(result.message); // Show success message from the server
-            navigate('/dashboard'); // Redirect on success
+            const dataToSubmit = new FormData();
+            
+            // Append all form fields
+            for (const key in formData) {
+                let value = formData[key];
+                if (key === 'negotiable_check') {
+                    value = value ? '1' : '0';
+                }
+
+                if (key === 'price' || key === 'distance_traveled' || key === 'model_year') {
+                    value = parseInt(value) || 0; // Use parseFloat and fallback to 0 if invalid
+                }
+
+                dataToSubmit.append(key, formData[key]);
+            }
+            
+            // Append images
+            for (const key in mandatoryImages) {
+                if(mandatoryImages[key]) dataToSubmit.append(`mandatory_images[${key}]`, mandatoryImages[key]);
+            }
+            extraImages.forEach((file, index) => {
+                dataToSubmit.append(`extra_images[${index}]`, file);
+            });
+
+
+            if (isEditMode) {
+                // For updates with FormData, you must use POST and add a _method field
+                dataToSubmit.append('_method', 'PUT'); 
+                await updateCarAd(adId, dataToSubmit);
+                alert('تم تحديث الإعلان بنجاح!');
+                navigate('/dashboard/car-ads');
+            } else {
+                await createCarAd(dataToSubmit);
+                alert('تم نشر الإعلان بنجاح!');
+                navigate('/dashboard/car-ads');
+            }
         } catch (error) {
-            // THE FIX: Set the error message as a plain string.
-            // The API error.message already contains newline characters (\n).
-            setErrorMessage(error.message);
+            setErrorMessage(error.response?.data?.message || 'فشل إرسال الإعلان.');
             window.scrollTo(0, 0); // Scroll to top to show the error
+        }
+        finally{
+            setIsSubmitting(false);
         }
     };
 
@@ -184,15 +236,14 @@ const AddCarForm = () => {
         );
     };
 
+    if (isLoading) {
+        return <div className="form-container wide-form"><p>جاري تحميل بيانات الإعلان...</p></div>;
+    }
+
     return (
         <div className="form-container wide-form">
-            <h2>أضف إعلان سيارة جديد</h2>
-            <p className="form-subtitle">املأ التفاصيل التالية لنشر إعلانك</p>
-            {/* 
-              --- THIS IS THE CORRECTED JSX ---
-              We render the error message directly and use CSS `white-space`
-              to respect the newline characters from the API error.
-            */}
+            <h2>{isEditMode ? 'تعديل إعلان سيارة' : 'أضف إعلان سيارة جديد'}</h2>
+            <p className="form-subtitle">{isEditMode ? 'قم بتحديث بيانات إعلانك أدناه.' : 'املأ التفاصيل التالية لنشر إعلانك'}</p>
 
             {errorMessage && (
                 <div className="error-message" style={{ whiteSpace: 'pre-line' }}>
@@ -220,11 +271,11 @@ const AddCarForm = () => {
                         </div>
                         <div className="form-group">
                             <label htmlFor="model_year">سنة الصنع *</label>
-                            <input type="number" id="model_year" name="model_year" value={formData.model_year} onChange={handleChange} placeholder="مثال: 2022" className={errors.model_year ? 'input-error' : ''} />
+                            <input type="text" id="model_year" name="model_year" value={formData.model_year} onChange={handleChange} placeholder="مثال: 2022" className={errors.model_year ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="status">الحالة</label>
-                            <select id="status" name="status" value={formData.status} onChange={handleChange}>{conditions.map(c => <option key={c} value={c}>{c}</option>)}</select>
+                            <label htmlFor="condition">الحالة</label>
+                            <select id="condition" name="condition" value={formData.condition} onChange={handleChange}>{conditions.map(c => <option key={c} value={c}>{c}</option>)}</select>
                         </div>
                     </div>
                 </fieldset>
@@ -235,24 +286,31 @@ const AddCarForm = () => {
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="gear">ناقل الحركة *</label>
-                            <select id="gear" name="gear" value={formData.gear} onChange={handleChange}
-                                className={errors.gear ? 'input-error' : ''}>
-                                {transmissions.map(t => <option key={t} value={t}>{t}</option>)}
+                            <select id="gear" name="gear" value={formData.gear} onChange={handleChange}>
+                                 {transmissions.map(t => <option key={t} value={t}>{t}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="fule_type">نوع الوقود *</label>
-                            <select id="fule_type" name="fule_type" value={formData.fule_type} onChange={handleChange}
-                                className={errors.fule_type ? 'input-error' : ''}>
+                            <select id="fule_type" name="fule_type" value={formData.fule_type} onChange={handleChange}>
                                 {fuelTypes.map(f => <option key={f} value={f}>{f}</option>)}
                             </select>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="distance_traveled">المسافة المقطوعة (كم) *</label>
-                            <input type="number" id="distance_traveled" name="distance_traveled" value={formData.distance_traveled} onChange={handleChange}
-                                placeholder="مثال: 50000" className={errors.distance_traveled ? 'input-error' : ''} />
-                        </div>
                     </div>
+                    {/* The distance_traveled input is now in its own full-width group */}
+                    <div className="form-group" style={{marginTop: '20px'}}>
+                       <label htmlFor="distance_traveled">المسافة المقطوعة (كم) *</label>
+                       <input 
+                            type="text" 
+                            inputMode="numeric" 
+                            pattern="[0-9]*"
+                            id="distance_traveled" 
+                            name="distance_traveled" 
+                            value={formData.distance_traveled} 
+                            onChange={handleChange} 
+                            placeholder="مثال: 50000"
+                       />
+                   </div>
                 </fieldset>
 
                 {/* --- القسم الثالث: السعر والموقع (موجود الآن) --- */}
@@ -261,7 +319,7 @@ const AddCarForm = () => {
                     <div className="form-grid">
                         <div className="form-group price-group">
                             <label htmlFor="price">السعر (دولار أمريكي) *</label>
-                            <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
+                            <input type="text" id="price" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                             <div className="checkbox-group">
                                 <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
                                 <label htmlFor="negotiable_check">السعر قابل للتفاوض</label>
@@ -332,7 +390,9 @@ const AddCarForm = () => {
                     multiple // السماح بتحديد عدة ملفات مرة واحدة للصور الإضافية
                 />
 
-                <button type="submit" className="submit-btn">نشر الإعلان</button>
+                <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                    {isSubmitting ? 'جاري الحفظ...' : (isEditMode ? 'حفظ التعديلات' : 'نشر الإعلان')}
+                </button>
             </form>
         </div>
     );

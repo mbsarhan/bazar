@@ -81,6 +81,15 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
 
     } ;
 
+    const handleEditClick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Determine the correct edit path based on the ad type
+        const editPath = ad.model_year ? `/dashboard/edit-car/${ad.id}` : `/dashboard/edit-real-estate/${ad.id}`;
+        navigate(editPath);
+    };
+
     // Stop propagation on delete button to prevent navigation
     const handleDeleteClick = (e) => {
         e.stopPropagation();
@@ -117,20 +126,20 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
                         </>
                     )}
 
-                    {!isPublic && ( <span className={`ad-card-status ${getStatusClass(ad.status)}`}>{ad.status}</span> )}
+                {!isPublic && ( <span className={`ad-card-status ${getStatusClass(ad.status)}`}>{ad.status}</span> )}
                 </div>
                 <div className="ad-card-details">
                     <h3>{ad.title}</h3>
                     <p className="ad-card-price">{ad.price}</p>
                     <div className="ad-card-specs">
-                        {ad.year && (
+                        {ad.model_year && (
                             <>
                                 <div className="spec-item"><Wrench size={16} /><span>{ad.condition}</span></div>
-                                <div className="spec-item"><Calendar size={16} /><span>{ad.year}</span></div>
-                                <div className="spec-item"><MapPin size={16} /><span>{ad.location.split(',')[0]}</span></div>
-                                <div className="spec-item"><GaugeCircle size={16} /><span>{formatNumber(ad.mileage)} كم</span></div>
-                                <div className="spec-item"><GitCommitVertical size={16} /><span>{ad.transmission}</span></div>
-                                <div className="spec-item"><Fuel size={16} /><span>{ad.fuelType}</span></div>
+                                <div className="spec-item"><Calendar size={16} /><span>{ad.model_year}</span></div>
+                                <div className="spec-item"><MapPin size={16} /><span>{ad.governorate}</span></div>
+                                <div className="spec-item"><GaugeCircle size={16} /><span>{formatNumber(ad.distance_traveled)} كم</span></div>
+                                <div className="spec-item"><GitCommitVertical size={16} /><span>{ad.gear}</span></div>
+                                <div className="spec-item"><Fuel size={16} /><span>{ad.fule_type}</span></div>
                             </>
                         )}
                         {ad.propertyType && (
@@ -148,7 +157,7 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
             {!isPublic && (
                 <div className="ad-card-actions">
                     <button className="action-btn view-btn" onClick={handleShowClick}><ViewIcon /> عرض</button>
-                    <button className="action-btn edit-btn"><EditIcon /> تعديل</button>
+                    <button className="action-btn edit-btn" onClick={handleEditClick}><EditIcon /> تعديل</button>
                     <button className="action-btn delete-btn" onClick={handleDeleteClick}><DeleteIcon /> حذف</button>
                 </div>
             )}

@@ -119,11 +119,11 @@ const AdDetailPage = () => {
                         {ad.year && ( /* Car Details */
                             <>
                                 <div className="info-item"><strong><Wrench size={16}/> الحالة:</strong> <span>{ad.condition}</span></div>
-                                <div className="info-item"><strong><Calendar size={16}/> سنة الصنع:</strong> <span>{ad.year}</span></div>
-                                <div className="info-item"><strong><MapPin size={16}/> المحافظة:</strong> <span>{ad.location.split(',')[0]}</span></div>
-                                <div className="info-item"><strong><GaugeCircle size={16}/> المسافة المقطوعة:</strong> <span>{formatNumber(ad.mileage)} كم</span></div>
-                                <div className="info-item"><strong><GitCommitVertical size={16}/> ناقل الحركة:</strong> <span>{ad.transmission}</span></div>
-                                <div className="info-item"><strong><Fuel size={16}/> نوع الوقود:</strong> <span>{ad.fuelType}</span></div>
+                                <div className="info-item"><strong><Calendar size={16}/> سنة الصنع:</strong> <span>{ad.model_year}</span></div>
+                                <div className="info-item"><strong><MapPin size={16}/> المحافظة:</strong> <span>{ad.governorate}</span></div>
+                                <div className="info-item"><strong><GaugeCircle size={16}/> المسافة المقطوعة:</strong> <span>{formatNumber(ad.distance_traveled)} كم</span></div>
+                                <div className="info-item"><strong><GitCommitVertical size={16}/> ناقل الحركة:</strong> <span>{ad.gear}</span></div>
+                                <div className="info-item"><strong><Fuel size={16}/> نوع الوقود:</strong> <span>{ad.fule_type}</span></div>
                             </>
                         )}
                         {ad.propertyType && ( /* Real Estate Details */
