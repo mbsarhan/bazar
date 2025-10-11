@@ -7,6 +7,7 @@ import 'rc-slider/assets/index.css';
 import { AuthProvider } from './context/AuthContext';
 import { AdProvider } from './context/AdContext'; // <-- IMPORT
 import { DashboardProvider } from './context/DashboardContext'; // <-- IMPORT
+import { UserProvider } from './context/UserContext'; // <-- IMPORT
 import ScrollToTop from './components/ScrollToTop';
 
 // --- Import pages and layouts ---
@@ -37,6 +38,7 @@ function App() {
     <AuthProvider>
       <AdProvider>
       <DashboardProvider>
+      <UserProvider>
       <Router>
         <ScrollToTop />
         <Header /> 
@@ -66,6 +68,7 @@ function App() {
 
         </Routes>
       </Router>
+      </UserProvider>
       </DashboardProvider>
       </AdProvider>
     </AuthProvider>
