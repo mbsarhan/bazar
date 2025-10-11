@@ -144,12 +144,22 @@ export const AdProvider = ({ children }) => {
         return response.data; // Return the success message
     };
 
-    
+
+
+    /**
+     * NEW: Fetches the public list of all active ads for the homepage.
+     */
+    const getPublicAds = async () => {
+        // This is a public route, so no token is needed. We can use the 'api' client.
+        const response = await api.get('/advertisements');
+        // The paginated resource collection is wrapped in a 'data' key.
+        return response.data.data;
+    };
 
 
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds}}>
             {children}
         </AdContext.Provider>
     );

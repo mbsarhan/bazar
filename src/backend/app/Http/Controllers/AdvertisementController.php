@@ -4,15 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\advertisement;
 use Illuminate\Http\Request;
+use App\Services\AdvertisementService;
+use App\Http\Resources\AdvertisementResource;
 
 class AdvertisementController extends Controller
 {
+    protected AdvertisementService $advertisementService;
+
+    public function __construct(AdvertisementService $advertisementService)
+    {
+        $this->advertisementService = $advertisementService;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $ads = $this->advertisementService->getPublicListing();
+
+        // Return the paginated data, formatted through our unified resource
+        return AdvertisementResource::collection($ads);
     }
 
     /**
