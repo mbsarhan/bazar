@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('manufacturer');
             $table->string('model');
             $table->year('model_year'); 
-            $table->enum('status', ['جديدة', 'مستعملة', 'متضررة'])->default('مستعملة');
+            $table->enum('status', ['جديدة', 'مستعملة', 'متضررة'])->default('مستعملة'); //changed
             $table->enum('gear', ['عادي', 'أوتوماتيك', 'الإثنان معا']);
-            $table->enum('fule_type', ['بانزين', 'ديزل', 'كهرباء', 'هايبرد']);
+            $table->enum('fule_type', ['بانزين', 'ديزل', 'كهرباء', 'هايبرد']); //changed
             $table->unsignedBigInteger('distance_traveled');
             $table->boolean('negotiable_check')->default(false);
             $table->unique('ads_id'); 
