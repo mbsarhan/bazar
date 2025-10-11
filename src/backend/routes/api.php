@@ -10,7 +10,7 @@ use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\UserRatingsController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
-
+use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
 
 
 /*
@@ -27,6 +27,9 @@ use App\Http\Controllers\RealestateAdsController;
 // Public routes (no authentication needed)
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+// Advertisements & SearchFilters
+Route::get('/advertisements', [AdvertisementController::class, 'index']);
 
 //Verify Email with Otp
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
@@ -45,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/verify-password', [UserController::class, 'verifyPassword']);
     Route::post('/user/password', [UserController::class, 'updatePassword']);
     Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::get('/user/reviews', [UserController::class, 'getReviews']);
 
     
     // Car Ad Management

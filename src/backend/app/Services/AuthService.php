@@ -33,13 +33,8 @@ class AuthService
                 $message = 'تمت عملية تسجيل المستخدم بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك';
             }
 
-
-
-            $token = $user->createToken('authToken')->plainTextToken;
-
             return [
                 'message' => $message,
-                'access_token' => $token,
             ];
         } catch (Exception $e) {
             Log::error('Register failed', [

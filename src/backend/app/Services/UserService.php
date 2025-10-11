@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException; // <-- IMPORT
 use Carbon\Carbon; // <-- 1. IMPORT CARBON FOR DATE MANIPULATION
 use Exception;
+use App\Models\UserRating; // <-- IMPORT
+use Illuminate\Support\Facades\DB; // <-- IMPORT
 use Ramsey\Uuid\Type\Integer;
 
 class UserService
@@ -81,6 +83,45 @@ class UserService
         } catch (Exception $e) {
             Log::error('Profile update failed', [ 'user_id' => $user->id, 'error' => $e->getMessage() ]);
             throw $e;
+        }
+    }
+
+
+
+    /**
+     * Get all review data for a specific user.
+     * This is the new, simpler, and more efficient version.
+     */
+    public function getReviewData(User $user): array
+    {
+        try {
+            // 1. Get the pre-calculated average directly from the user's 'review' column.
+            $averageRating = $user->review;
+
+            // 2. Perform a simple, fast count of the total reviews received.
+            $totalReviews = UserRating::where('rated_id', $user->id)->count();
+
+            // 3. Fetch the paginated list of individual reviews.
+            $reviews = UserRating::where('rated_id', $user->id)
+                                 ->with('rater:id,fname,lname') // Eager-load the reviewer's name
+                                 ->latest()
+                                 ->paginate(10); // Paginate for performance
+
+            return [
+                'averageRating' => $averageRating,
+                'totalReviews'  => $totalReviews,
+                'reviews'       => $reviews,
+            ];
+
+        } catch (Exception $e) {
+            // Log the detailed error for debugging.
+            Log::error('Failed to get review data for user.', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
+            // Re-throw the exception to be handled by the controller.
+            throw new Exception("An internal server error occurred while fetching review data.");
         }
     }
 }
