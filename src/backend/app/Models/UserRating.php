@@ -9,8 +9,9 @@ class UserRating extends Model
     protected $table = 'user_ratings';
     protected $fillable = [
         'rater_id',
-        'rating_id',
+        'rated_id',
         'rating', 
+        'message',
     ];
 
     public function rater()

@@ -5,10 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\CarAdsController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailChangeController;
+use App\Http\Controllers\UserRatingsController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
-use App\Http\Controllers\DashboardController;
 
 
 
@@ -72,4 +73,9 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/user/email/resend-change', [EmailChangeController::class, 'resendChange'])
     ->middleware('throttle:1,2');
+
+
+
+    //Rating and Review
+    Route::post('/users/rate', [UserRatingsController::class, 'store'])->middleware('throttle:5,1');
 });
