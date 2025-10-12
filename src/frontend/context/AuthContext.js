@@ -102,6 +102,30 @@ export const AuthProvider = ({ children }) => {
         return response.data;
     };
 
+
+    /**
+     * Step 1 of email change: Request a verification code to be sent to the new email.
+     */
+    const requestEmailChange = async (newEmail) => {
+        const response = await api.post('/user/email/request-change', { email: newEmail });
+        return response.data; // e.g., { message: '...' }
+    };
+
+    /**
+     * Step 2 of email change: Verify the code and finalize the update.
+     */
+    const verifyEmailChange = async (code) => {
+        const response = await api.post('/user/email/verify-change', { code });
+        
+        // --- CRITICAL STEP ---
+        // After a successful email change, we must refresh the user data
+        // to update the email displayed everywhere in the app.
+        const userResponse = await api.get('/user');
+        setUser(userResponse.data); // Update the central user state
+
+        return response.data; // Return the success message from the verify endpoint
+    };
+
     // Make sure the rest of your file (like the 'value' object and return statement) is correct.
 // The 'value' object should look like this:
 const value = {
@@ -112,6 +136,8 @@ const value = {
     verifyPassword, // <-- 3. EXPOSE THE NEW FUNCTIONS
     updatePassword, // <-- ADD THIS
     updateProfile,
+    requestEmailChange,
+    verifyEmailChange,
     isDashboardCollapsed,
     setIsDashboardCollapsed
 };

@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Modal from './Modal';
-import axios from 'axios';
+
 import { Mail, Phone, Lock } from 'lucide-react';
 import '../../styles/forms.css';
 import '../../styles/MyProfile.css';
 
-const API_URL = 'http://127.0.0.1:8000/api';
+
 
 const SecuritySettings = () => {
     // --- 1. Get the new updatePassword function from the context ---
-    const { user, updatePassword } = useAuth();
+    const { user, requestEmailChange, verifyEmailChange, updatePassword } = useAuth();
 
     // --- State for Display ---
     const [email, setEmail] = useState(user?.email || 'user@example.com');
     const [phone, setPhone] = useState(user?.phone || '0912345678');
+
+
     
     // --- State for Modals ---
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
     const [emailChangeStep, setEmailChangeStep] = useState(1); // 1: Enter new email, 2: Enter code
+    const [verificationCode, setVerificationCode] = useState('');
     const [newEmail, setNewEmail] = useState('');
-    const [otpCode, setOtpCode] = useState('');
     
     const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -40,63 +42,44 @@ const SecuritySettings = () => {
         setError('');
         setIsSubmitting(true);
 
-        // --- Step 1: Request an OTP for the new email address ---
-        if (emailChangeStep === 1) {
-            try {
+        try {
+            // --- Step 1: Request the change ---
+            if (emailChangeStep === 1) {
                 if (!newEmail || !newEmail.includes('@')) {
-                    throw new Error('يرجى إدخال بريد إلكتروني صالح.');
+                    setError('يرجى إدخال بريد إلكتروني صالح.');
+                    return;
                 }
-                // SIMULATION: Call your backend to send the OTP to `newEmail`
-                // await axios.post(`${API_URL}/user/email/send-otp`, { email: newEmail });
-                console.log(`Simulating sending OTP to ${newEmail}`);
-                alert(`للتجربة، تم إرسال الرمز "123456" إلى ${newEmail}`);
-
+                await requestEmailChange(newEmail);
                 // On success, move to the next step
                 setEmailChangeStep(2);
-
-            } catch (err) {
-                const errorMessage = err.response?.data?.message || err.message || 'حدث خطأ ما.';
-                setError(errorMessage);
             }
-        } 
-        
-        // --- Step 2: Verify the OTP using your existing route ---
-        else if (emailChangeStep === 2) {
-            try {
-                if (!otpCode) {
-                    throw new Error('يرجى إدخال رمز التأكيد.');
+            // --- Step 2: Verify the code ---
+            else if (emailChangeStep === 2) {
+                if (!verificationCode) {
+                    setError('يرجى إدخال رمز التحقق.');
+                    return;
                 }
-                
-                // This is the payload your existing API route expects
-                const payload = { 
-                    email: newEmail, 
-                    code: otpCode 
-                };
-
-                // Use the exact same API route we used on the verification page
-                await axios.post(`${API_URL}/email/verify-otp`, payload);
-
-                // On final success:
-                setEmail(newEmail);
-                setSuccessMessage('تم تغيير البريد الإلكتروني بنجاح!');
+                const result = await verifyEmailChange(verificationCode);
+                setSuccessMessage(result.message || 'تم تحديث البريد الإلكتروني بنجاح!');
+                // Update the local display email after the context refreshes the user object
+                setEmail(newEmail); 
                 closeEmailModal();
-
-            } catch (err) {
-                const errorMessage = err.response?.data?.message || err.message || 'الرمز غير صحيح أو انتهت صلاحيته.';
-                setError(errorMessage);
             }
+        } catch (err) {
+            const errorMessage = err.response?.data?.errors?.email?.[0] || err.response?.data?.errors?.code?.[0] || err.response?.data?.message || 'An error occurred.';
+            setError(errorMessage);
         }
         setIsSubmitting(false);
     };
 
     const closeEmailModal = () => {
         setIsEmailModalOpen(false);
-        setTimeout(() => { 
-            setEmailChangeStep(1); 
-            setNewEmail(''); 
-            setOtpCode(''); 
-            setError(''); 
-        }, 300);
+        setTimeout(() => {
+            setEmailChangeStep(1);
+            setNewEmail('');
+            setVerificationCode('');
+            setError('');
+        }, 300); // Delay for fade-out animation
     };
 
     // --- This function renders the correct content inside the email modal ---
@@ -118,7 +101,7 @@ const SecuritySettings = () => {
                     <p>لقد أرسلنا رمز تأكيد إلى <strong>{newEmail}</strong>. الرجاء إدخاله أدناه.</p>
                     <div className="form-group">
                         <label>رمز التأكيد</label>
-                        <input type="text" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} />
+                        <input type="text" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} />
                     </div>
                 </>
             );
