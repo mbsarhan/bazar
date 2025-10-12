@@ -64,6 +64,7 @@ function App() {
             <Route path="car-ads" element={<MyCarAds />} />
             <Route path="edit-car/:adId" element={<AddCarForm />} />
             <Route path="real-estate-ads" element={<MyRealEstateAds />} />
+            <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
             <Route path="reviews" element={<Reviews />} />
           </Route>
 

@@ -139,15 +139,15 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
                                 <div className="spec-item"><MapPin size={16} /><span>{ad.governorate}</span></div>
                                 <div className="spec-item"><GaugeCircle size={16} /><span>{formatNumber(ad.distance_traveled)} كم</span></div>
                                 <div className="spec-item"><GitCommitVertical size={16} /><span>{ad.gear}</span></div>
-                                <div className="spec-item"><Fuel size={16} /><span>{ad.fule_type}</span></div>
+                                <div className="spec-item"><Fuel size={16} /><span>{ad.fuel_type}</span></div>
                             </>
                         )}
-                        {ad.propertyType && (
+                        {ad.realestate_type && (
                             <>
-                                <div className="spec-item"><Home size={16} /><span>{ad.propertyType}</span></div>
+                                <div className="spec-item"><Home size={16} /><span>{ad.realestate_type}</span></div>
                                 <div className="spec-item"><MapPin size={16} /><span>{ad.location}</span></div>
                                 <div className="spec-item"><Square size={16} /><span>{ad.area} م²</span></div>
-                                <div className="spec-item"><BedDouble size={16} /><span>{ad.bedrooms} غرف نوم</span></div>
+                                <div className="spec-item"><BedDouble size={16} /><span>{ad.bedroom_num} غرف نوم</span></div>
                             </>
                         )}
                     </div>

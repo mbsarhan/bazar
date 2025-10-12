@@ -98,7 +98,7 @@ const AddCarForm = () => {
             const fetchAdData = async () => {
                 try {
                     const adData = await getAdById(adId);
-                    
+
                     // Pre-populate the form with the fetched data
                     setFormData({
                         transaction_type: adData.transaction_type || 'بيع',
@@ -116,7 +116,19 @@ const AddCarForm = () => {
                         description: adData.description || '',
                     });
                     // You would also handle pre-populating images here
-                    
+
+                    if (adData?.imageUrls) {
+                        setMandatoryImages({
+                            front: adData.imageUrls[0] || null,
+                            back: adData.imageUrls[1] || null,
+                            side1: adData.imageUrls[2] || null,
+                            side2: adData.imageUrls[3] || null,
+                        });
+
+                        const extra = adData.imageUrls.slice(4);
+                        setExtraImages(extra);
+                    }
+
                 } catch (err) {
                     console.error("Failed to fetch ad data for editing:", err);
                     setErrorMessage("فشل تحميل بيانات الإعلان.");
@@ -155,13 +167,13 @@ const AddCarForm = () => {
             window.scrollTo(0, 0);
             return;
         }
-        
+
 
         setIsSubmitting(true);
         // --- Call the API ---
         try {
             const dataToSubmit = new FormData();
-            
+
             // Append all form fields
             for (const key in formData) {
                 let value = formData[key];
@@ -175,10 +187,10 @@ const AddCarForm = () => {
 
                 dataToSubmit.append(key, formData[key]);
             }
-            
+
             // Append images
             for (const key in mandatoryImages) {
-                if(mandatoryImages[key]) dataToSubmit.append(`mandatory_images[${key}]`, mandatoryImages[key]);
+                if (mandatoryImages[key]) dataToSubmit.append(`mandatory_images[${key}]`, mandatoryImages[key]);
             }
             extraImages.forEach((file, index) => {
                 dataToSubmit.append(`extra_images[${index}]`, file);
@@ -187,7 +199,7 @@ const AddCarForm = () => {
 
             if (isEditMode) {
                 // For updates with FormData, you must use POST and add a _method field
-                dataToSubmit.append('_method', 'PUT'); 
+                dataToSubmit.append('_method', 'PUT');
                 await updateCarAd(adId, dataToSubmit);
                 alert('تم تحديث الإعلان بنجاح!');
                 navigate('/dashboard/car-ads');
@@ -200,7 +212,7 @@ const AddCarForm = () => {
             setErrorMessage(error.response?.data?.message || 'فشل إرسال الإعلان.');
             window.scrollTo(0, 0); // Scroll to top to show the error
         }
-        finally{
+        finally {
             setIsSubmitting(false);
         }
     };
@@ -213,17 +225,36 @@ const AddCarForm = () => {
 
     const MandatoryImageUploaderSlot = ({ fieldName, label }) => {
         const image = mandatoryImages[fieldName];
-        const hasError = errors[fieldName]; // التحقق من وجود خطأ لهذا الحقل
+        const hasError = errors[fieldName];
+
+        // Build a safe preview URL
+        const previewUrl = image
+            ? image instanceof File
+                ? URL.createObjectURL(image)
+                : image
+            : null;
 
         return (
             <div className="image-upload-slot">
                 <label>{label} *</label>
-                {/* إضافة كلاس 'input-error' ديناميكياً */}
-                <div className={`upload-box ${hasError ? 'input-error' : ''}`} onClick={() => !image && handleUploadClick('mandatory', fieldName)}>
+
+                <div
+                    className={`upload-box ${hasError ? 'input-error' : ''}`}
+                    onClick={() => !image && handleUploadClick('mandatory', fieldName)}
+                >
                     {image ? (
                         <div className="image-preview">
-                            <img src={URL.createObjectURL(image)} alt={label} />
-                            <button type="button" onClick={(e) => { e.stopPropagation(); removeMandatoryImage(fieldName); }} className="remove-image-btn">&times;</button>
+                            <img src={previewUrl} alt={label} />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeMandatoryImage(fieldName);
+                                }}
+                                className="remove-image-btn"
+                            >
+                                &times;
+                            </button>
                         </div>
                     ) : (
                         <div className="upload-placeholder">
@@ -235,6 +266,7 @@ const AddCarForm = () => {
             </div>
         );
     };
+
 
     if (isLoading) {
         return <div className="form-container wide-form"><p>جاري تحميل بيانات الإعلان...</p></div>;
@@ -287,7 +319,7 @@ const AddCarForm = () => {
                         <div className="form-group">
                             <label htmlFor="gear">ناقل الحركة *</label>
                             <select id="gear" name="gear" value={formData.gear} onChange={handleChange}>
-                                 {transmissions.map(t => <option key={t} value={t}>{t}</option>)}
+                                {transmissions.map(t => <option key={t} value={t}>{t}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
@@ -298,19 +330,19 @@ const AddCarForm = () => {
                         </div>
                     </div>
                     {/* The distance_traveled input is now in its own full-width group */}
-                    <div className="form-group" style={{marginTop: '20px'}}>
-                       <label htmlFor="distance_traveled">المسافة المقطوعة (كم) *</label>
-                       <input 
-                            type="text" 
-                            inputMode="numeric" 
+                    <div className="form-group" style={{ marginTop: '20px' }}>
+                        <label htmlFor="distance_traveled">المسافة المقطوعة (كم) *</label>
+                        <input
+                            type="text"
+                            inputMode="numeric"
                             pattern="[0-9]*"
-                            id="distance_traveled" 
-                            name="distance_traveled" 
-                            value={formData.distance_traveled} 
-                            onChange={handleChange} 
+                            id="distance_traveled"
+                            name="distance_traveled"
+                            value={formData.distance_traveled}
+                            onChange={handleChange}
                             placeholder="مثال: 50000"
-                       />
-                   </div>
+                        />
+                    </div>
                 </fieldset>
 
                 {/* --- القسم الثالث: السعر والموقع (موجود الآن) --- */}
@@ -364,11 +396,25 @@ const AddCarForm = () => {
                         {extraImages.map((image, index) => (
                             <div key={index} className="upload-box">
                                 <div className="image-preview">
-                                    <img src={URL.createObjectURL(image)} alt={`extra ${index + 1}`} />
-                                    <button type="button" onClick={() => removeExtraImage(index)} className="remove-image-btn">&times;</button>
+                                    <img
+                                        src={
+                                            image instanceof File
+                                                ? URL.createObjectURL(image) // for new uploads
+                                                : image                      // for URLs from backend
+                                        }
+                                        alt={`extra ${index + 1}`}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeExtraImage(index)}
+                                        className="remove-image-btn"
+                                    >
+                                        &times;
+                                    </button>
                                 </div>
                             </div>
                         ))}
+
 
                         {/* زر "أضف صورة" الدائم */}
                         <div className="upload-box" onClick={() => handleUploadClick('extra')}>

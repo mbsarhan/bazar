@@ -230,6 +230,16 @@
 .ad-card-details h3 {
     margin: 0 0 10px 0;
     font-size: 1.2rem;
+    white-space: nowrap;
+    
+    /* 2. Hide any text that overflows the container's width */
+    overflow: hidden;
+    
+    /* 3. Add the "..." ellipsis to the end of the hidden text */
+    text-overflow: ellipsis;
+    
+    /* 4. (Optional but good) Set a max-width to be safe */
+    max-width: 100%;
 }
 
 .ad-card-price {

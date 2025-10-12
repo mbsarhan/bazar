@@ -31,12 +31,13 @@ class AdvertisementResource extends JsonResource
             $carImages = $this->carDetails->ImagesForCar;
             
             $carData = [
-                'title' => "{$this->carDetails->manufacturer} {$this->carDetails->model} {$this->carDetails->model_year}",
-                'year' => $this->carDetails->model_year,
-                'mileage' => $this->carDetails->distance_traveled,
-                'transmission' => $this->carDetails->gear,
-                'fuelType' => $this->carDetails->fule_type,
-                'condition' => $this->carDetails->status,
+                'title' => $this->title,
+                'model_year' => $this->carDetails->model_year,
+                'distance_traveled' => $this->carDetails->distance_traveled,
+                'gear' => $this->carDetails->gear,
+                'fuel_type' => $this->carDetails->fuel_type,
+                'condition' => $this->carDetails->condition,
+                'governorate' => $this->governorate,
                 'imageUrls' => $carImages->isNotEmpty()
                     ? $carImages->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}")
                     : ['https://via.placeholder.com/300x200.png?text=No+Image'], // Fallback
@@ -51,8 +52,8 @@ class AdvertisementResource extends JsonResource
             $realEstateImages = $this->realEstateDetails->ImageForRealestate;
 
             $realEstateData = [
-                'title' => "{$this->realEstateDetails->realestate_type} في {$this->city}",
-                'propertyType' => $this->realEstateDetails->realestate_type,
+                'title' => $this->title,
+                'realestate_type' => $this->realEstateDetails->realestate_type,
                 'area' => $this->realEstateDetails->realestate_size,
                 'imageUrls' => $realEstateImages->isNotEmpty()
                     ? $realEstateImages->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}")

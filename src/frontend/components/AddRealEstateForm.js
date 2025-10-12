@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // Import the context hook
 import ProgressBar from './ProgressBar'; // Assuming you have this component
 import '../styles/forms.css';
@@ -16,24 +16,27 @@ const UploadIcon = () => (
 // This is YOUR original component structure.
 const AddRealEstateForm = () => {
     const navigate = useNavigate();
-    const { createRealEstateAd } = useAds(); // Get the function from context
+    const { adId } = useParams();
+    const isEditMode = Boolean(adId);
+
+    const { createRealEstateAd, getAdById, updateRealEstateAd } = useAds(); 
 
     // --- All of your state from your original file ---
     const [formData, setFormData] = useState({
         title: '',
-        transactionType: 'بيع',
-        propertyType: 'شقة',
-        province: 'دمشق',
+        transaction_type: 'بيع',
+        realestate_type: 'شقة',
+        governorate: 'دمشق',
         city: '',
-        address: '',
-        area: '',
-        bedrooms: '',
-        bathrooms: '',
-        floorNumber: '',
-        constructionStatus: 'جاهز',
-        finishingStatus: 'جيد',
+        detailed_address: '',
+        realestate_size: '',
+        bedroom_num: '',
+        bathroom_num: '',
+        floor_num: '',
+        building_status: 'جاهز',
+        cladding_condition: 'جيد',
         price: '',
-        isNegotiable: false,
+        negotiable_check: false,
         description: '',
     });
     const [images, setImages] = useState([]);
@@ -78,6 +81,44 @@ const AddRealEstateForm = () => {
         setVideoFile(null);
     };
 
+    const [isLoading, setIsLoading] = useState(isEditMode);
+
+    // --- Data Fetching for Edit Mode ---
+    useEffect(() => {
+        if (isEditMode) {
+            const fetchAdData = async () => {
+                try {
+                    const adData = await getAdById(adId, 'real-estate');
+                    
+                    setFormData({
+                        title: adData.title ?? '',
+                        transaction_type: adData.transaction_type ?? 'بيع',
+                        realestate_type: adData.realestate_type ?? 'شقة',
+                        governorate: adData.governorate ?? 'دمشق',
+                        city: adData.city ?? '',
+                        detailed_address: adData.detailed_address ?? '',
+                        realestate_size: adData.realestate_size ?? '',
+                        bedroom_num: adData.bedroom_num ?? '',
+                        bathroom_num: adData.bathroom_num ?? '',
+                        floor_num: adData.floor_num ?? '',
+                        building_status: adData.building_status ?? 'جاهز',
+                        cladding_condition: adData.cladding_condition ?? 'جيد',
+                        price: adData.price ?? '',
+                        negotiable_check: adData.negotiable_check === 1,
+                        description: adData.description ?? '',
+                    });
+                    
+                } catch (err) {
+                    console.error("Failed to fetch ad data for editing:", err);
+                    setErrorMessage("فشل تحميل بيانات الإعلان.");
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchAdData();
+        }
+    }, [adId, getAdById, isEditMode]);
+
     // --- THIS IS THE ONLY PART THAT CHANGES ---
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -98,7 +139,7 @@ const AddRealEstateForm = () => {
         // التحقق من كل حقل في النموذج
         if (!formData.title) newErrors.title = true;
         if (!formData.city) newErrors.city = true;
-        if (!formData.address) newErrors.address = true;
+        if (!formData.detailed_address) newErrors.detailed_address = true;
         if (!formData.area) newErrors.area = true;
         if (!formData.price) newErrors.price = true;
         if (!formData.description) newErrors.description = true;
@@ -113,60 +154,35 @@ const AddRealEstateForm = () => {
             window.scrollTo(0, 0);
             return;
         }
-
-        // --- Build the FormData for the API call ---
-        const submissionData = new FormData();
-        
-        // Map frontend camelCase names to backend snake_case names
-        const nameMap = {
-            title:'title',
-            transactionType: 'transaction_type',
-            propertyType: 'realestate_type',
-            province: 'governorate',
-            address: 'detailed_address',
-            area: 'realestate_size',
-            bedrooms: 'bedroom_num',
-            bathrooms: 'bathroom_num',
-            floorNumber: 'floor_num',
-            constructionStatus: 'building_status',
-            finishingStatus: 'cladding_condition',
-            isNegotiable: 'negotiable_check'
-        };
-
-        // Append text fields with correct backend names
-        for (const key in formData) {
-            const backendKey = nameMap[key] || key;
-            let value = formData[key];
-            if (key === 'isNegotiable') {
-                value = value ? '1' : '0'; // Convert boolean to 1/0
-            }
-            submissionData.append(backendKey, value);
-        }
-
-        // Append image files
-        images.forEach(file => {
-            submissionData.append('images[]', file);
-        });
-
-        // Append video file if it exists
-        if (videoFile) {
-            submissionData.append('video', videoFile);
-        }
         
         setIsSubmitting(true);
-        // --- Call the API ---
         try {
-            const result = await createRealEstateAd(submissionData);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            alert(result.message);
-            navigate('/dashboard/real-estate-ads');
-
+            const dataToSubmit = new FormData();
+            
+            for (const key in formData) {
+                let value = formData[key];
+                if (key === 'negotiable_check') {
+                    value = value ? '1' : '0';
+                }
+                dataToSubmit.append(key, value);
+            }
+            images.forEach(file => dataToSubmit.append('images[]', file));
+            if (videoFile) dataToSubmit.append('video', videoFile);
+            
+            if (isEditMode) {
+                dataToSubmit.append('_method', 'PUT');
+                await updateRealEstateAd(adId, dataToSubmit);
+                alert('تم تحديث الإعلان بنجاح!');
+                navigate('/dashboard/real-estate-ads');
+            } else {
+                await createRealEstateAd(dataToSubmit);
+                alert('تم نشر الإعلان بنجاح!');
+                navigate('/dashboard/real-estate-ads');
+            }
         } catch (err) {
-            console.error("Failed to create ad:", err);
-            setErrorMessage(err.response?.data?.message || 'فشل نشر الإعلان.');
+            console.error("Failed to submit ad:", err);
+            setErrorMessage(err.response?.data?.message || 'فشل إرسال الإعلان.');
         } finally {
-            // --- 3. Set submitting back to false ---
             setIsSubmitting(false);
         }
     };
@@ -182,8 +198,8 @@ const AddRealEstateForm = () => {
     const provinces = ["دمشق", "ريف دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "دير الزور", "الحسكة", "الرقة", "إدلب", "السويداء", "درعا", "القنيطرة"];
     return (
         <div className="form-container wide-form">
-            <h2>أضف إعلان عقار جديد</h2>
-            <p className="form-subtitle">املأ التفاصيل التالية لنشر إعلانك</p>
+            <h2>{isEditMode ? 'تعديل إعلان عقار' : 'أضف إعلان عقار جديد'}</h2>
+            <p className="form-subtitle">{isEditMode ? 'قم بتحديث بيانات إعلانك أدناه.' : 'املأ التفاصيل التالية لنشر إعلانك'}</p>
 
             {errorMessage && <div className="error-message" style={{ whiteSpace: 'pre-line' }}>{errorMessage}</div>}
 
@@ -208,12 +224,12 @@ const AddRealEstateForm = () => {
                     <legend>معلومات أساسية</legend>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="transactionType">نوع الصفقة *</label>
-                            <select name="transactionType" value={formData.transactionType} onChange={handleChange}>{transactionTypes.map(t => <option key={t} value={t}>{t}</option>)}</select>
+                            <label htmlFor="transaction_type">نوع الصفقة *</label>
+                            <select name="transaction_type" value={formData.transaction_type} onChange={handleChange}>{transactionTypes.map(t => <option key={t} value={t}>{t}</option>)}</select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="propertyType">نوع العقار *</label>
-                            <select name="propertyType" value={formData.propertyType} onChange={handleChange}>{propertyTypes.map(p => <option key={p} value={p}>{p}</option>)}</select>
+                            <label htmlFor="realestate_type">نوع العقار *</label>
+                            <select name="realestate_type" value={formData.realestate_type} onChange={handleChange}>{propertyTypes.map(p => <option key={p} value={p}>{p}</option>)}</select>
                         </div>
                     </div>
                 </fieldset>
@@ -222,16 +238,16 @@ const AddRealEstateForm = () => {
                     <legend>الموقع</legend>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="province">المحافظة *</label>
-                            <select name="province" value={formData.province} onChange={handleChange}>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select>
+                            <label htmlFor="governorate">المحافظة *</label>
+                            <select name="governorate" value={formData.governorate} onChange={handleChange}>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="city">المدينة / المنطقة *</label>
                             <input type="text" name="city" value={formData.city} onChange={handleChange} className={errors.city ? 'input-error' : ''} />
                         </div>
                         <div className="form-group full-width">
-                            <label htmlFor="address">العنوان التفصيلي *</label>
-                            <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="مثال: المزة - شارع الجلاء - بناء 22" className={errors.address ? 'input-error' : ''} />
+                            <label htmlFor="detailed_address">العنوان التفصيلي *</label>
+                            <input type="text" name="detailed_address" value={formData.detailed_address} onChange={handleChange} placeholder="مثال: المزة - شارع الجلاء - بناء 22" className={errors.address ? 'input-error' : ''} />
                         </div>
                     </div>
                 </fieldset>
@@ -244,24 +260,24 @@ const AddRealEstateForm = () => {
                             <input type="number" name="area" value={formData.area} onChange={handleChange} className={errors.area ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="bedrooms">غرف النوم</label>
-                            <input type="number" name="bedrooms" value={formData.bedrooms} onChange={handleChange} />
+                            <label htmlFor="bedroom_num">غرف النوم</label>
+                            <input type="number" name="bedroom_num" value={formData.bedroom_num} onChange={handleChange} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="bathrooms">الحمامات</label>
-                            <input type="number" name="bathrooms" value={formData.bathrooms} onChange={handleChange} />
+                            <label htmlFor="bathroom_num">الحمامات</label>
+                            <input type="number" name="bathroom_num" value={formData.bathroom_num} onChange={handleChange} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="floorNumber">رقم الطابق</label>
-                            <input type="number" name="floorNumber" value={formData.floorNumber} onChange={handleChange} />
+                            <label htmlFor="floor_num">رقم الطابق</label>
+                            <input type="number" name="floor_num" value={formData.floor_num} onChange={handleChange} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="constructionStatus">حالة البناء *</label>
-                            <select name="constructionStatus" value={formData.constructionStatus} onChange={handleChange}>{constructionStatuses.map(s => <option key={s} value={s}>{s}</option>)}</select>
+                            <label htmlFor="building_status">حالة البناء *</label>
+                            <select name="building_status" value={formData.building_status} onChange={handleChange}>{constructionStatuses.map(s => <option key={s} value={s}>{s}</option>)}</select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="finishingStatus">حالة الإكساء *</label>
-                            <select name="finishingStatus" value={formData.finishingStatus} onChange={handleChange}>{finishingStatuses.map(f => <option key={f} value={f}>{f}</option>)}</select>
+                            <label htmlFor="cladding_condition">حالة الإكساء *</label>
+                            <select name="cladding_condition" value={formData.cladding_condition} onChange={handleChange}>{finishingStatuses.map(f => <option key={f} value={f}>{f}</option>)}</select>
                         </div>
                     </div>
                 </fieldset>
@@ -274,8 +290,8 @@ const AddRealEstateForm = () => {
                             <input type="number" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                         </div>
                         <div className="form-group checkbox-group price-checkbox">
-                            <input type="checkbox" id="isNegotiable" name="isNegotiable" checked={formData.isNegotiable} onChange={handleChange} />
-                            <label htmlFor="isNegotiable">السعر قابل للتفاوض</label>
+                            <input type="checkbox" id="negotiable_check" name="nogotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
+                            <label htmlFor="negotiable_check">السعر قابل للتفاوض</label>
                         </div>
                     </div>
                 </fieldset>
@@ -320,7 +336,7 @@ const AddRealEstateForm = () => {
                 </fieldset>
 
                 <button type="submit" className="submit-btn" disabled={isUploading || isSubmitting}>
-                    {isSubmitting ? 'جاري النشر...' : (isUploading ? 'جاري رفع الفيديو...' : 'نشر إعلان العقار')}
+                    {isSubmitting ? 'جاري الحفظ...' : (isEditMode ? 'حفظ التعديلات' : 'نشر إعلان العقار')}
                 </button>
             </form>
         </div>
