@@ -127,16 +127,16 @@ const AdDetailPage = () => {
                                 <div className="info-item"><strong><MapPin size={16}/> المحافظة:</strong> <span>{ad.governorate}</span></div>
                                 <div className="info-item"><strong><GaugeCircle size={16}/> المسافة المقطوعة:</strong> <span>{formatNumber(ad.distance_traveled)} كم</span></div>
                                 <div className="info-item"><strong><GitCommitVertical size={16}/> ناقل الحركة:</strong> <span>{ad.gear}</span></div>
-                                <div className="info-item"><strong><Fuel size={16}/> نوع الوقود:</strong> <span>{ad.fule_type}</span></div>
+                                <div className="info-item"><strong><Fuel size={16}/> نوع الوقود:</strong> <span>{ad.fuel_type}</span></div>
                             </>
                         )}
-                        {ad.propertyType && ( /* Real Estate Details */
+                        {ad.realestate_type && ( /* Real Estate Details */
                             <>
-                                <div className="info-item"><strong><Home size={16}/> نوع العقار:</strong> <span>{ad.propertyType}</span></div>
+                                <div className="info-item"><strong><Home size={16}/> نوع العقار:</strong> <span>{ad.realestate_type}</span></div>
                                 <div className="info-item"><strong><MapPin size={16}/> الموقع:</strong> <span>{ad.location}</span></div>
                                 <div className="info-item"><strong><Square size={16}/> المساحة:</strong> <span>{ad.area} م²</span></div>
-                                <div className="info-item"><strong><BedDouble size={16}/> غرف النوم:</strong> <span>{ad.bedrooms}</span></div>
-                                <div className="info-item"><strong><Bath size={16}/> الحمامات:</strong> <span>{ad.bathrooms}</span></div>
+                                <div className="info-item"><strong><BedDouble size={16}/> غرف النوم:</strong> <span>{ad.bedroom_num}</span></div>
+                                <div className="info-item"><strong><Bath size={16}/> الحمامات:</strong> <span>{ad.bathroom_num}</span></div>
                             </>
                         )}
                     </div>
