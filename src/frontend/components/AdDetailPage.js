@@ -19,23 +19,28 @@ const AdDetailPage = () => {
     const [error, setError] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // 5. Use useEffect to fetch the specific ad data
+    
+    // 3. This useEffect hook is now perfect. It calls our unified function.
     useEffect(() => {
         const fetchAd = async () => {
             setIsLoading(true);
             setError(null);
             setAd(null);
+
             try {
-                const data = await getAdById(parseInt(adId, 10));
+                // The context function now handles calling the correct endpoint.
+                const data = await getAdById(adId);
                 setAd(data);
             } catch (err) {
-                setError(err.message);
+                // Axios will throw an error on 404, which will be caught here.
+                setError(err.response?.data?.message || err.message || 'Failed to fetch ad details.');
             } finally {
                 setIsLoading(false);
             }
         };
+
         fetchAd();
-    }, [adId, getAdById]);
+    }, [adId, getAdById]); // The dependency array is correct.
 
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
 

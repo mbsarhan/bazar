@@ -23,19 +23,12 @@ class EmailChangeController extends Controller
 
     public function requestChange(EmailChangeRequest $request)
     {
-        if (!$request->user()) {
-        // If we get this error, it means authentication is failing.
-        abort(401, 'User not authenticated.'); 
-    }
         $response = $this->emailChangeService->requestEmailChange(
             $request->user(),
             $request->validated()['email']
         );
-        return response()->json([
-            'success' => true,
-            'message' => 'Verification code sent',
-            'data' => $response
-        ]);
+        // Return a simple, flat response
+        return response()->json($response);
     }
 
     public function verifyChange(VerifyEmailChangeRequest $request)
@@ -44,39 +37,22 @@ class EmailChangeController extends Controller
             $request->user(),
             $request->validated()['code']
         );
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Email address updated successfully',
-            'data' => $response
-        ]);
+        // Return a simple, flat response
+        return response()->json($response);
     }
 
 
+
+    // Your resendChange method is well-structured, but let's simplify its response too.
     public function resendChange(Request $request)
     {
         try {
             $response = $this->emailChangeService->resendEmailChangeVerification($request->user());
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'تم إرسال كود التحقق الجديد',
-                'data' => $response
-            ]);
-
+            return response()->json($response);
         } catch (ValidationException $e) {
-            // Catch the specific validation error from the service (e.g., no pending request)
-            return response()->json([
-                'message' => 'لا يمكن إعادة إرسال الكود',
-                'errors' => $e->errors(),
-            ], 422);
-
+            return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
         } catch (Exception $e) {
-            // Catch any other unexpected errors
-            return response()->json([
-                'success' => false,
-                'message' => 'مشكلة في السيرفر',
-            ], 500);
+            return response()->json(['message' => 'An internal server error occurred.'], 500);
         }
     }
 }

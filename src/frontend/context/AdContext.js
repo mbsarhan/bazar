@@ -57,29 +57,16 @@ export const AdProvider = ({ children }) => {
         // The API now returns a 'data' key because we used a Resource Collection
         return result.data;
     };
+    /**
+     * NEW UNIFIED FUNCTION: Fetches any ad by its ID from the public endpoint.
+     */
     const getAdById = async (adId) => {
-
-
-        const token = localStorage.getItem('authToken');
-        if (!token) throw new Error('User not authenticated.');
-
-
-        const response = await fetch(`${API_URL}/car-ads/${adId}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        const result = await response.json();
-        if (!response.ok) {
-            throw new Error(result.message || 'Failed to fetch the ad.');
-        }
-
-        // The API now returns a 'data' key because we used a Resource Collection
-        return result.data;
-    }
+        // This is a public call, so no token is sent.
+        // We use the new, generalized endpoint.
+        const response = await api.get(`/advertisements/${adId}`);
+        // The resource wraps the response in a 'data' key.
+        return response.data.data;
+    };
     /**
      * NEW FUNCTION: Deletes a specific car ad by its ID.
      */

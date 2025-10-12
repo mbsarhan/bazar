@@ -67,17 +67,7 @@ class CarAdsController extends Controller
     
     public function show(Advertisement $ad)
     {
-        // Load the relationships required by the API Resource
-        $ad->load(['carDetails', 'carDetails.ImagesForCar', 'owner']);
-
-        // Ensure this is actually a car ad before returning it
-        if (is_null($ad->carDetails)) {
-            abort(404, 'Advertisement not found or is not a car advertisement.');
-        }
-
-        // Return the ad, formatted beautifully by our CarAdResource.
-        // This will wrap the final result in a "data" key.
-        return new CarAdResource($ad);
+        //
     }
 
     /**
