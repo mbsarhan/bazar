@@ -11,6 +11,7 @@ use App\Http\Controllers\UserRatingsController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
+use App\Http\Controllers\AdvertisementSearchController;
 
 
 /*
@@ -82,4 +83,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Rating and Review
     Route::post('/users/rate', [UserRatingsController::class, 'store'])->middleware('throttle:5,1');
+
+
+    //Search and filter
+    Route::get('/advertisement/search', [AdvertisementSearchController::class, 'search']);
 });
