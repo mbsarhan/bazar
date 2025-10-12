@@ -30,6 +30,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 // Advertisements & SearchFilters
 Route::get('/advertisements', [AdvertisementController::class, 'index']);
+Route::get('/advertisements/{ad}', [AdvertisementController::class, 'show']);
 
 //Verify Email with Otp
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
@@ -55,7 +56,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/car-ads', [CarAdsController::class, 'store']);
     Route::get('/user/car-ads', [CarAdsController::class, 'index']);
     Route::delete('/car-ads/{ad}', [CarAdsController::class, 'destroy']);
-    Route::get('/car-ads/{ad}', [CarAdsController::class,'show']);
 
   
   

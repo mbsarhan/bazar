@@ -69,30 +69,7 @@ class RealestateAdsController extends Controller
      */
     public function show(int $id)
     {
-            try {
-            // Call the service method to find the ad, increment view, and handle internal errors
-            $ad = $this->realestateAdsService->showAd($id);
-
-            // Return the ad data with a 200 OK status
-            return response()->json([
-                'message' => 'Ad retrieved successfully.',
-                'ad' => $ad
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            // Handle 404 Not Found exception thrown by the service
-            return response()->json([
-                'message' => $e->getMessage(),
-                'error' => 'Not Found'
-            ], 404);
-
-        } catch (Exception $e) {
-            // Handle any other generic error thrown by the service
-            return response()->json([
-                'message' => 'Failed to retrieve ad due to a server error.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+            //
     }
     
 
