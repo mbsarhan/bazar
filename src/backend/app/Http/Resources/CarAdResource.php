@@ -44,8 +44,8 @@ class CarAdResource extends JsonResource
             'distance_traveled' => number_format($this->carDetails->distance_traveled),
             'negotiable_check'  => $this->carDetails->negotiable_check,
             'gear'              => $this->carDetails->gear,
-            'fule_type'         => $this->carDetails->fule_type,
-            'condition'         => $this->carDetails->status,
+            'fule_type'         => $this->carDetails->fuel_type,
+            'condition'         => $this->carDetails->condition,
             // --- 1. ADD THE DESCRIPTION FIELD ---
             'description'       => $this->description,
 

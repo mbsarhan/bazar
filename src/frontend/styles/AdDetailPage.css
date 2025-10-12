@@ -1,7 +1,22 @@
+/* ============================================= */
+/* 1. Main Page Layout & Header                  */
+/* ============================================= */
 .ad-detail-container {
     max-width: 1100px;
     margin: 40px auto;
     padding: 20px;
+}
+
+.ad-detail-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+@media (max-width: 900px) {
+    .ad-detail-content {
+        grid-template-columns: 1fr;
+    }
 }
 
 .ad-detail-header {
@@ -26,47 +41,37 @@
     white-space: nowrap;
 }
 
-.ad-detail-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 40px;
-}
-
-@media (max-width: 900px) {
-    .ad-detail-content {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* ============================================= */
-/* Image Gallery Styles                          */
+/* 2. Image Gallery                              */
 /* ============================================= */
-
 .ad-detail-image-gallery {
     display: flex;
     flex-direction: column;
+    gap: 15px;
 }
 
+/* --- Main Image Viewer --- */
 .main-image-container {
     position: relative;
     overflow: hidden;
     border-radius: 16px;
-    background-color: #f0f0f0; /* Placeholder color */
+    background-color: #f0f0f0;
 }
 
 .main-image {
     width: 100%;
-    aspect-ratio: 4 / 3; /* Maintain a consistent aspect ratio */
+    aspect-ratio: 4 / 3;
     object-fit: cover;
     display: block;
-    transition: opacity 0.3s ease-in-out;
 }
 
+/* --- Navigation Arrows --- */
 .gallery-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.7); /* Match the card arrow background */
+    background-color: rgba(255, 255, 255, 0.7);
     border: none;
     border-radius: 50%;
     width: 48px;
@@ -75,61 +80,43 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #333; /* Match the card arrow color */
+    color: #333;
     z-index: 10;
     opacity: 0;
-    /* Animate ALL properties for the glow effect */
     transition: all 0.2s ease-in-out; 
 }
-
-.gallery-arrow.left {
-    left: 15px;
-}
-
-.gallery-arrow.right {
-    right: 15px;
-}
-
+.gallery-arrow.left { left: 15px; }
+.gallery-arrow.right { right: 15px; }
+.main-image-container:hover .gallery-arrow { opacity: 1; }
 .gallery-arrow:hover {
     background-color: white;
     box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
 }
 
-.main-image-container:hover .gallery-arrow {
-    opacity: 1;
-}
-
+/* --- Swiper.js Thumbnail Scroller --- */
 .thumbnail-scroller {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    overflow-x: auto;
-    padding: 5px; /* Add padding so shadows aren't cut off */
-}
-
-/* Hiding the scrollbar for a cleaner look (optional but recommended) */
-.thumbnail-scroller::-webkit-scrollbar {
-    height: 8px;
-}
-.thumbnail-scroller::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-.thumbnail-scroller::-webkit-scrollbar-track {
-    background: transparent;
+    overflow-x: auto;   /* 1. Allow horizontal scrolling */
+    white-space: nowrap;  /* 2. THIS IS THE KEY: Prevents items from wrapping */
+    padding-bottom: 10px; /* 3. Make space for the scrollbar */
+    font-size: 0;         /* 4. A trick to remove phantom spacing between inline-blocks */
 }
 
 
 .thumbnail-image {
-    width: 100px;
-    height: 75px;
+    display: inline-block; /* 5. Treat thumbnails like words in a single, non-breaking line */
+    width: 80px;           /* 6. The smaller size you wanted */
+    aspect-ratio: 4 / 3;
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     border: 3px solid transparent;
-    flex-shrink: 0;
     transition: all 0.2s ease-in-out;
     opacity: 0.7;
+    margin-right: 10px;    /* 7. Use margin for spacing */
+    vertical-align: top;
+}
+.thumbnail-image:last-child {
+    margin-right: 0;
 }
 
 .thumbnail-image:hover {
@@ -149,11 +136,14 @@
     object-fit: cover;
 }
 
+.thumbnail-scroller::-webkit-scrollbar { height: 8px; }
+.thumbnail-scroller::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+.thumbnail-scroller::-webkit-scrollbar-track { background: transparent; }
+
 
 /* ============================================= */
-/* Ad Info Styles                                */
+/* 3. Ad Information Column                      */
 /* ============================================= */
-
 .ad-detail-info h3 {
     margin-top: 0;
     margin-bottom: 15px;
@@ -205,6 +195,10 @@
     margin-top: 0;
 }
 
+
+/* ============================================= */
+/* 4. Not Found / Error Page Styles              */
+/* ============================================= */
 .not-found {
     text-align: center;
     padding-top: 50px;

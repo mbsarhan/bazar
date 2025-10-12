@@ -52,7 +52,6 @@ const AdDetailPage = () => {
         const newIndex = isLastSlide ? 0 : currentIndex + 1;
         setCurrentIndex(newIndex);
     };
-
     // --- 6. RENDER STATES ---
 
     if (isLoading) {
