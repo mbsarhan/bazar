@@ -143,10 +143,26 @@ export const AdProvider = ({ children }) => {
         return response.data.data;
     };
 
+    /**
+     * NEW: Increments the view count for an ad.
+     * This function will be awaited in the component.
+     */
+    const incrementAdView = async (adId) => {
+        try {
+            // The 'api' client automatically handles the auth token if the user is logged in.
+            // If the user is a guest, no token is sent, which is what our backend expects.
+            await api.post(`/advertisements/${adId}/view`);
+        } catch (error) {
+            // We log the error here for debugging but don't re-throw it.
+            // We don't want a failed view count to stop the user from navigating.
+            console.error("Failed to increment ad view count:", error);
+        }
+    };
+
 
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView}}>
             {children}
         </AdContext.Provider>
     );

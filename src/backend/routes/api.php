@@ -39,6 +39,9 @@ Route::post('/email/verify-otp/resend', [VerificationController::class, 'resend'
      ->name('verification.resend')
      ->middleware('throttle:1,2'); // Limit resends to 1 request every 2 minutes
 
+// --- ADD THIS NEW PUBLIC ROUTE ---
+Route::post('/advertisements/{ad}/view', [AdvertisementController::class, 'incrementView']);     
+
      
 // Protected routes (require Sanctum authentication)
 Route::middleware('auth:sanctum')->group(function () {

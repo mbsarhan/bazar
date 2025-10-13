@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate} from 'react-router-dom';
+import { useAds } from '../../context/AdContext';
 import { 
     ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, 
     GitCommitVertical, Fuel, Wrench, Home, Square, BedDouble, 
@@ -14,6 +15,7 @@ const ViewIcon = () => <ExternalLink size={16} />;
 const AdCard = ({ ad, isPublic = false, onDelete }) => {
 
     const navigate = useNavigate();
+    const { incrementAdView } = useAds();
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const getStatusClass = (status) => {
@@ -77,6 +79,8 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
     const handleShowClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        // Step 1: Call the API and wait for it to finish.
+        incrementAdView(ad.id);
         navigate(`/ad/${ad.id}`);
     } ;
 
@@ -98,8 +102,8 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
 
 
     return (
-        <div className="ad-card">
-            <Link to={`/ad/${ad.id}`} className="ad-card-clickable-area">
+        <div className="ad-card" onClick={handleShowClick}>
+            <Link to={`/ad/${ad.id}`} className="ad-card-clickable-area" onClick={handleShowClick}>
                 <div className="ad-card-image">
                     <img src={ad.imageUrls[currentIndex]} alt={ad.title} />
                     
