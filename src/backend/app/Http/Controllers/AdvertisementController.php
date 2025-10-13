@@ -78,4 +78,26 @@ class AdvertisementController extends Controller
     {
         //
     }
+
+    /**
+     * Increment the view count for a specific advertisement.
+     * This is a public endpoint.
+     */
+    public function incrementView(Request $request, Advertisement $ad)
+    {
+        // Get the authenticated user via the 'sanctum' guard, which returns null if guest.
+        $user = $request->user('sanctum');
+
+        // Increment the view count if:
+        // 1. The visitor is a guest (no authenticated user)
+        // OR
+        // 2. The visitor is a logged-in user who is NOT the owner of the ad.
+        if (!$user || $user->id !== $ad->owner_id) {
+            $ad->increment('views_count');
+        }
+
+        // Return a 204 No Content response, which is standard for a successful action
+        // that doesn't need to return any data. This is a fast and efficient response.
+        return response()->noContent();
+    }
 }

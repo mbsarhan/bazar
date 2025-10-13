@@ -11,6 +11,7 @@ use App\Http\Controllers\UserRatingsController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
+use App\Http\Controllers\AdvertisementSearchController;
 
 
 /*
@@ -37,6 +38,9 @@ Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->
 Route::post('/email/verify-otp/resend', [VerificationController::class, 'resend'])
      ->name('verification.resend')
      ->middleware('throttle:1,2'); // Limit resends to 1 request every 2 minutes
+
+// --- ADD THIS NEW PUBLIC ROUTE ---
+Route::post('/advertisements/{ad}/view', [AdvertisementController::class, 'incrementView']);     
 
      
 // Protected routes (require Sanctum authentication)
@@ -82,4 +86,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Rating and Review
     Route::post('/users/rate', [UserRatingsController::class, 'store'])->middleware('throttle:5,1');
+
+
+    //Search and filter
+    Route::get('/advertisement/search', [AdvertisementSearchController::class, 'search']);
 });
