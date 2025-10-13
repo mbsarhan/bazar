@@ -23,6 +23,7 @@ import AddAdChoice from './components/AddAdChoice';
 import AddCarForm from './components/AddCarForm';
 import AddRealEstateForm from './components/AddRealEstateForm';
 import AddReview from './components/AddReview';
+import PublicProfile from './components/PublicProfile';
 
 // --- Import Dashboard Layout and its pages ---
 import DashboardLayout from './components/dashboard/DashboardLayout';
@@ -56,6 +57,7 @@ function App() {
           <Route path="/add-ad" element={<AddAdChoice />} />
           <Route path="/add-car" element={<AddCarForm />} />
           <Route path="/add-real-estate" element={<AddRealEstateForm />} />
+          <Route path="/profile/:userId" element={<PublicProfile />} />
 
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<DashboardLayout />}>

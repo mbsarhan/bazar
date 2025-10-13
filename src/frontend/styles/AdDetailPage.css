@@ -208,3 +208,13 @@
     margin-top: 20px;
     display: inline-block;
 }
+
+.seller-name-link {
+    text-decoration: none;
+    color: var(--color-text-dark);
+    margin-right: 5px;
+}
+.seller-name-link:hover {
+    text-decoration: underline;
+    color: var(--color-accent-primary);
+}
