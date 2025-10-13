@@ -18,6 +18,7 @@ const Reviews = () => {
             try {
                 setIsLoading(true);
                 const data = await getUserReviews();
+                console.log("Fetching...");
                 setReviewData(data);
             } catch (err) {
                 setError(err.message || 'Failed to load reviews.');

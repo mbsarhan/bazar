@@ -20,7 +20,7 @@ class AdvertisementResource extends JsonResource
         $baseData = [
             'id' => $this->id,
             'title' => $this->title,
-            'price' => number_format($this->price) . ' $',
+            'price' => number_format($this->price),
             'location' => "{$this->governorate}, {$this->city}",
             'description'       => $this->description,
             'status' => $this->ad_status,
@@ -76,7 +76,7 @@ class AdvertisementResource extends JsonResource
                 'transaction_type' => $this->transaction_type,
                 'realestate_type' => $this->realEstateDetails->realestate_type,
                 'detailed_address' => $this->realEstateDetails->detailed_address,
-                'area' => $this->realEstateDetails->realestate_size,
+                'area' => number_format($this->realEstateDetails->realestate_size),
                 'bedroom_num' => $this->realEstateDetails->bedroom_num? $this->realEstateDetails->bedroom_num : 0,
                 'bathroom_num' => $this->realEstateDetails->bathroom_num? $this->realEstateDetails->bathroom_num : 0,
                 'floor_num' =>$this->realEstateDetails->floor_num? $this->realEstateDetails->bathroom_num : 0,

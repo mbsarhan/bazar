@@ -29,7 +29,7 @@ const AddRealEstateForm = () => {
         governorate: 'دمشق',
         city: '',
         detailed_address: '',
-        realestate_size: '',
+        area: '',
         bedroom_num: '',
         bathroom_num: '',
         floor_num: '',
@@ -93,7 +93,7 @@ const AddRealEstateForm = () => {
                     setFormData({
                         title: adData.title ?? '',
                         transaction_type: adData.transaction_type ?? 'بيع',
-                        realestate_type: adData.realestate_type ?? 'شقة',
+                        area: adData.area ?? 'شقة',
                         governorate: adData.governorate ?? 'دمشق',
                         city: adData.city ?? '',
                         detailed_address: adData.detailed_address ?? '',
@@ -107,6 +107,10 @@ const AddRealEstateForm = () => {
                         negotiable_check: adData.negotiable_check === 1,
                         description: adData.description ?? '',
                     });
+
+                    if(adData?.imageUrls){
+                        setImages(adData.imageUrls);
+                    }
                     
                 } catch (err) {
                     console.error("Failed to fetch ad data for editing:", err);
