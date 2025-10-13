@@ -1,16 +1,17 @@
 <?php
 namespace App\Services;
 
-use App\Models\RealestateImage;
 use Exception;
 use App\Models\User;
+use App\Jobs\ProcessVideoJob;
 use App\Models\Advertisement;
 use App\Models\RealestateAds;
+use App\Models\RealestateImage;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RealestateAdsService{
    
@@ -81,6 +82,8 @@ class RealestateAdsService{
                 if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
                     $videoPath = $data['video']->store('videos/real-estate', 'public');
                 }
+
+                ProcessVideoJob::dispatch($videoPath, $advertisement->id);
 
                 $realestateAd = RealestateAds::create([
                     'ads_id'              => $advertisement->id,
