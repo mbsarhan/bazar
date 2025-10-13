@@ -6,6 +6,7 @@ use App\Models\Advertisement;
 use Illuminate\Http\Request;
 use App\Services\AdvertisementService;
 use App\Http\Resources\AdvertisementResource;
+use Illuminate\Support\Facades\DB; // <-- 1. IMPORT DB FACADE
 
 class AdvertisementController extends Controller
 {
@@ -79,25 +80,22 @@ class AdvertisementController extends Controller
         //
     }
 
-    /**
-     * Increment the view count for a specific advertisement.
-     * This is a public endpoint.
-     */
     public function incrementView(Request $request, Advertisement $ad)
     {
-        // Get the authenticated user via the 'sanctum' guard, which returns null if guest.
+        // --- 2. UPDATE THE LOGIC ---
         $user = $request->user('sanctum');
 
-        // Increment the view count if:
-        // 1. The visitor is a guest (no authenticated user)
-        // OR
-        // 2. The visitor is a logged-in user who is NOT the owner of the ad.
         if (!$user || $user->id !== $ad->owner_id) {
+            // A. The original increment for the total count (still useful)
             $ad->increment('views_count');
+
+            // B. Your brilliant updateOrInsert logic for daily tracking
+            DB::table('ad_views')->updateOrInsert(
+                ['advertisement_id' => $ad->id, 'date' => today()],
+                ['views' => DB::raw('views + 1')]
+            );
         }
 
-        // Return a 204 No Content response, which is standard for a successful action
-        // that doesn't need to return any data. This is a fast and efficient response.
         return response()->noContent();
     }
 }

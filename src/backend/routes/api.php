@@ -69,8 +69,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/realestate-ads/{ad}', [RealestateAdsController::class, 'destroy']);
 
 
-    // --- DASHBOARD ROUTE ---
+    // DASHBOARD
     Route::get('/dashboard/statistics', [DashboardController::class, 'getStatistics']);
+    Route::get('/dashboard/views', [DashboardController::class, 'getViews']);
 
 
     

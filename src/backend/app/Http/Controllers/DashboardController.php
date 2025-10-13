@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\DashboardService;
-
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -31,5 +31,25 @@ class DashboardController extends Controller
 
         // Return the data as a JSON response
         return response()->json($statistics);
+    }
+
+
+
+    /**
+     * Get time-series view data for the dashboard chart.
+     */
+    public function getViews(Request $request)
+    {
+        // Validate the 'range' query parameter
+        $validated = $request->validate([
+            'range' => ['required', Rule::in(['days', 'weeks'])],
+        ]);
+
+        $user = $request->user();
+        $range = $validated['range'];
+
+        $viewData = $this->dashboardService->getViewsData($user, $range);
+
+        return response()->json($viewData);
     }
 }
