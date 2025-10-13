@@ -75,8 +75,8 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
     };
     
     const handleShowClick = (e) => {
-        e.preventDefault(); // Prevent any default button behavior
-        e.stopPropagation(); // Stop the click from bubbling up to the main Link
+        e.preventDefault();
+        e.stopPropagation();
         navigate(`/ad/${ad.id}`);
     } ;
 
