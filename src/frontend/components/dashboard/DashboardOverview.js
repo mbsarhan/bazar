@@ -91,7 +91,8 @@ const DashboardOverview = () => {
     const { user } = useAuth();
     const userName = user ? user.fname : "المستخدم";
 
-    const { getDashboardStats } = useDashboard(); // <-- 2. GET THE FUNCTION
+    const { getDashboardStats, getDashboardViews } = useDashboard(); // <-- 2. GET THE FUNCTION
+    
     // --- 3. CREATE STATE for the statistics data ---
     const [stats, setStats] = useState({
         carStats: { active: 0, pending: 0, sold: 0 },
@@ -102,7 +103,7 @@ const DashboardOverview = () => {
     const [timeRange, setTimeRange] = useState('weeks'); // 'weeks' or 'days'
 
     const [viewData, setViewData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [viewsLoading, setViewsLoading] = useState(true); // Renamed from isLoading
 
 
     
@@ -129,23 +130,20 @@ const DashboardOverview = () => {
 
     useEffect(() => {
         const fetchViewData = async () => {
-            setIsLoading(true);
-            
-            // SIMULATION: In a real app, you'd pass the timeRange to your API
-            // const response = await axios.get(`/api/dashboard/views?range=${timeRange}`);
-            console.log(`Fetching data for range: ${timeRange}`);
-
-            const dataLength = 7; // Both are 7 for now
-            const fakeApiData = Array.from({ length: dataLength }, () => Math.floor(Math.random() * 200) + 50);
-            
-            setTimeout(() => {
-                setViewData(fakeApiData);
-                setIsLoading(false);
-            }, 300); // Simulate network delay
+            setViewsLoading(true);
+            try {
+                // Call the API with the current timeRange
+                const data = await getDashboardViews(timeRange);
+                setViewData(data);
+            } catch (error) {
+                console.error(`Failed to fetch view data for range: ${timeRange}`, error);
+            } finally {
+                setViewsLoading(false);
+            }
         };
 
         fetchViewData();
-    }, [timeRange]); // The dependency array now includes `timeRange`
+    }, [timeRange,getDashboardViews]); // The dependency array now includes `timeRange`
 
     // --- 2. Prepare Chart Data (Mock Data for Views) ---
     const chartOptions = {
@@ -260,7 +258,7 @@ const DashboardOverview = () => {
 
             {/* --- 3. Graph on Top --- */}
             <div className="chart-container" style={{ height: '400px', position: 'relative' }}>
-                {isLoading ? (
+                {viewsLoading ? (
                     <div className="chart-skeleton-loader"></div>
                 ) : (
                     <Line options={chartOptions} data={chartData} />

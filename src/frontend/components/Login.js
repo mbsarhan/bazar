@@ -8,6 +8,8 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const navigate = useNavigate();
 
   const location = useLocation(); // 3. للوصول إلى المعلومات الممررة
@@ -23,17 +25,20 @@ const Login = () => {
       setError('يرجى إدخال البريد/رقم الهاتف وكلمة المرور.');
       return;
     }
-    try{
-        await auth.login({ credential, password });
-        // 7.إذا كانت البيانات صحيحة التوجيه إلى المسار الصحيح
-        navigate(from, { replace: true });
+
+    setIsSubmitting(true);
+    try {
+      await auth.login({ credential, password });
+      // 7.إذا كانت البيانات صحيحة التوجيه إلى المسار الصحيح
+      navigate(from, { replace: true });
 
     } catch (err) {
       // إذا كانت البيانات خاطئة أعرض الخطأ
       setError(err.message);
     }
-
-    
+    finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -71,8 +76,8 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="submit" className="submit-btn">
-            تسجيل الدخول
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
           </button>
         </form>
         <div className="form-link">

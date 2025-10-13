@@ -139,7 +139,12 @@ const AdDetailPage = () => {
                     <p className="ad-detail-description">{ad.description || 'لا يوجد وصف متاح.'}</p>
                     <div className="seller-info">
                         <h4>معلومات المعلن</h4>
-                        <p>اسم المعلن: <strong>{ad.owner?.name || 'مستخدم بازار'}</strong></p>
+                        <p>
+                            اسم المعلن: 
+                            <Link to={`/profile/${ad.owner?.id}`} className="seller-name-link">
+                                <strong>{ad.owner?.name || 'مستخدم بازار'}</strong>
+                            </Link>
+                        </p>
                         <button className="submit-btn">إظهار رقم الهاتف</button>
                     </div>
                 </div>

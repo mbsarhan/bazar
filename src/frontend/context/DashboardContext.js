@@ -15,8 +15,23 @@ export const DashboardProvider = ({ children }) => {
         return response.data;
     };
 
+
+
+    /**
+     * NEW: Fetches the time-series view data for the chart.
+     * @param {string} range - 'days' or 'weeks'
+     */
+    const getDashboardViews = async (range) => {
+        // Pass the range as a query parameter
+        const response = await api.get('/dashboard/views', {
+            params: { range }
+        });
+        return response.data; // Returns the array of 7 numbers
+    };
+
     const value = {
         getDashboardStats,
+        getDashboardViews,
     };
 
     return (
