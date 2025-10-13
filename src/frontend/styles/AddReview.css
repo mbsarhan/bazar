@@ -1,0 +1,22 @@
+/* src/frontend/styles/AddReview.css */
+
+.star-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 0;
+    
+    /* --- THIS IS THE KEY --- */
+    /* This forces the stars to be LTR, so they fill from the left */
+    direction: ltr; 
+}
+
+.star-input-container svg {
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out;
+}
+
+/* Add a slight grow effect on hover for better feedback */
+.star-input-container svg:hover {
+    transform: scale(1.15);
+}

@@ -22,6 +22,7 @@ import ResetPassword from './components/ResetPassword';
 import AddAdChoice from './components/AddAdChoice';
 import AddCarForm from './components/AddCarForm';
 import AddRealEstateForm from './components/AddRealEstateForm';
+import AddReview from './components/AddReview';
 
 // --- Import Dashboard Layout and its pages ---
 import DashboardLayout from './components/dashboard/DashboardLayout';
@@ -66,6 +67,7 @@ function App() {
             <Route path="real-estate-ads" element={<MyRealEstateAds />} />
             <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
             <Route path="reviews" element={<Reviews />} />
+            <Route path="add-review/:userIdToReview" element={<AddReview />} />
           </Route>
 
         </Routes>
