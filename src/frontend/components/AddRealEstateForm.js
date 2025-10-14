@@ -146,10 +146,9 @@ const AddRealEstateForm = () => {
         if (!formData.city) newErrors.city = true;
         if (!formData.detailed_address) newErrors.detailed_address = true;
         if (!formData.area) newErrors.area = true;
-        if (!formData.price) newErrors.price = true;
         if (!formData.description) newErrors.description = true;
 
-        if (images.length < 2) {
+        if (!images.length) {
             newErrors.images = true;
         }
 
@@ -263,7 +262,7 @@ const AddRealEstateForm = () => {
                     <div className="form-grid four-columns">
                         <div className="form-group">
                             <label htmlFor="area">المساحة (م²) *</label>
-                            <input type="text" name="area" value={formData.area} onChange={handleChange} className={errors.area ? 'input-error' : ''} />
+                            <input type="text" name="area" value={formData.area} onChange={handleChange} placeholder='يقبل مساحة تقريبية' className={errors.area ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
                             <label htmlFor="bedroom_num">غرف النوم</label>
@@ -292,8 +291,8 @@ const AddRealEstateForm = () => {
                     <legend>السعر</legend>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="price">السعر المطلوب *</label>
-                            <input type="text" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
+                            <label htmlFor="price">السعر المطلوب</label>
+                            <input type="text" name="price" value={formData.price} onChange={handleChange}/>
                         </div>
                         <div className="form-group checkbox-group price-checkbox">
                             <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
@@ -309,7 +308,7 @@ const AddRealEstateForm = () => {
                         <textarea name="description" rows="5" value={formData.description} onChange={handleChange} placeholder="اكتب هنا عن ميزات العقار كالإطلالة، وجود مصعد، كراج، تدفئة..." className={errors.description ? 'input-error' : ''}></textarea>
                     </div>
                     <div className="form-group">
-                        <label>الصور (صورتان على الأقل) *</label>
+                        <label>الصور (صورة على الأقل) *</label>
                         <div className={`image-uploader ${errors.images ? 'input-error' : ''}`}>
                             <div className="image-grid-container">
                                 {images.map((image, index) => (

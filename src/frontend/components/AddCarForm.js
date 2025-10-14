@@ -151,7 +151,6 @@ const AddCarForm = () => {
         if (!formData.model) newErrors.model = true;
         if (!formData.model_year) newErrors.model_year = true;
         if (!formData.distance_traveled) newErrors.distance_traveled = true;
-        if (!formData.price) newErrors.price = true;
         if (!formData.city) newErrors.city = true;
 
         // التحقق من الصور الإلزامية
@@ -351,8 +350,8 @@ const AddCarForm = () => {
                     <legend>السعر والموقع</legend>
                     <div className="form-grid">
                         <div className="form-group price-group">
-                            <label htmlFor="price">السعر (دولار أمريكي) *</label>
-                            <input type="text" id="price" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
+                            <label htmlFor="price">السعر (دولار أمريكي)</label>
+                            <input type="text" id="price" name="price" value={formData.price} onChange={handleChange} />
                             <div className="checkbox-group">
                                 <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
                                 <label htmlFor="negotiable_check">السعر قابل للتفاوض</label>

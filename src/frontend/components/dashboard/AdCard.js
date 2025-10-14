@@ -89,7 +89,9 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
         e.preventDefault();
         
         // Determine the correct edit path based on the ad type
-        const editPath = ad.model_year ? `/dashboard/edit-car/${ad.id}` : `/dashboard/edit-real-estate/${ad.id}`;
+        const editPath = ad.model_year 
+            ? `/edit-car/${ad.id}` 
+            : `/edit-real-estate/${ad.id}`;
         navigate(editPath);
     };
 
