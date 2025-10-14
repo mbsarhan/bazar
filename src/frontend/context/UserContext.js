@@ -17,7 +17,14 @@ export const UserProvider = ({ children }) => {
         }
     }, []);
 
-    const value = { getUserReviews };
+    const getPublicProfile = async (userId) => {
+        // The axios client automatically sends a token if one exists (for the security check).
+        // If the user is a guest, no token is sent.
+        const response = await api.get(`/users/${userId}/public-profile`);
+        return response.data;
+    };
+
+    const value = { getUserReviews , getPublicProfile};
 
     return (
         <UserContext.Provider value={value}>

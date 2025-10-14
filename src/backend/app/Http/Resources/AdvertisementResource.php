@@ -50,6 +50,7 @@ class AdvertisementResource extends JsonResource
                 'owner'             => [
                     'name' => "{$this->owner->fname} {$this->owner->lname}",
                     'phone' => "{$this->owner->phone}",
+                    'id' => $this->owner->id,
                     // You can add more owner details here if needed later, like phone number
                 ],
 
