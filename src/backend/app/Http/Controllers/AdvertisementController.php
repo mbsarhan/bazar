@@ -16,14 +16,14 @@ class AdvertisementController extends Controller
     {
         $this->advertisementService = $advertisementService;
     }
-    /**
-     * Display a listing of the resource.
+   /**
+     * Display a paginated listing of public advertisements.
      */
-    public function index()
+    public function index(Request $request) // <-- The Request is already here
     {
-        $ads = $this->advertisementService->getPublicListing();
+        // Pass the entire request object to the service.
+        $ads = $this->advertisementService->getPublicListing($request);
 
-        // Return the paginated data, formatted through our unified resource
         return AdvertisementResource::collection($ads);
     }
 
