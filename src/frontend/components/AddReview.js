@@ -32,7 +32,7 @@ const AddReview = () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             alert('شكراً لك، تم إرسال تقييمك بنجاح!');
-            navigate('/dashboard'); // Navigate back to the dashboard
+            navigate('/'); // Navigate back to the dashboard
 
         } catch (err) {
             setError(err.response?.data?.message || 'فشل إرسال التقييم.');

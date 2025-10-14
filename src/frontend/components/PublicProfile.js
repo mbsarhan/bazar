@@ -1,6 +1,6 @@
 // src/frontend/components/PublicProfile.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // We'll need a new function here
 import StarRating from './dashboard/StarRating';
 import AdCard from './dashboard/AdCard';
@@ -12,6 +12,7 @@ import { carAdsData, realEstateAdsData } from './dashboard/mockData';
 
 const PublicProfile = () => {
     const { userId } = useParams();
+    const navigate = useNavigate();
     // const { getUserPublicProfile } = useAds(); // We will use this in the future
 
     const [profileData, setProfileData] = useState(null);
@@ -74,6 +75,14 @@ const PublicProfile = () => {
                         <span>{profileData.reviews.averageRating.toFixed(1)}</span>
                         <span>({profileData.reviews.totalReviews} تقييمات)</span>
                     </div>
+                </div>
+                <div className="add-review-button-wrapper">
+                    <button 
+                        className="submit-btn add-review-btn" 
+                        onClick={() => navigate(`/add-review/${userId}`)}
+                    >
+                        + أضف تقييمك
+                    </button>
                 </div>
             </div>
 

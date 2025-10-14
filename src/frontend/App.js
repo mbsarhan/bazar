@@ -58,6 +58,7 @@ function App() {
           <Route path="/add-car" element={<AddCarForm />} />
           <Route path="/add-real-estate" element={<AddRealEstateForm />} />
           <Route path="/profile/:userId" element={<PublicProfile />} />
+          <Route path="add-review/:userIdToReview" element={<AddReview />} />
 
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<DashboardLayout />}>
@@ -69,7 +70,6 @@ function App() {
             <Route path="real-estate-ads" element={<MyRealEstateAds />} />
             <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
             <Route path="reviews" element={<Reviews />} />
-            <Route path="add-review/:userIdToReview" element={<AddReview />} />
           </Route>
 
         </Routes>
