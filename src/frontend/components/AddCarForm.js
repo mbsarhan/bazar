@@ -324,8 +324,8 @@ const AddCarForm = () => {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="fule_type">نوع الوقود *</label>
-                            <select id="fule_type" name="fule_type" value={formData.fule_type} onChange={handleChange}>
+                            <label htmlFor="fuel_type">نوع الوقود *</label>
+                            <select id="fuel_type" name="fuel_type" value={formData.fuel_type} onChange={handleChange}>
                                 {fuelTypes.map(f => <option key={f} value={f}>{f}</option>)}
                             </select>
                         </div>
