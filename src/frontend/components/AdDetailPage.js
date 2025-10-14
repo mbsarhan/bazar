@@ -141,7 +141,7 @@ const AdDetailPage = () => {
                         <h4>معلومات المعلن</h4>
                         <p>
                             اسم المعلن: 
-                            <Link to={`/profile/${ad.owner?.id}`} className="seller-name-link">
+                            <Link to={`/profile/${ad.owner.id}`} className="seller-name-link">
                                 <strong>{ad.owner?.name || 'مستخدم بازار'}</strong>
                             </Link>
                         </p>
