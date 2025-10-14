@@ -296,7 +296,7 @@ const AddRealEstateForm = () => {
                             <input type="text" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                         </div>
                         <div className="form-group checkbox-group price-checkbox">
-                            <input type="checkbox" id="negotiable_check" name="nogotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
+                            <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
                             <label htmlFor="negotiable_check">السعر قابل للتفاوض</label>
                         </div>
                     </div>

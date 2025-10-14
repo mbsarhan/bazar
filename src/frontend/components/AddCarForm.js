@@ -110,7 +110,7 @@ const AddCarForm = () => {
                         model_year: adData.model_year || '',
                         distance_traveled: adData.distance_traveled ?? '',
                         price: adData.price || '',
-                        negotiable_check: adData.negotiable_check ? 1 : 0, // Convert 1/0 to true/false
+                        negotiable_check: adData.negotiable_check === 1, // Convert 1/0 to true/false
                         governorate: adData.governorate || 'دمشق',
                         city: adData.city || '',
                         description: adData.description || '',
