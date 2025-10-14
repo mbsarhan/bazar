@@ -134,12 +134,13 @@ export const AdProvider = ({ children }) => {
 
 
     /**
-     * NEW: Fetches the public list of all active ads for the homepage.
+     * Fetches the public list of ads, with optional filters.
+     * @param {object} filters - e.g., { type: 'car' }
      */
-    const getPublicAds = async () => {
-        // This is a public route, so no token is needed. We can use the 'api' client.
-        const response = await api.get('/advertisements');
-        // The paginated resource collection is wrapped in a 'data' key.
+    const getPublicAds = async (filters = {}) => {
+        const response = await api.get('/advertisements', {
+            params: filters // Axios will create the URL: /advertisements?type=car
+        });
         return response.data.data;
     };
 
