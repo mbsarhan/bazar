@@ -19,7 +19,7 @@ const AddRealEstateForm = () => {
     const { adId } = useParams();
     const isEditMode = Boolean(adId);
 
-    const { createRealEstateAd, getAdById, updateRealEstateAd } = useAds(); 
+    const { createRealEstateAd, getAdById, updateRealEstateAd } = useAds();
 
     // --- All of your state from your original file ---
     const [formData, setFormData] = useState({
@@ -89,14 +89,15 @@ const AddRealEstateForm = () => {
             const fetchAdData = async () => {
                 try {
                     const adData = await getAdById(adId, 'real-estate');
-                    
+
                     setFormData({
                         title: adData.title ?? '',
                         transaction_type: adData.transaction_type ?? 'بيع',
-                        area: adData.area ?? 'شقة',
+                        realestate_type: adData.realestate_type ?? 'شقة',
                         governorate: adData.governorate ?? 'دمشق',
                         city: adData.city ?? '',
                         detailed_address: adData.detailed_address ?? '',
+                        area: adData.area ?? '',
                         realestate_size: adData.realestate_size ?? '',
                         bedroom_num: adData.bedroom_num ?? '',
                         bathroom_num: adData.bathroom_num ?? '',
@@ -108,10 +109,10 @@ const AddRealEstateForm = () => {
                         description: adData.description ?? '',
                     });
 
-                    if(adData?.imageUrls){
+                    if (adData?.imageUrls) {
                         setImages(adData.imageUrls);
                     }
-                    
+
                 } catch (err) {
                     console.error("Failed to fetch ad data for editing:", err);
                     setErrorMessage("فشل تحميل بيانات الإعلان.");
@@ -133,11 +134,11 @@ const AddRealEstateForm = () => {
         const newErrors = {};
         if (!formData.city) newErrors.city = true;
         if (images.length < 2) newErrors.images = true;
-// // منع الإرسال أثناء رفع الفيديو
-         if (isUploading) {
-             setErrorMessage('يرجى الانتظار حتى يكتمل رفع الفيديو.');
-             return;
-         }
+        // // منع الإرسال أثناء رفع الفيديو
+        if (isUploading) {
+            setErrorMessage('يرجى الانتظار حتى يكتمل رفع الفيديو.');
+            return;
+        }
 
 
         // التحقق من كل حقل في النموذج
@@ -148,9 +149,9 @@ const AddRealEstateForm = () => {
         if (!formData.price) newErrors.price = true;
         if (!formData.description) newErrors.description = true;
 
-         if (images.length < 2) {
-             newErrors.images = true;
-         }
+        if (images.length < 2) {
+            newErrors.images = true;
+        }
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -158,11 +159,11 @@ const AddRealEstateForm = () => {
             window.scrollTo(0, 0);
             return;
         }
-        
+
         setIsSubmitting(true);
         try {
             const dataToSubmit = new FormData();
-            
+
             for (const key in formData) {
                 let value = formData[key];
                 if (key === 'negotiable_check') {
@@ -172,7 +173,7 @@ const AddRealEstateForm = () => {
             }
             images.forEach(file => dataToSubmit.append('images[]', file));
             if (videoFile) dataToSubmit.append('video', videoFile);
-            
+
             if (isEditMode) {
                 dataToSubmit.append('_method', 'PUT');
                 await updateRealEstateAd(adId, dataToSubmit);
@@ -186,6 +187,7 @@ const AddRealEstateForm = () => {
         } catch (err) {
             console.error("Failed to submit ad:", err);
             setErrorMessage(err.response?.data?.message || 'فشل إرسال الإعلان.');
+            window.scrollTo(0, 0); // Scroll to top to show the error
         } finally {
             setIsSubmitting(false);
         }
@@ -223,7 +225,7 @@ const AddRealEstateForm = () => {
                         />
                     </div>
                 </fieldset>
-                
+
                 <fieldset>
                     <legend>معلومات أساسية</legend>
                     <div className="form-grid">
@@ -261,7 +263,7 @@ const AddRealEstateForm = () => {
                     <div className="form-grid four-columns">
                         <div className="form-group">
                             <label htmlFor="area">المساحة (م²) *</label>
-                            <input type="number" name="area" value={formData.area} onChange={handleChange} className={errors.area ? 'input-error' : ''} />
+                            <input type="text" name="area" value={formData.area} onChange={handleChange} className={errors.area ? 'input-error' : ''} />
                         </div>
                         <div className="form-group">
                             <label htmlFor="bedroom_num">غرف النوم</label>
@@ -291,7 +293,7 @@ const AddRealEstateForm = () => {
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="price">السعر المطلوب *</label>
-                            <input type="number" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
+                            <input type="text" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
                         </div>
                         <div className="form-group checkbox-group price-checkbox">
                             <input type="checkbox" id="negotiable_check" name="nogotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
@@ -311,7 +313,25 @@ const AddRealEstateForm = () => {
                         <div className={`image-uploader ${errors.images ? 'input-error' : ''}`}>
                             <div className="image-grid-container">
                                 {images.map((image, index) => (
-                                    <div key={index} className="upload-box"><div className="image-preview"><img src={URL.createObjectURL(image)} alt={`preview ${index}`} /><button type="button" onClick={() => removeImage(index)} className="remove-image-btn">&times;</button></div></div>
+                                    <div key={index} className="upload-box">
+                                        <div className="image-preview">
+                                            <img
+                                                src={
+                                                    image instanceof File
+                                                        ? URL.createObjectURL(image) // for new uploads
+                                                        : image                      // for URLs from backend
+                                                }
+                                                alt={`extra ${index + 1}`}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(index)}
+                                                className="remove-image-btn"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    </div>
                                 ))}
                                 <div className="upload-box" onClick={() => imageInputRef.current.click()}><div className="upload-placeholder"><UploadIcon /><span>أضف صور</span></div></div>
                             </div>

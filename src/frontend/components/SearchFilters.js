@@ -1,6 +1,6 @@
 // src/frontend/components/SearchFilters.js
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal, Search } from 'lucide-react';
+import { SlidersHorizontal, Search, Car, Home, LayoutGrid } from 'lucide-react';
 import Slider from 'rc-slider';
 import Modal from './dashboard/Modal';
 import '../styles/SearchFilters.css';
@@ -108,100 +108,52 @@ const RealEstateFilters = ({ filters, onFilterChange }) => {
 };
 
 // --- Main SearchFilters Component ---
-const SearchFilters = () => {
-    const [activeTab, setActiveTab] = useState('cars');
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const SearchFilters = ({ onFilterChange }) => {
+    // 1. New state: 'all' is the default
+    const [activeFilter, setActiveFilter] = useState('all');
 
-    // "Committed" filter state that lives in the parent
-    const [carFilters, setCarFilters] = useState({ priceRange: [0, 300000] });
-    const [realEstateFilters, setRealEstateFilters] = useState({ priceRange: [0, 1000000] });
-
-    // "Temporary" state for the modal to work on
-    const [tempFilters, setTempFilters] = useState({});
-
-    // When the modal opens, copy the current filters to the temporary state
-    const openFilterModal = () => {
-        const currentFilters = activeTab === 'cars' ? carFilters : realEstateFilters;
-        setTempFilters(currentFilters);
-        setIsModalOpen(true);
+    const handleFilterClick = (filter) => {
+        setActiveFilter(filter);
+        onFilterChange(filter); // Notify the parent component (HomePage) of the change
     };
-
-    // When "Confirm" is clicked, save temp state to the main state
-    const handleConfirmFilters = () => {
-        if (activeTab === 'cars') {
-            setCarFilters(tempFilters);
-        } else {
-            setRealEstateFilters(tempFilters);
-        }
-        setIsModalOpen(false);
-        // Here you would trigger the actual search/filtering of the main page
-        console.log("Filters Saved:", tempFilters);
-    };
-
-    // A function to update the temporary state from within the modal
-    const handleTempFilterChange = (filterName, value) => {
-        setTempFilters(prevFilters => ({
-            ...prevFilters,
-            [filterName]: value
-        }));
-    };
-    
-    // When switching tabs, if the modal is open, update the temp filters
-    useEffect(() => {
-        if(isModalOpen) {
-            const currentFilters = activeTab === 'cars' ? carFilters : realEstateFilters;
-            setTempFilters(currentFilters);
-        }
-    }, [activeTab, isModalOpen]);
 
     return (
         <div className="search-container">
-            {/* --- UI WAS MISSING FROM HERE --- */}
-            <div className="search-tabs">
-                <button 
-                    className={`tab-btn ${activeTab === 'cars' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('cars')}
-                >
-                    البحث عن سيارة
-                </button>
-                <button 
-                    className={`tab-btn ${activeTab === 'real-estate' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('real-estate')}
-                >
-                    البحث عن عقار
-                </button>
-            </div>
-
+            {/* --- The Big Search Bar (remains the same) --- */}
             <div className="main-search-bar">
                 <div className="search-input-wrapper">
                     <Search className="search-icon" size={24} />
-                    <input 
-                        type="text" 
-                        placeholder={activeTab === 'cars' ? "ابحث بالاسم أو الموديل (كيا ريو...)" : "ابحث بالمنطقة أو العنوان..."} 
-                    />
+                    <input type="text" placeholder="ابحث بالاسم، الموديل، أو المنطقة..." />
                 </div>
-                <button className="filter-btn" onClick={openFilterModal}>
-                    <SlidersHorizontal size={20} />
-                    <span>فلاتر</span>
+                {/* We can hide the modal button for now, or connect it later */}
+                {/* <button className="filter-btn" onClick={() => {}}>... فلاتر</button> */}
+                <button className="search-btn-main">بحث</button>
+            </div>
+
+            {/* --- 2. The NEW Icon Filter Bar --- */}
+            <div className="icon-filter-bar">
+                <button 
+                    className={`icon-filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => handleFilterClick('all')}
+                >
+                    <LayoutGrid size={20} />
+                    <span>الكل</span>
                 </button>
-                <button className="search-btn-main">
-                    بحث
+                <button 
+                    className={`icon-filter-btn ${activeFilter === 'cars' ? 'active' : ''}`}
+                    onClick={() => handleFilterClick('cars')}
+                >
+                    <Car size={20} />
+                    <span>سيارات</span>
+                </button>
+                <button 
+                    className={`icon-filter-btn ${activeFilter === 'real-estate' ? 'active' : ''}`}
+                    onClick={() => handleFilterClick('real-estate')}
+                >
+                    <Home size={20} />
+                    <span>عقارات</span>
                 </button>
             </div>
-            {/* --- END OF MISSING UI --- */}
-
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onConfirm={handleConfirmFilters}
-                title="فلاتر البحث المتقدمة"
-            >
-                {activeTab === 'cars' ? (
-                    <CarFilters filters={tempFilters} onFilterChange={handleTempFilterChange} />
-                ) : (
-                    <RealEstateFilters filters={tempFilters} onFilterChange={handleTempFilterChange} />
-                )}
-            </Modal>
         </div>
     );
 };

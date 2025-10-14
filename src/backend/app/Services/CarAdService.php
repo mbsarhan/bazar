@@ -36,9 +36,9 @@ class CarAdService
                     'manufacturer'      => $data['manufacturer'],
                     'model'             => $data['model'], // The model was missing from your fillable array
                     'model_year'        => $data['model_year'],
-                    'status'            => $data['status'],
+                    'condition'         => $data['condition'],
                     'gear'              => $data['gear'],
-                    'fule_type'         => $data['fule_type'],
+                    'fuel_type'         => $data['fuel_type'],
                     'distance_traveled' => $data['distance_traveled'],
                     'negotiable_check'  => $data['negotiable_check'],
                 ]);

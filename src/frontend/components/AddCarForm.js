@@ -28,7 +28,7 @@ const AddCarForm = () => {
         model: '',
         condition: 'مستعملة',
         gear: 'أوتوماتيك',
-        fule_type: 'بانزين',
+        fuel_type: 'بانزين',
         model_year: '',
         distance_traveled: '',
         price: '',
@@ -106,11 +106,11 @@ const AddCarForm = () => {
                         model: adData.model || '',
                         condition: adData.condition || 'مستعملة',
                         gear: adData.gear || 'أوتوماتيك',
-                        fule_type: adData.fule_type || 'بانزين',
+                        fuel_type: adData.fule_type || 'بانزين',
                         model_year: adData.model_year || '',
                         distance_traveled: adData.distance_traveled ?? '',
                         price: adData.price || '',
-                        negotiable_check: adData.negotiable_check === 1, // Convert 1/0 to true/false
+                        negotiable_check: adData.negotiable_check ? 1 : 0, // Convert 1/0 to true/false
                         governorate: adData.governorate || 'دمشق',
                         city: adData.city || '',
                         description: adData.description || '',
@@ -178,22 +178,23 @@ const AddCarForm = () => {
             for (const key in formData) {
                 let value = formData[key];
                 if (key === 'negotiable_check') {
-                    value = value ? '1' : '0';
+                    value = value ? 1 : 0;
                 }
 
                 if (key === 'price' || key === 'distance_traveled' || key === 'model_year') {
                     value = parseInt(value) || 0; // Use parseFloat and fallback to 0 if invalid
                 }
 
-                dataToSubmit.append(key, formData[key]);
+                dataToSubmit.append(key, value);
             }
 
             // Append images
             for (const key in mandatoryImages) {
-                if (mandatoryImages[key]) dataToSubmit.append(`mandatory_images[${key}]`, mandatoryImages[key]);
+                if (mandatoryImages[key]) dataToSubmit.append(key, mandatoryImages[key]);
             }
-            extraImages.forEach((file, index) => {
-                dataToSubmit.append(`extra_images[${index}]`, file);
+
+            extraImages.forEach((file) => {
+                dataToSubmit.append('extra_images[]', file); // ✅ matches Laravel’s rule for arrays
             });
 
 
