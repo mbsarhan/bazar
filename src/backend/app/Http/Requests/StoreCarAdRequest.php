@@ -29,7 +29,7 @@ class StoreCarAdRequest extends FormRequest
             'distance_traveled' => 'required|numeric|min:0',
             'condition'         => ['required', Rule::in(['جديدة', 'مستعملة', 'متضررة'])],
             'gear'              => ['required', Rule::in(['عادي', 'أوتوماتيك', 'الإثنان معا'])],
-            'fuel_type'         => ['required', Rule::in(['بانزين', 'ديزل', 'كهرباء', 'هايبرد'])],
+            'fuel_type'         => ['required', Rule::in(['بنزين', 'ديزل', 'كهرباء', 'هايبرد'])],
             'negotiable_check'  => 'required|boolean',
 
             // --- Image Uploads ---
