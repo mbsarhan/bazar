@@ -167,7 +167,7 @@ const AddRealEstateForm = () => {
             for (const key in formData) {
                 let value = formData[key];
                 if (key === 'negotiable_check') {
-                    value = value ? '1' : '0';
+                    value = value ? 1 : 0;
                 }
                 dataToSubmit.append(key, value);
             }

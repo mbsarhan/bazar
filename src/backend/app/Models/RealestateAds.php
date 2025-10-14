@@ -12,7 +12,7 @@ class RealestateAds extends Model
         'ads_id',
         'realestate_type',
         'detailed_address',
-        'realestate_size',
+        'area',
         'bedroom_num',
         'bathroom_num ', 
         'floor_num ',

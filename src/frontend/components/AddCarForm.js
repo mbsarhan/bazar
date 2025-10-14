@@ -106,7 +106,7 @@ const AddCarForm = () => {
                         model: adData.model || '',
                         condition: adData.condition || 'مستعملة',
                         gear: adData.gear || 'أوتوماتيك',
-                        fuel_type: adData.fule_type || 'بانزين',
+                        fuel_type: adData.fuel_type || 'بانزين',
                         model_year: adData.model_year || '',
                         distance_traveled: adData.distance_traveled ?? '',
                         price: adData.price || '',

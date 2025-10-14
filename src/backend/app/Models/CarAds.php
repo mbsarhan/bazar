@@ -14,9 +14,9 @@ class CarAds extends Model
         'manufacturer',
         'model',
         'model_year',
-        'status',
+        'condition',
         'gear',
-        'fule_type',
+        'fuel_type',
         'distance_traveled',
         'negotiable_check'
     ];
