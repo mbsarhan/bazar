@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext'; // 1. IMPORT
+import { useAuth } from '../context/AuthContext'; // 2. IMPORT AuthContext
 import { useAds } from '../context/AdContext'; // We'll need a new function here
 import StarRating from './dashboard/StarRating';
 import AdCard from './dashboard/AdCard';
@@ -12,6 +13,7 @@ const PublicProfile = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
     const { getPublicProfile } = useUser(); // 2. GET THE FUNCTION
+    const { user: loggedInUser } = useAuth(); // 3. Get the currently logged-in user
     // const { getUserPublicProfile } = useAds(); // We will use this in the future
 
     const [profileData, setProfileData] = useState(null);
@@ -36,6 +38,18 @@ const PublicProfile = () => {
         };
         fetchProfile();
     }, [userId, getPublicProfile]);
+
+    // --- 4. THE NEW HANDLER FOR THE "ADD REVIEW" BUTTON ---
+    const handleAddReviewClick = () => {
+        if (loggedInUser) {
+            // If the user is logged in, navigate to the review page
+            navigate(`/add-review/${userId}`);
+        } else {
+            // If the user is a guest, navigate to the login page
+            // We pass the current path in the state to redirect back after login
+            navigate('/login', { state: { from: `/profile/${userId}` } });
+        }
+    };
 
 
     if (isLoading) {
@@ -65,12 +79,18 @@ const PublicProfile = () => {
                     </div>
                 </div>
                 <div className="add-review-button-wrapper">
-                    <button 
-                        className="submit-btn add-review-btn" 
-                        onClick={() => navigate(`/add-review/${userId}`)}
-                    >
-                        + أضف تقييمك
-                    </button>
+                    {/* 
+                      * 5. The button now calls our new handler.
+                      * We also add a condition to hide the button if the user is viewing their own profile.
+                    */}
+                    {loggedInUser?.id !== parseInt(userId) && (
+                         <button 
+                            className="submit-btn add-review-btn" 
+                            onClick={handleAddReviewClick}
+                        >
+                            + أضف تقييمك
+                        </button>
+                    )}
                 </div>
             </div>
 
