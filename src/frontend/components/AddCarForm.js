@@ -120,7 +120,7 @@ const AddCarForm = () => {
                     if (adData?.imageUrls) {
                         setMandatoryImages({
                             front: adData.imageUrls[0] || null,
-                            back: adData.imageUrls[1] || null,
+                            back: adData.imageUrls[1]  || null,
                             side1: adData.imageUrls[2] || null,
                             side2: adData.imageUrls[3] || null,
                         });
