@@ -6,6 +6,7 @@ import {
     GitCommitVertical, Fuel, Wrench, Home, Square, BedDouble, 
     Eye, Edit, Trash2, ExternalLink
 } from 'lucide-react';
+import { isNullOrUndef } from 'chart.js/helpers';
 
 // Re-defining these here for completeness as simple functional components
 const EditIcon = () => <Edit size={16} />;
@@ -89,7 +90,9 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
         e.preventDefault();
         
         // Determine the correct edit path based on the ad type
-        const editPath = ad.model_year ? `/dashboard/edit-car/${ad.id}` : `/dashboard/edit-real-estate/${ad.id}`;
+        const editPath = ad.model_year 
+            ? `/edit-car/${ad.id}` 
+            : `/edit-real-estate/${ad.id}`;
         navigate(editPath);
     };
 
@@ -133,7 +136,7 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
                 </div>
                 <div className="ad-card-details">
                     <h3>{ad.title}</h3>
-                    <p className="ad-card-price">{ad.price}</p>
+                    <p className="ad-card-price">{`${ad.price == 0 ? 'السعر عند التواصل' : `${ad.price} $`} ${ad.negotiable_check ? '(قابل للتفاوض)' : ''}`}</p>
                     <div className="ad-card-specs">
                         {ad.model_year && (
                             <>

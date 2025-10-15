@@ -1,52 +1,55 @@
 // src/frontend/components/PublicProfile.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext'; // 1. IMPORT
+import { useAuth } from '../context/AuthContext'; // 2. IMPORT AuthContext
 import { useAds } from '../context/AdContext'; // We'll need a new function here
 import StarRating from './dashboard/StarRating';
 import AdCard from './dashboard/AdCard';
 import '../styles/PublicProfile.css'; // New CSS file
 
-// Mock data until the API is ready
-import { userReviewsData } from './dashboard/mockData';
-import { carAdsData, realEstateAdsData } from './dashboard/mockData';
 
 const PublicProfile = () => {
     const { userId } = useParams();
+    const navigate = useNavigate();
+    const { getPublicProfile } = useUser(); // 2. GET THE FUNCTION
+    const { user: loggedInUser } = useAuth(); // 3. Get the currently logged-in user
     // const { getUserPublicProfile } = useAds(); // We will use this in the future
 
     const [profileData, setProfileData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 3. REPLACE MOCK LOGIC with the real API call
     useEffect(() => {
         const fetchProfile = async () => {
             setIsLoading(true);
+            setError(null);
             try {
-                // --- API Call Simulation ---
-                // In a real app:
-                // const data = await getUserPublicProfile(userId);
-                
-                // For now, we simulate finding the user and their data
-                await new Promise(resolve => setTimeout(resolve, 500));
-                const fakeProfileData = {
-                    user: {
-                        id: userId,
-                        name: 'عاطف غياض', // Example name
-                        memberSince: 'سبتمبر 2025',
-                    },
-                    reviews: userReviewsData,
-                    ads: [...carAdsData, ...realEstateAdsData].filter(ad => ad.status === 'فعال'),
-                };
-                setProfileData(fakeProfileData);
-
+                const data = await getPublicProfile(userId);
+                setProfileData(data);
             } catch (err) {
-                setError("لا يمكن تحميل الملف الشخصي للمستخدم.");
+                // Get the error message from the API response
+                const errorMessage = err.response?.data?.message || 'لا يمكن تحميل الملف الشخصي للمستخدم.';
+                setError(errorMessage);
             } finally {
                 setIsLoading(false);
             }
         };
         fetchProfile();
-    }, [userId]);
+    }, [userId, getPublicProfile]);
+
+    // --- 4. THE NEW HANDLER FOR THE "ADD REVIEW" BUTTON ---
+    const handleAddReviewClick = () => {
+        if (loggedInUser) {
+            // If the user is logged in, navigate to the review page
+            navigate(`/add-review/${userId}`);
+        } else {
+            // If the user is a guest, navigate to the login page
+            // We pass the current path in the state to redirect back after login
+            navigate('/login', { state: { from: `/profile/${userId}` } });
+        }
+    };
 
 
     if (isLoading) {
@@ -74,6 +77,20 @@ const PublicProfile = () => {
                         <span>{profileData.reviews.averageRating.toFixed(1)}</span>
                         <span>({profileData.reviews.totalReviews} تقييمات)</span>
                     </div>
+                </div>
+                <div className="add-review-button-wrapper">
+                    {/* 
+                      * 5. The button now calls our new handler.
+                      * We also add a condition to hide the button if the user is viewing their own profile.
+                    */}
+                    {loggedInUser?.id !== parseInt(userId) && (
+                         <button 
+                            className="submit-btn add-review-btn" 
+                            onClick={handleAddReviewClick}
+                        >
+                            + أضف تقييمك
+                        </button>
+                    )}
                 </div>
             </div>
 

@@ -28,7 +28,7 @@ const AddCarForm = () => {
         model: '',
         condition: 'مستعملة',
         gear: 'أوتوماتيك',
-        fule_type: 'بانزين',
+        fuel_type: 'بنزين',
         model_year: '',
         distance_traveled: '',
         price: '',
@@ -106,7 +106,7 @@ const AddCarForm = () => {
                         model: adData.model || '',
                         condition: adData.condition || 'مستعملة',
                         gear: adData.gear || 'أوتوماتيك',
-                        fule_type: adData.fule_type || 'بانزين',
+                        fuel_type: adData.fuel_type || 'بنزين',
                         model_year: adData.model_year || '',
                         distance_traveled: adData.distance_traveled ?? '',
                         price: adData.price || '',
@@ -120,7 +120,7 @@ const AddCarForm = () => {
                     if (adData?.imageUrls) {
                         setMandatoryImages({
                             front: adData.imageUrls[0] || null,
-                            back: adData.imageUrls[1] || null,
+                            back: adData.imageUrls[1]  || null,
                             side1: adData.imageUrls[2] || null,
                             side2: adData.imageUrls[3] || null,
                         });
@@ -151,7 +151,6 @@ const AddCarForm = () => {
         if (!formData.model) newErrors.model = true;
         if (!formData.model_year) newErrors.model_year = true;
         if (!formData.distance_traveled) newErrors.distance_traveled = true;
-        if (!formData.price) newErrors.price = true;
         if (!formData.city) newErrors.city = true;
 
         // التحقق من الصور الإلزامية
@@ -178,23 +177,30 @@ const AddCarForm = () => {
             for (const key in formData) {
                 let value = formData[key];
                 if (key === 'negotiable_check') {
-                    value = value ? '1' : '0';
+                    value = value ? 1 : 0;
+                }
+
+                if (typeof value === 'string') {
+                    value = value.trim(); // 🔥 removes invisible spaces
                 }
 
                 if (key === 'price' || key === 'distance_traveled' || key === 'model_year') {
                     value = parseInt(value) || 0; // Use parseFloat and fallback to 0 if invalid
                 }
 
-                dataToSubmit.append(key, formData[key]);
+                dataToSubmit.append(key, value);
             }
 
             // Append images
             for (const key in mandatoryImages) {
-                if (mandatoryImages[key]) dataToSubmit.append(`mandatory_images[${key}]`, mandatoryImages[key]);
+                if (mandatoryImages[key]) dataToSubmit.append(key, mandatoryImages[key]);
             }
-            extraImages.forEach((file, index) => {
-                dataToSubmit.append(`extra_images[${index}]`, file);
+
+            extraImages.forEach((file) => {
+                dataToSubmit.append('extra_images[]', file); // ✅ matches Laravel’s rule for arrays
             });
+
+            
 
 
             if (isEditMode) {
@@ -209,7 +215,7 @@ const AddCarForm = () => {
                 navigate('/dashboard/car-ads');
             }
         } catch (error) {
-            setErrorMessage(error.response?.data?.message || 'فشل إرسال الإعلان.');
+            setErrorMessage(error.response?.message || error.message || 'فشل إرسال الإعلان.');
             window.scrollTo(0, 0); // Scroll to top to show the error
         }
         finally {
@@ -219,7 +225,7 @@ const AddCarForm = () => {
 
     const dealTypes = ['بيع', 'إيجار'];
     const conditions = ['جديدة', 'مستعملة', 'متضررة'];
-    const transmissions = ['أوتوماتيك', 'عادي', 'الاثنان معاً'];
+    const transmissions = ['أوتوماتيك', 'عادي', 'الإثنان معا'];
     const fuelTypes = ['بنزين', 'ديزل', 'كهرباء', 'هايبرد'];
     const provinces = ["دمشق", "ريف دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "دير الزور", "الحسكة", "الرقة", "إدلب", "السويداء", "درعا", "القنيطرة"];
 
@@ -323,8 +329,8 @@ const AddCarForm = () => {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="fule_type">نوع الوقود *</label>
-                            <select id="fule_type" name="fule_type" value={formData.fule_type} onChange={handleChange}>
+                            <label htmlFor="fuel_type">نوع الوقود *</label>
+                            <select id="fuel_type" name="fuel_type" value={formData.fuel_type} onChange={handleChange}>
                                 {fuelTypes.map(f => <option key={f} value={f}>{f}</option>)}
                             </select>
                         </div>
@@ -350,8 +356,8 @@ const AddCarForm = () => {
                     <legend>السعر والموقع</legend>
                     <div className="form-grid">
                         <div className="form-group price-group">
-                            <label htmlFor="price">السعر (دولار أمريكي) *</label>
-                            <input type="text" id="price" name="price" value={formData.price} onChange={handleChange} className={errors.price ? 'input-error' : ''} />
+                            <label htmlFor="price">السعر (دولار أمريكي)</label>
+                            <input type="text" id="price" name="price" value={formData.price} onChange={handleChange} />
                             <div className="checkbox-group">
                                 <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
                                 <label htmlFor="negotiable_check">السعر قابل للتفاوض</label>

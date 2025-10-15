@@ -1,6 +1,7 @@
 // src/frontend/components/AddReview.js
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useUser } from '../context/UserContext'; // 1. IMPORT
 import StarInput from './StarInput'; // Our new interactive star component
 import '../styles/forms.css';
 import '../styles/AddReview.css'; // New CSS for this page
@@ -8,6 +9,7 @@ import '../styles/AddReview.css'; // New CSS for this page
 const AddReview = () => {
     const navigate = useNavigate();
     const { userIdToReview } = useParams(); // Get the ID of the user we are reviewing from the URL
+    const { rateUser } = useUser    (); // 2. GET THE FUNCTION
 
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -24,15 +26,19 @@ const AddReview = () => {
 
         setIsSubmitting(true);
         try {
-            // --- API Call Simulation ---
-            // In a real app:
-            // await api.post(`/users/${userIdToReview}/reviews`, { rating, comment });
-            
-            console.log("Submitting Review:", { rating, comment, userIdToReview });
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Prepare the data in the format the backend expects
+            const ratingData = {
+                rated_user_id: parseInt(userIdToReview),
+                rating: rating,
+                message: comment,
+            };
+
+            // Call the context function
+            const result = await rateUser(ratingData);
 
             alert('شكراً لك، تم إرسال تقييمك بنجاح!');
-            navigate('/dashboard'); // Navigate back to the dashboard
+            // Navigate back to the profile page you were just on
+            navigate(`/profile/${userIdToReview}`);
 
         } catch (err) {
             setError(err.response?.data?.message || 'فشل إرسال التقييم.');

@@ -15,7 +15,7 @@ const Login = () => {
   const location = useLocation(); // 3. للوصول إلى المعلومات الممررة
   const auth = useAuth(); // 4. للوصول لدالة login
 
-  const from = location.state?.redirectTo || '/dashboard';
+  const from = location.state?.from || '/dashboard';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ const Login = () => {
 
     } catch (err) {
       // إذا كانت البيانات خاطئة أعرض الخطأ
-      setError(err.message);
+      setError(err.response?.data?.message || err.message || "فشل تسجيل الدخول");
     }
     finally {
       setIsSubmitting(false);

@@ -24,23 +24,23 @@ class StoreRealestateAdRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string','max:50'],
-            'transaction_type' => ['required', 'string', Rule::in(['بيع', 'إيجار', 'استثمار'])],
+            'transaction_type'   => ['required', 'string', Rule::in(['بيع', 'إيجار', 'استثمار'])],
             'realestate_type'    => ['required', 'string'],
-            'governorate'      => ['required', 'string'],
-            'city'             => ['required', 'string', 'max:255'],
+            'governorate'        => ['required', 'string'],
+            'city'               => ['required', 'string', 'max:255'],
             'detailed_address'   => ['required', 'string', 'max:500'],
-            'realestate_size'    => ['required', 'numeric', 'min:1'],
+            'area'               => ['required', 'numeric', 'min:1'],
             'bedroom_num'        => ['nullable', 'integer', 'min:0'],
             'bathroom_num'       => ['nullable', 'integer', 'min:0'],
             'floor_num'          => ['nullable', 'integer'],
             'building_status'    => ['required', 'string'],
             'cladding_condition' => ['required', 'string'],
-            'price'            => ['required', 'numeric', 'min:0'],
+            'price'              => ['min:0'],
             'negotiable_check'   => ['required', 'boolean'],
-            'description'      => ['required', 'string', 'max:5000'],
-            'images'           => 'required|array|min:2',
-            'images.*'         => 'image|mimes:jpeg,png,jpg|max:2048',
-            'video'            => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:20480'],
+            'description'        => ['required', 'string', 'max:5000'],
+            'images'             => 'required|array',
+            'images.*'           => 'image|mimes:jpeg,png,jpg|max:2048',
+            'video'              => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:20480'],
         ];
     }
 

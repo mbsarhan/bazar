@@ -65,6 +65,7 @@ class AdvertisementResource extends JsonResource
                 'owner'             => [
                     'name' => "{$this->owner->fname} {$this->owner->lname}",
                     'phone' => "{$this->owner->phone}",
+                    'id' => $this->owner->id,
                     // You can add more owner details here if needed later, like phone number
                 ],
 
@@ -86,18 +87,18 @@ class AdvertisementResource extends JsonResource
             $realEstateImages = $this->realEstateDetails->ImageForRealestate;
 
             $realEstateData = [
-                'governorate' => $this->governorate,
-                'city' => $this->city,
-                'transaction_type' => $this->transaction_type,
-                'realestate_type' => $this->realEstateDetails->realestate_type,
-                'detailed_address' => $this->realEstateDetails->detailed_address,
-                'area' => number_format($this->realEstateDetails->realestate_size),
-                'bedroom_num' => $this->realEstateDetails->bedroom_num? $this->realEstateDetails->bedroom_num : 0,
-                'bathroom_num' => $this->realEstateDetails->bathroom_num? $this->realEstateDetails->bathroom_num : 0,
-                'floor_num' =>$this->realEstateDetails->floor_num? $this->realEstateDetails->bathroom_num : 0,
-                'building_status' => $this->realEstateDetails->building_status,
-                'cladding_condition' => $this->realEstateDetails->cladding_condition,
-                'negotiable_check' => $this->realEstateDetails->negotiable_check,
+                'governorate'           => $this->governorate,
+                'city'                  => $this->city,
+                'transaction_type'      => $this->transaction_type,
+                'realestate_type'       => $this->realEstateDetails->realestate_type,
+                'detailed_address'      => $this->realEstateDetails->detailed_address,
+                'area'                  => number_format($this->realEstateDetails->area),
+                'bedroom_num'           => $this->realEstateDetails->bedroom_num? $this->realEstateDetails->bedroom_num : 0,
+                'bathroom_num'          => $this->realEstateDetails->bathroom_num? $this->realEstateDetails->bathroom_num : 0,
+                'floor_num'             => $this->realEstateDetails->floor_num? $this->realEstateDetails->bathroom_num : 0,
+                'building_status'       => $this->realEstateDetails->building_status,
+                'cladding_condition'    => $this->realEstateDetails->cladding_condition,
+                'negotiable_check'      => $this->realEstateDetails->negotiable_check,
                 'owner' => [
                     'name' => "{$this->owner->fname} {$this->owner->lname}",
                     'phone' => "{$this->owner->phone}",

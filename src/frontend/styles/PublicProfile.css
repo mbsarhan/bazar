@@ -1,11 +1,12 @@
-/* src/frontend/styles/PublicProfile.css */
-
 .profile-page-container {
     max-width: 1100px;
     margin: 40px auto;
     padding: 20px;
 }
 
+/* ============================================= */
+/* Profile Header Card                           */
+/* ============================================= */
 .profile-header-card {
     display: flex;
     align-items: center;
@@ -31,6 +32,10 @@
     flex-shrink: 0;
 }
 
+.profile-header-info {
+    flex-grow: 1; /* Pushes the button to the far left */
+}
+
 .profile-header-info h1 {
     margin: 0 0 5px 0;
 }
@@ -47,6 +52,23 @@
     font-weight: 600;
 }
 
+.add-review-button-wrapper {
+    /* This element will not shrink */
+    flex-shrink: 0;
+}
+
+/* 2. Style the button itself */
+.add-review-btn {
+    /* Use the values you wanted for a small rectangle */
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+}
+
+
+/* ============================================= */
+/* Profile Sections (Ads & Reviews)              */
+/* ============================================= */
 .profile-section {
     margin-bottom: 50px;
 }
@@ -58,4 +80,5 @@
     padding-bottom: 15px;
 }
 
-/* We reuse .ads-list-container and .reviews-list from other files */
+/* Note: .ads-list-container and .reviews-list styles are reused 
+   from Dashboard.css and Reviews.css respectively */

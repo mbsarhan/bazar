@@ -92,7 +92,7 @@ class RealestateAdsService{
                     'ads_id'              => $advertisement->id,
                     'realestate_type'     => $data['realestate_type'],
                     'detailed_address'    => $data['detailed_address'],
-                    'realestate_size'     => $data['realestate_size'],
+                    'area'                => $data['area'],
                     'bedroom_num'         => $data['bedroom_num'] ?? null,
                     'bathroom_num'        => $data['bathroom_num'] ?? null,
                     'floor_num'           => $data['floor_num'] ?? null,
