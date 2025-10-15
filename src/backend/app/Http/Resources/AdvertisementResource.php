@@ -15,6 +15,21 @@ class AdvertisementResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Get the real estate details, which are already loaded
+        $details = $this->whenLoaded('realEstateDetails');
+
+        $videoUrl = null;
+        if ($details) {
+            // Priority 1: Use the HLS URL if it's ready.
+            if ($this->$details->hls_url) {
+                $videoUrl = Storage::url($this->$details->hls_url);
+            } 
+            // Priority 2: Fall back to the original video URL if HLS isn't ready.
+            elseif ($this->$details->video_url) {
+                $videoUrl = Storage::url($this->$details->video_url);
+            }
+        }
+
         $baseUrl = config('app.url');
 
         $baseData = [
@@ -91,9 +106,10 @@ class AdvertisementResource extends JsonResource
                 'imageUrls' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
                     return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");
                 }),
-                'videoUrl' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
-                    return $this->realEstateDetails->video_url ? "{$baseUrl}/storage/{$this->realEstateDetails->video_url}" : null;
-                }),
+                // 'videoUrl' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
+                //     return $this->realEstateDetails->video_url ? "{$baseUrl}/storage/{$this->realEstateDetails->video_url}" : null;
+                // }),
+                'video_url' => $videoUrl,
             ];
             return array_merge($baseData, $realEstateData);
         }

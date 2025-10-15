@@ -8,10 +8,11 @@ use App\Http\Controllers\CarAdsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\UserRatingsController;
+use App\Http\Controllers\VideoUploadController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
-use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
 use App\Http\Controllers\AdvertisementSearchController;
+use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
 
 
 /*
@@ -91,4 +92,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Search and filter
     Route::get('/advertisement/search', [AdvertisementSearchController::class, 'search']);
+
+
+    //Video
+    Route::post('/advertisements/{advertisement}/video', [VideoUploadController::class, 'store'])
+        ->name('api.video.store');
 });
