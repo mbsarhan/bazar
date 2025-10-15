@@ -4,6 +4,7 @@ import { useAds } from '../context/AdContext'; // Import the context hook
 import ProgressBar from './ProgressBar'; // Assuming you have this component
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
+import { vi } from 'date-fns/locale';
 
 
 const UploadIcon = () => (
@@ -113,6 +114,10 @@ const AddRealEstateForm = () => {
                         setImages(adData.imageUrls);
                     }
 
+                    if(adData?.videoUrl){
+                        setVideoFile(adData.videoUrl);
+                    }
+
                 } catch (err) {
                     console.error("Failed to fetch ad data for editing:", err);
                     setErrorMessage("فشل تحميل بيانات الإعلان.");
@@ -148,7 +153,7 @@ const AddRealEstateForm = () => {
         if (!formData.area) newErrors.area = true;
         if (!formData.description) newErrors.description = true;
 
-        if (!images.length) {
+        if (images.length < 1) {
             newErrors.images = true;
         }
 
@@ -342,7 +347,11 @@ const AddRealEstateForm = () => {
                         <div className="video-uploader">
                             {videoFile ? (
                                 <div className="video-preview">
-                                    {isUploading ? <ProgressBar progress={uploadProgress} /> : <video controls src={URL.createObjectURL(videoFile)} />}
+                                    {isUploading ? <ProgressBar progress={uploadProgress} /> : <video controls src={
+                                                    videoFile instanceof File
+                                                        ? URL.createObjectURL(videoFile) // for new uploads
+                                                        : videoFile                      // for URLs from backend
+                                                } />}
                                     <button type="button" onClick={removeVideo} className="remove-image-btn">&times;</button>
                                 </div>
                             ) : (

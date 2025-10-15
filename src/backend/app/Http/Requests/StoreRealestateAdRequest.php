@@ -35,10 +35,10 @@ class StoreRealestateAdRequest extends FormRequest
             'floor_num'          => ['nullable', 'integer'],
             'building_status'    => ['required', 'string'],
             'cladding_condition' => ['required', 'string'],
-            'price'              => ['required', 'numeric', 'min:0'],
+            'price'              => ['min:0'],
             'negotiable_check'   => ['required', 'boolean'],
             'description'        => ['required', 'string', 'max:5000'],
-            'images'             => 'required|array|min:2',
+            'images'             => 'required|array',
             'images.*'           => 'image|mimes:jpeg,png,jpg|max:2048',
             'video'              => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:20480'],
         ];
