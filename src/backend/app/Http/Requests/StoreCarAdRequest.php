@@ -28,7 +28,7 @@ class StoreCarAdRequest extends FormRequest
             'model_year'        => 'required|digits:4|integer|min:1900',
             'distance_traveled' => 'required|numeric|min:0',
             'condition'         => ['required', Rule::in(['جديدة', 'مستعملة', 'متضررة'])],
-            'gear'              => ['required', Rule::in(['عادي', 'أوتوماتيك', 'الإثنان معا'])],
+            'gear'              => ['required', Rule::in(['أوتوماتيك', 'عادي', 'الإثنان معا'])],
             'fuel_type'         => ['required', Rule::in(['بنزين', 'ديزل', 'كهرباء', 'هايبرد'])],
             'negotiable_check'  => 'required|boolean',
 

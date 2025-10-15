@@ -180,6 +180,10 @@ const AddCarForm = () => {
                     value = value ? 1 : 0;
                 }
 
+                if (typeof value === 'string') {
+                    value = value.trim(); // 🔥 removes invisible spaces
+                }
+
                 if (key === 'price' || key === 'distance_traveled' || key === 'model_year') {
                     value = parseInt(value) || 0; // Use parseFloat and fallback to 0 if invalid
                 }
@@ -196,6 +200,8 @@ const AddCarForm = () => {
                 dataToSubmit.append('extra_images[]', file); // ✅ matches Laravel’s rule for arrays
             });
 
+            
+
 
             if (isEditMode) {
                 // For updates with FormData, you must use POST and add a _method field
@@ -209,7 +215,7 @@ const AddCarForm = () => {
                 navigate('/dashboard/car-ads');
             }
         } catch (error) {
-            setErrorMessage(error.response?.data?.message || 'فشل إرسال الإعلان.');
+            setErrorMessage(error.message || 'فشل إرسال الإعلان.');
             window.scrollTo(0, 0); // Scroll to top to show the error
         }
         finally {
@@ -219,7 +225,7 @@ const AddCarForm = () => {
 
     const dealTypes = ['بيع', 'إيجار'];
     const conditions = ['جديدة', 'مستعملة', 'متضررة'];
-    const transmissions = ['أوتوماتيك', 'عادي', 'الاثنان معاً'];
+    const transmissions = ['أوتوماتيك', 'عادي', 'الإثنان معا'];
     const fuelTypes = ['بنزين', 'ديزل', 'كهرباء', 'هايبرد'];
     const provinces = ["دمشق", "ريف دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "دير الزور", "الحسكة", "الرقة", "إدلب", "السويداء", "درعا", "القنيطرة"];
 
