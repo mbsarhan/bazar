@@ -34,7 +34,7 @@ const Login = () => {
 
     } catch (err) {
       // إذا كانت البيانات خاطئة أعرض الخطأ
-      setError(err.message);
+      setError(err.response?.data?.message || err.message || "فشل تسجيل الدخول");
     }
     finally {
       setIsSubmitting(false);

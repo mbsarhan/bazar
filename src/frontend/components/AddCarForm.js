@@ -215,7 +215,7 @@ const AddCarForm = () => {
                 navigate('/dashboard/car-ads');
             }
         } catch (error) {
-            setErrorMessage(error.message || 'فشل إرسال الإعلان.');
+            setErrorMessage(error.response?.message || error.message || 'فشل إرسال الإعلان.');
             window.scrollTo(0, 0); // Scroll to top to show the error
         }
         finally {

@@ -185,7 +185,7 @@ const AddRealEstateForm = () => {
             }
         } catch (err) {
             console.error("Failed to submit ad:", err);
-            setErrorMessage(err.message || 'فشل إرسال الإعلان.');
+            setErrorMessage(err.response?.data?.message || err.message || 'فشل إرسال الإعلان.');
             window.scrollTo(0, 0); // Scroll to top to show the error
         } finally {
             setIsSubmitting(false);
