@@ -24,7 +24,18 @@ export const UserProvider = ({ children }) => {
         return response.data;
     };
 
-    const value = { getUserReviews , getPublicProfile};
+
+    /**
+     * NEW: Submits a rating for a specific user.
+     * @param {object} ratingData - { rated_user_id, rating, message }
+     */
+    const rateUser = async (ratingData) => {
+        // The axios client automatically adds the auth token for this protected route.
+        const response = await api.post('/users/rate', ratingData);
+        return response.data; // Return the success message and new average
+    };
+
+    const value = { getUserReviews, getPublicProfile, rateUser};
 
     return (
         <UserContext.Provider value={value}>
