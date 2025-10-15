@@ -12,6 +12,7 @@ use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
 use App\Http\Controllers\AdvertisementSearchController;
+use App\Http\Controllers\PublicProfileController;
 
 
 /*
@@ -41,6 +42,10 @@ Route::post('/email/verify-otp/resend', [VerificationController::class, 'resend'
 
 // --- ADD THIS NEW PUBLIC ROUTE ---
 Route::post('/advertisements/{ad}/view', [AdvertisementController::class, 'incrementView']);     
+
+
+Route::get('/users/{userId}/public-profile', [PublicProfileController::class, 'show']);
+
 
      
 // Protected routes (require Sanctum authentication)
