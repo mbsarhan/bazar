@@ -36,7 +36,7 @@ const AddReview = () => {
             // Call the context function
             const result = await rateUser(ratingData);
 
-            alert(result.message || 'شكراً لك، تم إرسال تقييمك بنجاح!');
+            alert('شكراً لك، تم إرسال تقييمك بنجاح!');
             // Navigate back to the profile page you were just on
             navigate(`/profile/${userIdToReview}`);
 
