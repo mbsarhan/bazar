@@ -4,9 +4,9 @@ import { useParams, Link } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // 1. Use the context
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
-import {
-    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
-    Home, Square, BedDouble, Bath
+import { 
+    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench, 
+    Home, Square, BedDouble, Bath 
 } from 'lucide-react';
 
 const AdDetailPage = () => {
@@ -67,7 +67,7 @@ const AdDetailPage = () => {
             </div>
         );
     }
-
+    
     if (!ad) {
         return (
             <div className="ad-detail-container not-found">
@@ -88,7 +88,7 @@ const AdDetailPage = () => {
             <div className="ad-detail-content">
                 <div className="ad-detail-image-gallery">
                     <div className="main-image-container">
-                        <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image" />
+                        <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image"/>
                         {ad.imageUrls.length > 1 && (
                             <>
                                 <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
@@ -100,7 +100,7 @@ const AdDetailPage = () => {
                     {ad.imageUrls.length > 1 && (
                         <div className="thumbnail-scroller">
                             {ad.imageUrls.map((url, index) => (
-                                <div
+                                <div 
                                     key={index}
                                     className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`}
                                     onClick={() => setCurrentIndex(index)}
@@ -111,38 +111,27 @@ const AdDetailPage = () => {
                         </div>
                     )}
                 </div>
-                {ad.realestate_type && ad.videoUrl && (
-                    <div className="video-section">
-                        <h3>جولة بالفيديو داخل العقار</h3>
-                        <div className="video-player-wrapper">
-                            <video controls width="100%">
-                                <source src={ad.videoUrl} type="video/mp4" />
-                                عفواً، متصفحك لا يدعم عرض مقاطع الفيديو.
-                            </video>
-                        </div>
-                    </div>
-                )}
 
                 <div className="ad-detail-info">
                     <h3>التفاصيل الأساسية</h3>
                     <div className="info-grid">
                         {ad.model_year && ( /* Car Details */
                             <>
-                                <div className="info-item"><strong><Wrench size={16} /> الحالة:</strong> <span>{ad.condition}</span></div>
-                                <div className="info-item"><strong><Calendar size={16} /> سنة الصنع:</strong> <span>{ad.model_year}</span></div>
-                                <div className="info-item"><strong><MapPin size={16} /> المحافظة:</strong> <span>{ad.governorate}</span></div>
-                                <div className="info-item"><strong><GaugeCircle size={16} /> المسافة المقطوعة:</strong> <span>{formatNumber(ad.distance_traveled)} كم</span></div>
-                                <div className="info-item"><strong><GitCommitVertical size={16} /> ناقل الحركة:</strong> <span>{ad.gear}</span></div>
-                                <div className="info-item"><strong><Fuel size={16} /> نوع الوقود:</strong> <span>{ad.fuel_type}</span></div>
+                                <div className="info-item"><strong><Wrench size={16}/> الحالة:</strong> <span>{ad.condition}</span></div>
+                                <div className="info-item"><strong><Calendar size={16}/> سنة الصنع:</strong> <span>{ad.model_year}</span></div>
+                                <div className="info-item"><strong><MapPin size={16}/> المحافظة:</strong> <span>{ad.governorate}</span></div>
+                                <div className="info-item"><strong><GaugeCircle size={16}/> المسافة المقطوعة:</strong> <span>{formatNumber(ad.distance_traveled)} كم</span></div>
+                                <div className="info-item"><strong><GitCommitVertical size={16}/> ناقل الحركة:</strong> <span>{ad.gear}</span></div>
+                                <div className="info-item"><strong><Fuel size={16}/> نوع الوقود:</strong> <span>{ad.fuel_type}</span></div>
                             </>
                         )}
                         {ad.realestate_type && ( /* Real Estate Details */
                             <>
-                                <div className="info-item"><strong><Home size={16} /> نوع العقار:</strong> <span>{ad.realestate_type}</span></div>
-                                <div className="info-item"><strong><MapPin size={16} /> الموقع:</strong> <span>{ad.location}</span></div>
-                                <div className="info-item"><strong><Square size={16} /> المساحة:</strong> <span>{ad.area} م²</span></div>
-                                <div className="info-item"><strong><BedDouble size={16} /> غرف النوم:</strong> <span>{ad.bedroom_num}</span></div>
-                                <div className="info-item"><strong><Bath size={16} /> الحمامات:</strong> <span>{ad.bathroom_num}</span></div>
+                                <div className="info-item"><strong><Home size={16}/> نوع العقار:</strong> <span>{ad.realestate_type}</span></div>
+                                <div className="info-item"><strong><MapPin size={16}/> الموقع:</strong> <span>{ad.location}</span></div>
+                                <div className="info-item"><strong><Square size={16}/> المساحة:</strong> <span>{ad.area} م²</span></div>
+                                <div className="info-item"><strong><BedDouble size={16}/> غرف النوم:</strong> <span>{ad.bedroom_num}</span></div>
+                                <div className="info-item"><strong><Bath size={16}/> الحمامات:</strong> <span>{ad.bathroom_num}</span></div>
                             </>
                         )}
                     </div>
@@ -151,7 +140,7 @@ const AdDetailPage = () => {
                     <div className="seller-info">
                         <h4>معلومات المعلن</h4>
                         <p>
-                            اسم المعلن:
+                            اسم المعلن: 
                             <Link to={`/profile/${ad.owner.id}`} className="seller-name-link">
                                 <strong>{ad.owner?.name || 'مستخدم بازار'}</strong>
                             </Link>
