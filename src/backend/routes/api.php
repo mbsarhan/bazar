@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/car-ads', [CarAdsController::class, 'store']);
     Route::get('/user/car-ads', [CarAdsController::class, 'index']);
     Route::delete('/car-ads/{ad}', [CarAdsController::class, 'destroy']);
+    Route::put('/car-ads/{ad}', [CarAdsController::class, 'update']);
 
   
   

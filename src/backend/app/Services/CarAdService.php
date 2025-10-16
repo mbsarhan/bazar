@@ -155,4 +155,122 @@ class CarAdService
             }
         });
     }
+
+
+    /**
+     * Update a car advertisement based on your detailed plan.
+     */
+    public function updateAd(Advertisement $ad, array $data): array
+    {
+        // 1. Load all necessary relationships
+        $ad->load(['carDetails', 'carDetails.ImagesForCar']);
+
+        // // 2. Build Snapshots for comparison
+        // $currentSnapshot = $this->buildSnapshot($ad);
+        // $incomingSnapshot = $this->buildIncomingSnapshot($data, $currentSnapshot);
+
+        // // 3. Compare Snapshots
+        // if ($currentSnapshot == $incomingSnapshot) {
+        //     return ['message' => 'لا توجد تغييرات لتحديث الإعلان.', 'no_changes' => true];
+        // }
+
+        // 4. Perform Update within a Transaction
+        DB::transaction(function () use ($ad, $data) {
+            // Update Advertisement table
+            $ad->update([
+                'title'            => $data['manufacturer']." ".$data['model']." ".$data['model_year'],
+                'transaction_type' => $data['transaction_type'],
+                'price'            => $data['price'],
+                'governorate'      => $data['governorate'],
+                'city'             => $data['city'],
+                'description'      => $data['description'] ?? null,
+            ]);
+            
+            // Update CarAds table
+            $ad->carDetails->update([
+                'manufacturer'      => $data['manufacturer'],
+                'model'             => $data['model'],
+                'model_year'        => $data['model_year'],
+                'condition'            => $data['condition'],
+                'gear'              => $data['gear'],
+                'fuel_type'         => $data['fuel_type'],
+                'distance_traveled' => $data['distance_traveled'],
+                'negotiable_check'  => $data['negotiable_check'],
+            ]);
+
+            // 5. Handle Image Changes
+            $this->processImageUpdates($ad, $data);
+        });
+
+        return [
+            'message' => 'تم تحديث الإعلان بنجاح!',
+            'redirect_url' => '/dashboard/car-ads',
+        ];
+    }
+
+    
+
+/**
+     * The definitive, corrected image processing logic.
+     */
+    private function processImageUpdates(Advertisement $ad, array $data): void
+    {
+        $carAdId = $ad->carDetails->id;
+
+        // --- 1. HANDLE MANDATORY IMAGE UPDATES ---
+        $mandatorySlots = ['front', 'back', 'side1', 'side2'];
+        
+        // This is a simplified assumption. A better schema would have a 'type' column
+        // in the images table (e.g., 'front', 'extra'). For now, we'll map by order.
+        $existingMandatoryImages = CarAdImage::where('car_ad_id', $carAdId)->orderBy('id', 'asc')->limit(4)->get();
+
+        foreach ($mandatorySlots as $index => $slot) {
+            // Check if a NEW file was uploaded for this slot (e.g., 'front')
+            if (isset($data[$slot])) {
+                // Find the old image for this slot, if it exists
+                $oldImage = $existingMandatoryImages->get($index);
+
+                // Store the new image
+                $path = $data[$slot]->store('images/cars', 'public');
+
+                if ($oldImage) {
+                    // If an old image existed, delete it from storage and update the DB record
+                    Storage::disk('public')->delete($oldImage->image_url);
+                    $oldImage->update(['image_url' => $path]);
+                } else {
+                    // If no old image existed for this slot, create a new DB record
+                    CarAdImage::create([
+                        'car_ad_id' => $carAdId,
+                        'image_url' => $path,
+                    ]);
+                }
+            }
+        }
+
+
+        // --- 2. HANDLE REMOVED IMAGES ---
+        // This primarily targets extra images now.
+        if (!empty($data['removed_images'])) {
+            $imagesToDelete = CarAdImage::where('car_ad_id', $carAdId)
+                ->whereIn(DB::raw('SUBSTRING_INDEX(image_url, "/", -1)'), $data['removed_images'])
+                ->get();
+                
+            foreach ($imagesToDelete as $image) {
+                Storage::disk('public')->delete($image->image_url);
+                $image->delete();
+            }
+        }
+        
+
+        // --- 3. HANDLE NEW EXTRA IMAGES ---
+        if (!empty($data['extra_images'])) {
+            foreach ($data['extra_images'] as $imageFile) {
+                $path = $imageFile->store('images/cars', 'public');
+                CarAdImage::create([
+                    'car_ad_id' => $carAdId,
+                    'image_url' => $path,
+                ]);
+            }
+        }
+    }   
 }
