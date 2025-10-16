@@ -150,7 +150,6 @@ const AddRealEstateForm = () => {
         if (!formData.city) newErrors.city = true;
         if (!formData.detailed_address) newErrors.detailed_address = true;
         if (!formData.area) newErrors.area = true;
-        if (!formData.description) newErrors.description = true;
         if (!images.length) newErrors.images = true;
 
         if (Object.keys(newErrors).length > 0) {
@@ -207,7 +206,7 @@ const AddRealEstateForm = () => {
         return <div className="form-container wide-form"><p>جاري تحميل بيانات الإعلان...</p></div>;
     }
 
-    
+
     return (
         <div className="form-container wide-form">
             <h2>{isEditMode ? 'تعديل إعلان عقار' : 'أضف إعلان عقار جديد'}</h2>
@@ -311,7 +310,7 @@ const AddRealEstateForm = () => {
                 <fieldset>
                     <legend>التفاصيل والوسائط</legend>
                     <div className="form-group">
-                        <label htmlFor="description">وصف تفصيلي للعقار والميزات *</label>
+                        <label htmlFor="description">وصف تفصيلي للعقار والميزات</label>
                         <textarea name="description" rows="5" value={formData.description} onChange={handleChange} placeholder="اكتب هنا عن ميزات العقار كالإطلالة، وجود مصعد، كراج، تدفئة..." className={errors.description ? 'input-error' : ''}></textarea>
                     </div>
                     <div className="form-group">

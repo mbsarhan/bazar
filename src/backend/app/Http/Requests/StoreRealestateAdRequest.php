@@ -37,7 +37,7 @@ class StoreRealestateAdRequest extends FormRequest
             'cladding_condition' => ['required', 'string'],
             'price'              => ['min:0'],
             'negotiable_check'   => ['required', 'boolean'],
-            'description'        => ['required', 'string', 'max:5000'],
+            'description'        => ['nullable', 'string', 'max:5000'],
             'images'             => 'required|array',
             'images.*'           => 'image|mimes:jpeg,png,jpg|max:2048',
             'video'              => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:20480'],
