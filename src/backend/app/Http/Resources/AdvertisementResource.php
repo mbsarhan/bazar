@@ -16,19 +16,19 @@ class AdvertisementResource extends JsonResource
     public function toArray(Request $request): array
     {
         // Get the real estate details, which are already loaded
-        $details = $this->whenLoaded('realEstateDetails');
+        // $details = $this->whenLoaded('realEstateDetails');
 
-        $videoUrl = null;
-        if ($details) {
-            // Priority 1: Use the HLS URL if it's ready.
-            if ($this->$details->hls_url) {
-                $videoUrl = Storage::url($this->$details->hls_url);
-            } 
-            // Priority 2: Fall back to the original video URL if HLS isn't ready.
-            elseif ($this->$details->video_url) {
-                $videoUrl = Storage::url($this->$details->video_url);
-            }
-        }
+        // $videoUrl = null;
+        // if ($details) {
+        //     // Priority 1: Use the HLS URL if it's ready.
+        //     if ($details->hls_url) {
+        //         $videoUrl = Storage::url($this->$details->hls_url);
+        //     } 
+        //     // Priority 2: Fall back to the original video URL if HLS isn't ready.
+        //     elseif ($this->$details->video_url) {
+        //         $videoUrl = Storage::url($this->$details->video_url);
+        //     }
+        // }
 
         $baseUrl = config('app.url');
 
@@ -85,7 +85,14 @@ class AdvertisementResource extends JsonResource
         // --- REAL ESTATE AD LOGIC ---
         if ($this->relationLoaded('realEstateDetails') && $this->realEstateDetails) {
             $realEstateImages = $this->realEstateDetails->ImageForRealestate;
-
+            $videoUrl = null;
+            if ($this->realEstateDetails->hls_url) {
+                $videoUrl = Storage::url($this->realEstateDetails->hls_url);
+            } 
+            // Priority 2: Fall back to the original video URL if HLS isn't ready.
+            elseif ($this->realEstateDetails->video_url) {
+                $videoUrl = Storage::url($this->realEstateDetails->video_url);
+            }
             $realEstateData = [
                 'governorate'           => $this->governorate,
                 'city'                  => $this->city,
@@ -110,7 +117,7 @@ class AdvertisementResource extends JsonResource
                 // 'videoUrl' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
                 //     return $this->realEstateDetails->video_url ? "{$baseUrl}/storage/{$this->realEstateDetails->video_url}" : null;
                 // }),
-                'video_url' => $videoUrl,
+                'videoUrl' => $videoUrl,
             ];
             return array_merge($baseData, $realEstateData);
         }

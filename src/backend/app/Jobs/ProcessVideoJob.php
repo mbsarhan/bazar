@@ -118,6 +118,7 @@ use Throwable;
 class ProcessVideoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    public $timeout = 600;
 
     /**
      * The number of times the job may be attempted.

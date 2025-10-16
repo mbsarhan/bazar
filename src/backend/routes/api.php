@@ -13,7 +13,7 @@ use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
-use App\Http\Controllers\AdvertisementSearchController;
+// use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\PublicProfileController;
 
 
