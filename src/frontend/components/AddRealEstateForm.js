@@ -42,6 +42,7 @@ const AddRealEstateForm = () => {
     });
     const [images, setImages] = useState([]);
     const [videoFile, setVideoFile] = useState(null);
+    const [removedMedia, setRemovedMedia] = useState([]); // Holds filenames of removed media
     const [uploadProgress, setUploadProgress] = useState(0); // This can be used in the future
     const [isUploading, setIsUploading] = useState(false); // This can be used in the future
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,25 +62,27 @@ const AddRealEstateForm = () => {
     };
 
     const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length > 0) {
-            setImages(prev => [...prev, ...files]);
-            if (errors.images) {
-                setErrors(prev => ({ ...prev, images: false }));
-            }
-        }
-        e.target.value = null;
+        setImages(prev => [...prev, ...Array.from(e.target.files)]);
     };
 
     const handleVideoChange = (e) => {
         setVideoFile(e.target.files[0]);
     };
 
-    const removeImage = (index) => {
-        setImages(prev => prev.filter((_, i) => i !== index));
+    const removeImage = (indexToRemove) => {
+        const imageToRemove = images[indexToRemove];
+        if (typeof imageToRemove === 'string') { // It's an existing URL
+            const filename = imageToRemove.substring(imageToRemove.lastIndexOf('/') + 1);
+            setRemovedMedia(prev => [...prev, filename]);
+        }
+        setImages(prev => prev.filter((_, i) => i !== indexToRemove));
     };
-
+    
     const removeVideo = () => {
+        if (typeof videoFile === 'string') { // It's an existing URL
+            const filename = videoFile.substring(videoFile.lastIndexOf('/') + 1);
+            setRemovedMedia(prev => [...prev, filename]);
+        }
         setVideoFile(null);
     };
 
@@ -163,21 +166,34 @@ const AddRealEstateForm = () => {
         try {
             const dataToSubmit = new FormData();
 
-            for (const key in formData) {
-                let value = formData[key];
-                if (key === 'negotiable_check') {
-                    value = value ? 1 : 0;
-                }
-                dataToSubmit.append(key, value);
+            Object.keys(formData).forEach(key => {
+            let value = formData[key];
+            if (key === 'negotiable_check') value = value ? '1' : '0';
+            dataToSubmit.append(key, value);
+        });
+        
+        // Append ONLY new images
+        images.forEach(image => {
+            if (image instanceof File) {
+                dataToSubmit.append('images[]', image);
             }
-            images.forEach(file => dataToSubmit.append('images[]', file));
-            if (videoFile) dataToSubmit.append('video', videoFile);
+        });
+
+        // Append ONLY a new video
+        if (videoFile instanceof File) {
+            dataToSubmit.append('video', videoFile);
+        }
+
+        // Append the list of removed media filenames
+        removedMedia.forEach(filename => {
+            dataToSubmit.append('removed_media[]', filename);
+        });
 
             if (isEditMode) {
                 dataToSubmit.append('_method', 'PUT');
-                await updateRealEstateAd(adId, dataToSubmit);
-                alert('تم تحديث الإعلان بنجاح!');
-                navigate('/dashboard/real-estate-ads');
+                const result = await updateRealEstateAd(adId, dataToSubmit);
+                alert(result.message);
+                navigate(result.redirect_url || '/dashboard/real-estate-ads');
             } else {
                 await createRealEstateAd(dataToSubmit);
                 alert('تم نشر الإعلان بنجاح!');
