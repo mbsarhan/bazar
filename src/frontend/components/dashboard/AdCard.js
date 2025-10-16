@@ -6,7 +6,6 @@ import {
     GitCommitVertical, Fuel, Wrench, Home, Square, BedDouble, 
     Eye, Edit, Trash2, ExternalLink
 } from 'lucide-react';
-import { isNullOrUndef } from 'chart.js/helpers';
 
 // Re-defining these here for completeness as simple functional components
 const EditIcon = () => <Edit size={16} />;
@@ -136,7 +135,7 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
                 </div>
                 <div className="ad-card-details">
                     <h3>{ad.title}</h3>
-                    <p className="ad-card-price">{`${ad.price == 0 ? 'السعر عند التواصل' : `${ad.price} $`} ${ad.negotiable_check ? '(قابل للتفاوض)' : ''}`}</p>
+                    <p className="ad-card-price">{ad.price}</p>
                     <div className="ad-card-specs">
                         {ad.model_year && (
                             <>
