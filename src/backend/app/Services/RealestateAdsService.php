@@ -180,4 +180,97 @@ class RealestateAdsService{
             }
         });
     }
+
+
+
+    /**
+     * Update a Real Estate Advertisement.
+     */
+    public function updateAd(Advertisement $ad, array $data): array
+    {
+        // For simplicity, we will skip the "no changes" check for now,
+        // as it's very complex with files. We will perform the update.
+        // A success message is sufficient for the user.
+        
+        DB::transaction(function () use ($ad, $data) {
+            // 1. Update the parent Advertisement table
+            $ad->update([
+                'ad_status'       => 'قيد المراجعة',
+                'transaction_type' => $data['transaction_type'],
+                'price'            => $data['price'],
+                'governorate'      => $data['governorate'],
+                'city'             => $data['city'],
+                'description'      => $data['description'] ?? null,
+            ]);
+
+            // 2. Handle Media Updates (Delete old files first)
+            $this->processMediaUpdates($ad, $data);
+            
+            // 3. Update the RealestateAds details table
+            $ad->realEstateDetails->update([
+                'realestate_type'     => $data['realestate_type'],
+                'detailed_address'    => $data['detailed_address'],
+                'area'                => $data['area'],
+                'bedroom_num'         => $data['bedroom_num'] ?? null,
+                'bathroom_num'        => $data['bathroom_num'] ?? null,
+                'floor_num'           => $data['floor_num'] ?? null,
+                'building_status'     => $data['building_status'],
+                'cladding_condition'  => $data['cladding_condition'],
+                'negotiable_check'    => $data['negotiable_check'],
+            ]);
+        });
+
+        return [
+            'message' => 'تم تحديث الإعلان بنجاح!',
+            'redirect_url' => '/dashboard/real-estate-ads',
+        ];
+    }
+
+    private function processMediaUpdates(Advertisement $ad, array $data): void
+    {
+        $realEstateAd = $ad->realEstateDetails;
+
+        // --- 1. Delete Removed Media ---
+        if (!empty($data['removed_media'])) {
+            // Delete removed images
+            $imagesToDelete = RealestateImage::where('realestate_ad_id', $realEstateAd->id)
+                ->whereIn(DB::raw('SUBSTRING_INDEX(image_url, "/", -1)'), $data['removed_media'])
+                ->get();
+
+            foreach ($imagesToDelete as $image) {
+                Storage::disk('public')->delete($image->image_url);
+                $image->delete();
+            }
+
+            // Delete removed video (if its filename is in the array)
+            if ($realEstateAd->video_url && in_array(basename($realEstateAd->video_url), $data['removed_media'])) {
+                Storage::disk('public')->delete($realEstateAd->video_url);
+                $realEstateAd->video_url = null;
+                $realEstateAd->save();
+            }
+        }
+
+        // --- 2. Add New Images ---
+        if (!empty($data['images'])) {
+            foreach ($data['images'] as $imageFile) {
+                $path = $imageFile->store('images/real-estate', 'public');
+                RealestateImage::create([
+                    'realestate_ad_id' => $realEstateAd->id,
+                    'image_url' => $path,
+                ]);
+            }
+        }
+
+        // --- 3. Add/Replace Video ---
+        if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
+            // Delete the old video if it exists
+            if ($realEstateAd->video_url) {
+                Storage::disk('public')->delete($realEstateAd->video_url);
+            }
+            // Store the new one and update the record
+            $videoPath = $data['video']->store('videos/real-estate', 'public');
+            $realEstateAd->video_url = $videoPath;
+            $realEstateAd->save();
+        }
+    }
 }
