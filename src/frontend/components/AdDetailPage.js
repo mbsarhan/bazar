@@ -106,12 +106,16 @@ const AdDetailPage = () => {
                 <div className="ad-detail-image-gallery">
                     {/* Main Image Display */}
                     <div className="main-image-container">
-                        <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image" />
-                        {ad.imageUrls.length > 1 && (
-                            <>
-                                <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
-                                <button className="gallery-arrow right" onClick={prevSlide}><ChevronRight size={32} /></button>
-                            </>
+                        {currentIndex === -1 && ad.videoUrl ? (
+                            <video controls width="100%" height="auto" className="main-image">
+                                <source src={ad.videoUrl} type="video/mp4" />
+                            </video>
+                        ) : (
+                            <img
+                                src={ad.imageUrls[currentIndex]}
+                                alt={`${ad.title} - ${currentIndex + 1}`}
+                                className="main-image"
+                            />
                         )}
                     </div>
 
@@ -120,8 +124,8 @@ const AdDetailPage = () => {
                         {/* Video Thumbnails - Left Side (space always reserved) */}
                         <div className="video-thumbnails">
                             {ad.realestate_type && ad.videoUrl && (
-                                <div className="video-thumbnail">
-                                    <video>
+                                <div className="video-thumbnail" onClick={() => setCurrentIndex(-1)}>
+                                    <video muted preload="metadata">
                                         <source src={ad.videoUrl} type="video/mp4" />
                                     </video>
                                 </div>
@@ -129,7 +133,7 @@ const AdDetailPage = () => {
                         </div>
 
                         {/* Photo Thumbnails - Right Side */}
-                        {ad.imageUrls.length > 1 && (
+                        {ad.imageUrls.length && (
                             <div className="thumbnail-scroller">
                                 {ad.imageUrls.map((url, index) => (
                                     <div
