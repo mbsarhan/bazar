@@ -18,14 +18,20 @@ class AdvertisementResource extends JsonResource
         $baseUrl = config('app.url');
 
         $baseData = [
-            'id' => $this->id,
-            'title' => $this->title,
-            'price' => number_format($this->price),
-            'location' => "{$this->governorate}, {$this->city}",
+            'id'                => $this->id,
+            'title'             => $this->title,
+            'price'             => number_format($this->price),
+            'location'          => "{$this->governorate}, {$this->city}",
             'description'       => $this->description,
-            'status' => $this->ad_status,
-            'views' => $this->views_count,
-            'isPublic' => true,
+            'status'            => $this->ad_status,
+            'views'             => $this->views_count,
+            'isPublic'          => true,
+            'owner'             => [
+                'name'          => "{$this->owner->fname} {$this->owner->lname}",
+                'phone'         => "{$this->owner->phone}",
+                'id'            => $this->owner->id,
+                // You can add more owner details here if needed later, like phone number
+            ],
         ];
 
         // --- CAR AD LOGIC ---
@@ -47,12 +53,6 @@ class AdvertisementResource extends JsonResource
 
                 // --- 2. ADD THE OWNER (SELLER) INFORMATION ---
                 // The 'owner' relationship was already eager-loaded in the controller.
-                'owner'             => [
-                    'name' => "{$this->owner->fname} {$this->owner->lname}",
-                    'phone' => "{$this->owner->phone}",
-                    'id' => $this->owner->id,
-                    // You can add more owner details here if needed later, like phone number
-                ],
 
 
                 // --- THE CORRECTED IMAGE URL GENERATION ---
@@ -84,10 +84,6 @@ class AdvertisementResource extends JsonResource
                 'building_status'       => $this->realEstateDetails->building_status,
                 'cladding_condition'    => $this->realEstateDetails->cladding_condition,
                 'negotiable_check'      => $this->realEstateDetails->negotiable_check,
-                'owner' => [
-                    'name' => "{$this->owner->fname} {$this->owner->lname}",
-                    'phone' => "{$this->owner->phone}",
-                ],
                 
                 'imageUrls' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
                     return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");

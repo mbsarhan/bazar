@@ -137,8 +137,6 @@ const AddRealEstateForm = () => {
 
         // Your client-side validation
         const newErrors = {};
-        if (!formData.city) newErrors.city = true;
-        if (images.length < 2) newErrors.images = true;
         // // منع الإرسال أثناء رفع الفيديو
         if (isUploading) {
             setErrorMessage('يرجى الانتظار حتى يكتمل رفع الفيديو.');
@@ -152,10 +150,7 @@ const AddRealEstateForm = () => {
         if (!formData.detailed_address) newErrors.detailed_address = true;
         if (!formData.area) newErrors.area = true;
         if (!formData.description) newErrors.description = true;
-
-        if (images.length < 1) {
-            newErrors.images = true;
-        }
+        if (!images.length) newErrors.images = true;
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
