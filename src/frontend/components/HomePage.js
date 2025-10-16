@@ -5,6 +5,7 @@ import AdCardSkeleton from './dashboard/AdCardSkeleton'; // 1. Import the skelet
 import SearchFilters from './SearchFilters';
 import '../styles/HomePage.css';
 import { useAds } from '../context/AdContext'; // 1. Import the context hook
+import { ChevronDown } from 'lucide-react';
 
 const HomePage = () => {
 
@@ -15,6 +16,7 @@ const HomePage = () => {
     const [ads, setAds] = useState([]);
     const [error, setError] = useState(null); // Add error state
     const { getPublicAds } = useAds(); // 2. Get the function from context
+    const [sortOrder, setSortOrder] = useState('newest-first'); // Default sort
 
      // This useEffect hook is now the "engine". It depends on activeFilter.
     useEffect(() => {
@@ -52,8 +54,23 @@ const HomePage = () => {
     return (
         <div className="home-page-container">
             <SearchFilters onFilterChange={handleFilterChange}/>
+            <div className="list-header">
+                <h1>أحدث الإعلانات</h1>
+                <div className="sort-dropdown-wrapper">
+                    <select 
+                        className="sort-dropdown"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                    >
+                        <option value="newest-first">الأحدث أولاً</option>
+                        <option value="oldest-first">الأقدم أولاً</option>
+                        <option value="price-asc">السعر: من الأرخص للأغلى</option>
+                        <option value="price-desc">السعر: من الأغلى للأرخص</option>
+                    </select>
+                    <ChevronDown size={20} className="sort-dropdown-icon" />
+                </div>
+            </div>
 
-            <h1>أحدث الإعلانات</h1>
             <div className="ads-list-container">
                 {isLoading ? (
                     // 4. If loading, show a grid of 8 skeleton cards

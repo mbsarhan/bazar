@@ -49,6 +49,7 @@ const AddRealEstateForm = () => {
     const [errors, setErrors] = useState({});
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
+    
 
     // --- All of your handlers from your original file ---
     const handleChange = (e) => {
@@ -201,6 +202,12 @@ const AddRealEstateForm = () => {
     const constructionStatuses = ['جاهز', 'على الهيكل', 'قيد الإنشاء'];
     const finishingStatuses = ['سوبر ديلوكس', 'جيد جداً', 'جيد', 'عادي', 'بحاجة لتجديد'];
     const provinces = ["دمشق", "ريف دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "دير الزور", "الحسكة", "الرقة", "إدلب", "السويداء", "درعا", "القنيطرة"];
+
+    if (isLoading) {
+        return <div className="form-container wide-form"><p>جاري تحميل بيانات الإعلان...</p></div>;
+    }
+
+    
     return (
         <div className="form-container wide-form">
             <h2>{isEditMode ? 'تعديل إعلان عقار' : 'أضف إعلان عقار جديد'}</h2>

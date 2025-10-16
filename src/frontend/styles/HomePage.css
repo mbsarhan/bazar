@@ -1,10 +1,58 @@
-/* src/styles/HomePage.css */
+/* src/frontend/styles/HomePage.css */
+
 .home-page-container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px;
 }
-.home-page-container h1 {
+
+/* --- NEW: Styles for the List Header and Sort Dropdown --- */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 30px;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 20px;
 }
-/* سنعيد استخدام نفس كلاس ads-list-container من Dashboard.css */
+
+.list-header h1 {
+    margin: 0;
+}
+
+.sort-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.sort-dropdown {
+    /* Reset default browser appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    
+    /* Custom Styles */
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border-subtle);
+    padding: 10px 40px 10px 20px; /* Make space on the right for the icon */
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    cursor: pointer;
+}
+
+.sort-dropdown:focus {
+    outline: none;
+    border-color: var(--color-accent-primary);
+}
+
+.sort-dropdown-icon {
+    position: absolute;
+    right: 15px; /* Position icon on the right for RTL */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none; /* Make the icon unclickable */
+}
