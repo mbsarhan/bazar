@@ -10,11 +10,13 @@ use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\UserRatingsController;
 use App\Http\Controllers\VideoUploadController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\RealestateAdsController;
+// use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
-// use App\Http\Controllers\AdvertisementSearchController;
-use App\Http\Controllers\PublicProfileController;
+
 
 
 /*
@@ -39,8 +41,8 @@ Route::get('/advertisements/{ad}', [AdvertisementController::class, 'show']);
 //Verify Email with Otp
 Route::post('/email/verify-otp', [VerificationController::class, 'verifyOtp'])->name('verification.verify_otp');
 Route::post('/email/verify-otp/resend', [VerificationController::class, 'resend'])
-     ->name('verification.resend')
-     ->middleware('throttle:1,2'); // Limit resends to 1 request every 2 minutes
+->name('verification.resend')
+->middleware('throttle:1,2'); // Limit resends to 1 request every 2 minutes
 
 // --- ADD THIS NEW PUBLIC ROUTE ---
 Route::post('/advertisements/{ad}/view', [AdvertisementController::class, 'incrementView']);     
@@ -49,7 +51,14 @@ Route::post('/advertisements/{ad}/view', [AdvertisementController::class, 'incre
 Route::get('/users/{userId}/public-profile', [PublicProfileController::class, 'show']);
 
 
-     
+
+//PASSWORD RESET ---
+Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword'])->name('password.email');
+Route::post('/verify-password-reset-code', [PasswordResetController::class, 'verifyCode'])->name('password.verify.code');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+
+
+
 // Protected routes (require Sanctum authentication)
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -104,4 +113,8 @@ Route::middleware('auth:sanctum')->group(function () {
     //Video
     Route::post('/advertisements/{advertisement}/video', [VideoUploadController::class, 'store'])
         ->name('api.video.store');
+
+
+
+
 });
