@@ -178,6 +178,7 @@ class CarAdService
         DB::transaction(function () use ($ad, $data) {
             // Update Advertisement table
             $ad->update([
+                'ad_status'       => 'قيد المراجعة', // Reset status to 'Under Review' on update
                 'title'            => $data['manufacturer']." ".$data['model']." ".$data['model_year'],
                 'transaction_type' => $data['transaction_type'],
                 'price'            => $data['price'],
