@@ -151,7 +151,7 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
                         {ad.realestate_type && (
                             <>
                                 <div className="spec-item"><Home size={16} /><span>{ad.realestate_type}</span></div>
-                                <div className="spec-item"><MapPin size={16} /><span>{ad.location}</span></div>
+                                <div className="spec-item"><MapPin size={16} /><span>{ad.governorate}</span></div>
                                 <div className="spec-item"><Square size={16} /><span>{ad.area} م²</span></div>
                                 <div className="spec-item"><BedDouble size={16} /><span>{ad.bedroom_num} غرف نوم</span></div>
                             </>
