@@ -5,9 +5,9 @@ import { useAds } from '../context/AdContext'; // 1. Use the context
 import { useUser } from '../context/UserContext';
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
-import { 
-    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench, 
-    Home, Square, BedDouble, Bath 
+import {
+    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
+    Home, Square, BedDouble, Bath
 } from 'lucide-react';
 
 const AdDetailPage = () => {
@@ -81,7 +81,7 @@ const AdDetailPage = () => {
             </div>
         );
     }
-    
+
     if (!ad) {
         return (
             <div className="ad-detail-container not-found">
@@ -96,14 +96,15 @@ const AdDetailPage = () => {
         <div className="ad-detail-container">
             <div className="ad-detail-header">
                 <h1>{ad.title}</h1>
-                <span className="ad-detail-price">{ad.price}</span>
+                <span className="ad-detail-price">{`${ad.price == 0 ? 'السعر عند التواصل' : `${ad.price} $`}
+                     ${ad.negotiable_check ? '(قابل للتفاوض)' : ''}`}</span>
             </div>
 
             <div className="ad-detail-content">
                 <div className="ad-detail-image-gallery">
                     {/* Main Image Display */}
                     <div className="main-image-container">
-                        <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image"/>
+                        <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image" />
                         {ad.imageUrls.length > 1 && (
                             <>
                                 <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
@@ -111,20 +112,35 @@ const AdDetailPage = () => {
                             </>
                         )}
                     </div>
-                    {/* --- The Thumbnail Scroller --- */}
-                    {ad.imageUrls.length > 1 && (
-                        <div className="thumbnail-scroller">
-                            {ad.imageUrls.map((url, index) => (
-                                <div 
-                                    key={index}
-                                    className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`}
-                                    onClick={() => setCurrentIndex(index)}
-                                >
-                                    <img src={url} alt={`Thumbnail ${index + 1}`} />
+
+                    {/* Thumbnails Container */}
+                    <div className="thumbnail-container-wrapper">
+                        {/* Video Thumbnails - Left Side (space always reserved) */}
+                        <div className="video-thumbnails">
+                            {ad.realestate_type && ad.videoUrl && (
+                                <div className="video-thumbnail">
+                                    <video>
+                                        <source src={ad.videoUrl} type="video/mp4" />
+                                    </video>
                                 </div>
-                            ))}
+                            )}
                         </div>
-                    )}
+
+                        {/* Photo Thumbnails - Right Side */}
+                        {ad.imageUrls.length > 1 && (
+                            <div className="thumbnail-scroller">
+                                {ad.imageUrls.map((url, index) => (
+                                    <div
+                                        key={index}
+                                        className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`}
+                                        onClick={() => setCurrentIndex(index)}
+                                    >
+                                        <img src={url} alt={`Thumbnail ${index + 1}`} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Ad Details Info */}
@@ -133,21 +149,21 @@ const AdDetailPage = () => {
                     <div className="info-grid">
                         {ad.model_year && (
                             <>
-                                <div className="info-item"><strong><Wrench size={16}/> الحالة:</strong> <span>{ad.condition}</span></div>
-                                <div className="info-item"><strong><Calendar size={16}/> سنة الصنع:</strong> <span>{ad.model_year}</span></div>
-                                <div className="info-item"><strong><MapPin size={16}/> المحافظة:</strong> <span>{ad.governorate}</span></div>
-                                <div className="info-item"><strong><GaugeCircle size={16}/> المسافة المقطوعة:</strong> <span>{formatNumber(ad.distance_traveled)} كم</span></div>
-                                <div className="info-item"><strong><GitCommitVertical size={16}/> ناقل الحركة:</strong> <span>{ad.gear}</span></div>
-                                <div className="info-item"><strong><Fuel size={16}/> نوع الوقود:</strong> <span>{ad.fuel_type}</span></div>
+                                <div className="info-item"><strong><Wrench size={16} /> الحالة:</strong> <span>{ad.condition}</span></div>
+                                <div className="info-item"><strong><Calendar size={16} /> سنة الصنع:</strong> <span>{ad.model_year}</span></div>
+                                <div className="info-item"><strong><MapPin size={16} /> المحافظة:</strong> <span>{ad.governorate}</span></div>
+                                <div className="info-item"><strong><GaugeCircle size={16} /> المسافة المقطوعة:</strong> <span>{formatNumber(ad.distance_traveled)} كم</span></div>
+                                <div className="info-item"><strong><GitCommitVertical size={16} /> ناقل الحركة:</strong> <span>{ad.gear}</span></div>
+                                <div className="info-item"><strong><Fuel size={16} /> نوع الوقود:</strong> <span>{ad.fuel_type}</span></div>
                             </>
                         )}
                         {ad.realestate_type && (
                             <>
-                                <div className="info-item"><strong><Home size={16}/> نوع العقار:</strong> <span>{ad.realestate_type}</span></div>
-                                <div className="info-item"><strong><MapPin size={16}/> الموقع:</strong> <span>{ad.location}</span></div>
-                                <div className="info-item"><strong><Square size={16}/> المساحة:</strong> <span>{ad.area} م²</span></div>
-                                <div className="info-item"><strong><BedDouble size={16}/> غرف النوم:</strong> <span>{ad.bedroom_num}</span></div>
-                                <div className="info-item"><strong><Bath size={16}/> الحمامات:</strong> <span>{ad.bathroom_num}</span></div>
+                                <div className="info-item"><strong><Home size={16} /> نوع العقار:</strong> <span>{ad.realestate_type}</span></div>
+                                <div className="info-item"><strong><MapPin size={16} /> الموقع:</strong> <span>{ad.location}</span></div>
+                                <div className="info-item"><strong><Square size={16} /> المساحة:</strong> <span>{ad.area} م²</span></div>
+                                <div className="info-item"><strong><BedDouble size={16} /> غرف النوم:</strong> <span>{ad.bedroom_num}</span></div>
+                                <div className="info-item"><strong><Bath size={16} /> الحمامات:</strong> <span>{ad.bathroom_num}</span></div>
                             </>
                         )}
                     </div>
@@ -156,12 +172,12 @@ const AdDetailPage = () => {
                     <div className="seller-info">
                         <h4>معلومات المعلن</h4>
                         <p>
-                            اسم المعلن: 
+                            اسم المعلن:
                             <Link to={
-    currentUser && currentUser.id === ad.owner.id
-      ? '/dashboard'
-      : `/profile/${ad.owner.id}`
-  } className="seller-name-link">
+                                currentUser && currentUser.id === ad.owner.id
+                                    ? '/dashboard'
+                                    : `/profile/${ad.owner.id}`
+                            } className="seller-name-link">
                                 <strong>{ad.owner?.name || 'مستخدم بازار'}</strong>
                             </Link>
                         </p>
