@@ -8,6 +8,7 @@ use App\Models\Advertisement;
 use App\Models\RealestateAds;
 use App\Services\RealestateAdsService;
 use App\Http\Requests\StoreRealestateAdRequest;
+use App\Http\Requests\UpdateRealestateAdRequest; // <-- 1. IMPORT
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Http\Resources\RealestateAdResource; // Import the resource
 
@@ -84,9 +85,18 @@ class RealestateAdsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, RealestateAds $realestateAds)
+    public function update(UpdateRealestateAdRequest $request, Advertisement $ad)
     {
-        //
+        // --- 2. AUTHORIZATION ---
+        // Manually check if the authenticated user is the owner of the ad.
+        if ($request->user()->id !== $ad->owner_id) {
+            return response()->json(['message' => 'This action is unauthorized.'], 403);
+        }
+
+        // --- 3. CALL THE SERVICE ---
+        $result = $this->realestateAdsService->updateAd($ad, $request->validated());
+
+        return response()->json($result);
     }
 
     /**

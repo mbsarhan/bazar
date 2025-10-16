@@ -178,9 +178,22 @@ export const AdProvider = ({ children }) => {
     };
 
 
+    /**
+     * NEW: Updates a specific Real Estate Ad.
+     */
+    const updateRealEstateAd = async (adId, adData) => {
+        const response = await api.post(`/realestate-ads/${adId}`, adData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    };
+
+
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView ,updateCarAd}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView ,updateCarAd ,updateRealEstateAd}}>
             {children}
         </AdContext.Provider>
     );
