@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // 1. Use the context
+import { useUser } from '../context/UserContext';
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
 import { 
@@ -12,6 +13,7 @@ import {
 const AdDetailPage = () => {
     const { adId } = useParams();
     const { getAdById } = useAds(); // 3. Get the fetching function from context
+    const { currentUser } = useUser();
 
     // 4. Set up state for ad data, loading, and errors
     const [ad, setAd] = useState(null);
@@ -141,7 +143,11 @@ const AdDetailPage = () => {
                         <h4>معلومات المعلن</h4>
                         <p>
                             اسم المعلن: 
-                            <Link to={`/profile/${ad.owner.id}`} className="seller-name-link">
+                            <Link to={
+    currentUser && currentUser.id === ad.owner.id
+      ? '/dashboard'
+      : `/profile/${ad.owner.id}`
+  } className="seller-name-link">
                                 <strong>{ad.owner?.name || 'مستخدم بازار'}</strong>
                             </Link>
                         </p>
