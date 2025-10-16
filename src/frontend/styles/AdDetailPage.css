@@ -8,15 +8,9 @@
 }
 
 .ad-detail-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 40px;
-}
-
-@media (max-width: 900px) {
-    .ad-detail-content {
-        grid-template-columns: 1fr;
-    }
 }
 
 .ad-detail-header {
@@ -48,7 +42,7 @@
 .ad-detail-image-gallery {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 0;
 }
 
 /* --- Main Image Viewer --- */
@@ -61,7 +55,7 @@
 
 .main-image {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     display: block;
 }
@@ -77,8 +71,7 @@
     overflow: hidden;
     border-radius: 16px;
     background-color: #000;
-    /* Maintain a 16:9 aspect ratio for the video player */
-    padding-top: 56.25%; /* 9 / 16 = 0.5625 */
+    padding-top: 56.25%;
 }
 
 .video-player-wrapper video {
@@ -117,18 +110,102 @@
     box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
 }
 
-/* --- Swiper.js Thumbnail Scroller --- */
-.thumbnail-scroller {
-    overflow-x: auto;   /* 1. Allow horizontal scrolling */
-    white-space: nowrap;  /* 2. THIS IS THE KEY: Prevents items from wrapping */
-    padding-bottom: 10px; /* 3. Make space for the scrollbar */
-    font-size: 0;         /* 4. A trick to remove phantom spacing between inline-blocks */
+/* --- Thumbnail Container Wrapper --- */
+.thumbnail-container-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px 0;
+    background-color: #f9f9f9;
+    border-radius: 0 0 16px 16px;
+    margin-top: -16px;
 }
 
+@media (max-width: 1140px) {
+    .thumbnail-container-wrapper {
+        padding: 20px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .thumbnail-container-wrapper {
+        flex-direction: column;
+    }
+}
+
+/* --- Video Thumbnails (Left Side) --- */
+.video-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 120px; /* Reserve space even when empty */
+    flex-shrink: 0;
+}
+
+.video-thumbnail {
+    width: 120px;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+    opacity: 0.7;
+    position: relative;
+    background-color: #000;
+}
+
+.video-thumbnail:hover {
+    opacity: 1;
+    border-color: #aaa;
+}
+
+.video-thumbnail.active {
+    border-color: var(--color-accent-primary);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.video-thumbnail video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Play icon overlay */
+.video-thumbnail::after {
+    content: '▶';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* --- Photo Thumbnails Scroller (Right Side) --- */
+.thumbnail-scroller {
+    direction: rtl;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+    font-size: 0;
+    max-width: 450px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .thumbnail-scroller {
+        max-width: 100%;
+        direction: ltr;
+    }
+}
 
 .thumbnail-image {
-    display: inline-block; /* 5. Treat thumbnails like words in a single, non-breaking line */
-    width: 80px;           /* 6. The smaller size you wanted */
+    display: inline-block;
+    width: 80px;
     aspect-ratio: 4 / 3;
     border-radius: 8px;
     overflow: hidden;
@@ -136,11 +213,12 @@
     border: 3px solid transparent;
     transition: all 0.2s ease-in-out;
     opacity: 0.7;
-    margin-right: 10px;    /* 7. Use margin for spacing */
+    margin-left: 10px;
     vertical-align: top;
 }
-.thumbnail-image:last-child {
-    margin-right: 0;
+
+.thumbnail-image:first-child {
+    margin-left: 0;
 }
 
 .thumbnail-image:hover {
@@ -168,6 +246,12 @@
 /* ============================================= */
 /* 3. Ad Information Column                      */
 /* ============================================= */
+.ad-detail-info {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
 .ad-detail-info h3 {
     margin-top: 0;
     margin-bottom: 15px;

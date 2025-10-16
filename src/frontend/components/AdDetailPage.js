@@ -1,8 +1,8 @@
 // src/frontend/components/AdDetailPage.js
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useAds } from '../context/AdContext'; // 1. Use the context
-import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
+import { useAds } from '../context/AdContext';
+import AdDetailSkeleton from './AdDetailSkeleton';
 import '../styles/AdDetailPage.css';
 import {
     ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
@@ -11,15 +11,14 @@ import {
 
 const AdDetailPage = () => {
     const { adId } = useParams();
-    const { getAdById } = useAds(); // 3. Get the fetching function from context
+    const { getAdById } = useAds();
 
-    // 4. Set up state for ad data, loading, and errors
     const [ad, setAd] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const thumbnailScrollerRef = React.useRef(null);
 
-    // 5. Use useEffect to fetch the specific ad data
     useEffect(() => {
         const fetchAd = async () => {
             setIsLoading(true);
@@ -37,6 +36,20 @@ const AdDetailPage = () => {
         fetchAd();
     }, [adId, getAdById]);
 
+    // Auto-scroll thumbnail into view when currentIndex changes
+    useEffect(() => {
+        if (thumbnailScrollerRef.current && ad && ad.imageUrls.length > 1) {
+            const thumbnails = thumbnailScrollerRef.current.children;
+            if (thumbnails[currentIndex]) {
+                thumbnails[currentIndex].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'center'
+                });
+            }
+        }
+    }, [currentIndex, ad]);
+
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
 
     const prevSlide = () => {
@@ -52,7 +65,6 @@ const AdDetailPage = () => {
         const newIndex = isLastSlide ? 0 : currentIndex + 1;
         setCurrentIndex(newIndex);
     };
-    // --- 6. RENDER STATES ---
 
     if (isLoading) {
         return <AdDetailSkeleton />;
@@ -87,6 +99,7 @@ const AdDetailPage = () => {
 
             <div className="ad-detail-content">
                 <div className="ad-detail-image-gallery">
+                    {/* Main Image Display */}
                     <div className="main-image-container">
                         <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image" />
                         {ad.imageUrls.length > 1 && (
@@ -96,37 +109,42 @@ const AdDetailPage = () => {
                             </>
                         )}
                     </div>
-                    {/* --- The Thumbnail Scroller --- */}
-                    {ad.imageUrls.length > 1 && (
-                        <div className="thumbnail-scroller">
-                            {ad.imageUrls.map((url, index) => (
-                                <div
-                                    key={index}
-                                    className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`}
-                                    onClick={() => setCurrentIndex(index)}
-                                >
-                                    <img src={url} alt={`Thumbnail ${index + 1}`} />
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-                {ad.realestate_type && ad.videoUrl && (
-                    <div className="video-section">
-                        <h3>جولة بالفيديو داخل العقار</h3>
-                        <div className="video-player-wrapper">
-                            <video controls width="100%">
-                                <source src={ad.videoUrl} type="video/mp4" />
-                                عفواً، متصفحك لا يدعم عرض مقاطع الفيديو.
-                            </video>
-                        </div>
-                    </div>
-                )}
 
+                    {/* Thumbnails Container */}
+                    <div className="thumbnail-container-wrapper">
+                        {/* Video Thumbnails - Left Side (space always reserved) */}
+                        <div className="video-thumbnails">
+                            {ad.realestate_type && ad.videoUrl && (
+                                <div className="video-thumbnail">
+                                    <video>
+                                        <source src={ad.videoUrl} type="video/mp4" />
+                                    </video>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Photo Thumbnails - Right Side */}
+                        {ad.imageUrls.length > 1 && (
+                            <div className="thumbnail-scroller">
+                                {ad.imageUrls.map((url, index) => (
+                                    <div
+                                        key={index}
+                                        className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`}
+                                        onClick={() => setCurrentIndex(index)}
+                                    >
+                                        <img src={url} alt={`Thumbnail ${index + 1}`} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Ad Details Info */}
                 <div className="ad-detail-info">
                     <h3>التفاصيل الأساسية</h3>
                     <div className="info-grid">
-                        {ad.model_year && ( /* Car Details */
+                        {ad.model_year && (
                             <>
                                 <div className="info-item"><strong><Wrench size={16} /> الحالة:</strong> <span>{ad.condition}</span></div>
                                 <div className="info-item"><strong><Calendar size={16} /> سنة الصنع:</strong> <span>{ad.model_year}</span></div>
@@ -136,7 +154,7 @@ const AdDetailPage = () => {
                                 <div className="info-item"><strong><Fuel size={16} /> نوع الوقود:</strong> <span>{ad.fuel_type}</span></div>
                             </>
                         )}
-                        {ad.realestate_type && ( /* Real Estate Details */
+                        {ad.realestate_type && (
                             <>
                                 <div className="info-item"><strong><Home size={16} /> نوع العقار:</strong> <span>{ad.realestate_type}</span></div>
                                 <div className="info-item"><strong><MapPin size={16} /> الموقع:</strong> <span>{ad.location}</span></div>
