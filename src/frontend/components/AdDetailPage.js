@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // 1. Use the context
-import { useUser } from '../context/UserContext';
+import { useAuth } from '../context/AuthContext';
+
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
 import {
@@ -13,7 +14,8 @@ import {
 const AdDetailPage = () => {
     const { adId } = useParams();
     const { getAdById } = useAds(); // 3. Get the fetching function from context
-    const { currentUser } = useUser();
+    const { user } = useAuth();
+
 
     const [ad, setAd] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -175,7 +177,7 @@ const AdDetailPage = () => {
                         <p>
                             اسم المعلن:
                             <Link to={
-                                currentUser && currentUser.id === ad.owner.id
+                                user && user.id === ad.owner.id
                                     ? '/dashboard'
                                     : `/profile/${ad.owner.id}`
                             } className="seller-name-link">
