@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CarAds;
 use App\Http\Requests\StoreCarAdRequest;
 use App\Http\Resources\CarAdResource; // <-- 1. IMPORT THE RESOURCE
+use App\Http\Requests\UpdateCarAdRequest; // <-- 1. IMPORT
 use App\Services\CarAdService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -81,11 +82,25 @@ class CarAdsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CarAds $carAds)
+    public function update(UpdateCarAdRequest $request, Advertisement $ad)
     {
-        //
+        // --- THIS IS THE FIX ---
+
+        // 1. Get the currently authenticated user.
+        $user = $request->user();
+
+        // 2. Manually check if the user's ID matches the ad's owner_id.
+        if ($user->id !== $ad->owner_id) {
+            // If they do not match, return a 403 Forbidden response.
+            return response()->json(['message' => 'This action is unauthorized.'], 403);
+        }
+
+        $result = $this->carAdService->updateAd($ad, $request->validated());
+
+        return response()->json($result);
     }
 
+    
     /**
      * Remove the specified resource from storage.
      */

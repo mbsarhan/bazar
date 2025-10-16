@@ -161,9 +161,26 @@ export const AdProvider = ({ children }) => {
     };
 
 
+
+    /**
+     * NEW: Updates a specific car ad.
+     * @param {string} adId - The ID of the ad to update.
+     * @param {FormData} adData - The form data including _method=PUT.
+     */
+    const updateCarAd = async (adId, adData) => {
+        // Use POST for multipart/form-data, Laravel will handle the PUT method.
+        const response = await api.post(`/car-ads/${adId}`, adData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    };
+
+
      // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView ,updateCarAd}}>
             {children}
         </AdContext.Provider>
     );

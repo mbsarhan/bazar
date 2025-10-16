@@ -42,6 +42,11 @@ const AddCarForm = () => {
         front: null, back: null, side1: null, side2: null,
     });
     const [extraImages, setExtraImages] = useState([]); // مصفوفة للصور الإضافية
+
+    // --- NEW STATE TO TRACK REMOVED IMAGES ---
+    const [removedImages, setRemovedImages] = useState([]);
+
+
     const [errorMessage, setErrorMessage] = useState(''); // لرسالة الخطأ العامة في الأعلى
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,17 +89,29 @@ const AddCarForm = () => {
     };
 
     const removeMandatoryImage = (fieldName) => {
+        const imageToRemove = mandatoryImages[fieldName];
+        // If the image is a string, it's an existing URL from the backend
+        if (typeof imageToRemove === 'string') {
+            const filename = imageToRemove.substring(imageToRemove.lastIndexOf('/') + 1);
+            setRemovedImages(prev => [...prev, filename]);
+        }
         setMandatoryImages(prev => ({ ...prev, [fieldName]: null }));
     };
 
     const removeExtraImage = (index) => {
+        const imageToRemove = extraImages[index];
+        // If the image is a string, it's an existing URL
+        if (typeof imageToRemove === 'string') {
+            const filename = imageToRemove.substring(imageToRemove.lastIndexOf('/') + 1);
+            setRemovedImages(prev => [...prev, filename]);
+        }
         setExtraImages(prev => prev.filter((_, i) => i !== index));
     };
 
 
     // --- 4. NEW useEffect to fetch data in Edit Mode ---
     useEffect(() => {
-        if (isEditMode) {
+        if (isEditMode && adId) {
             const fetchAdData = async () => {
                 try {
                     const adData = await getAdById(adId);
@@ -191,24 +208,42 @@ const AddCarForm = () => {
                 dataToSubmit.append(key, value);
             }
 
-            // Append images
-            for (const key in mandatoryImages) {
-                if (mandatoryImages[key]) dataToSubmit.append(key, mandatoryImages[key]);
+            // --- THIS IS THE CRITICAL FIX ---
+
+        // 2. Append ONLY NEWLY UPLOADED mandatory images
+        // A new image will be a 'File' object, an existing one is a 'string' (URL).
+        Object.keys(mandatoryImages).forEach(key => {
+            const image = mandatoryImages[key];
+            if (image instanceof File) {
+                dataToSubmit.append(key, image);
             }
+        });
 
-            extraImages.forEach((file) => {
-                dataToSubmit.append('extra_images[]', file); // ✅ matches Laravel’s rule for arrays
-            });
+        // 3. Append ONLY NEWLY UPLOADED extra images
+        extraImages.forEach(image => {
+            if (image instanceof File) {
+                dataToSubmit.append('extra_images[]', image);
+            }
+        });
 
+        // 4. Append the list of REMOVED image filenames (this part is correct)
+        removedImages.forEach(filename => {
+            dataToSubmit.append('removed_images[]', filename);
+        });
             
 
 
             if (isEditMode) {
                 // For updates with FormData, you must use POST and add a _method field
                 dataToSubmit.append('_method', 'PUT');
-                await updateCarAd(adId, dataToSubmit);
-                alert('تم تحديث الإعلان بنجاح!');
-                navigate('/dashboard/car-ads');
+                const result = await updateCarAd(adId, dataToSubmit);
+                
+                if (result.no_changes) {
+                    setErrorMessage(result.message);
+                } else {
+                    alert(result.message);
+                    navigate(result.redirect_url || '/dashboard/car-ads');
+                }
             } else {
                 await createCarAd(dataToSubmit);
                 alert('تم نشر الإعلان بنجاح!');
