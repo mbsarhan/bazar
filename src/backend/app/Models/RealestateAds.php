@@ -20,6 +20,7 @@ class RealestateAds extends Model
         'cladding_condition ',
         'negotiable_check',
         'video_url',
+        'hls_url',
 
     ];
 

@@ -1,16 +1,17 @@
 <?php
 namespace App\Services;
 
-use App\Models\RealestateImage;
 use Exception;
 use App\Models\User;
+use App\Jobs\ProcessVideoJob;
 use App\Models\Advertisement;
 use App\Models\RealestateAds;
+use App\Models\RealestateImage;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RealestateAdsService{
    
@@ -77,9 +78,14 @@ class RealestateAdsService{
                     'ad_status'        => 'قيد المراجعة',
                 ]);
 
-                $videoPath = null;
+                $originalVideoPath = null;
                 if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
-                    $videoPath = $data['video']->store('videos/real-estate', 'public');
+                    // Store the original video file. Its path is now ready for instant playback.
+                    $originalVideoPath = $data['video']->store('videos/real-estate/originals', 'public');
+                    
+                    // Dispatch the background job to transcode this video.
+                    // We pass the original path and the main Advertisement ID.
+                    ProcessVideoJob::dispatch($originalVideoPath, $advertisement->id);
                 }
 
                 $realestateAd = RealestateAds::create([
@@ -93,7 +99,8 @@ class RealestateAdsService{
                     'building_status'     => $data['building_status'],
                     'cladding_condition'  => $data['cladding_condition'],
                     'negotiable_check'    => $data['negotiable_check'],
-                    'video_url'           => $videoPath,
+                    'video_url'           => $originalVideoPath,
+                    'hls_url'             => null,
                 ]);
 
                 $this->uploadImages($realestateAd, $data['images']);
