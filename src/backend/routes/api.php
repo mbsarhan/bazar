@@ -56,6 +56,9 @@ Route::get('/users/{userId}/public-profile', [PublicProfileController::class, 's
 Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword'])->name('password.email');
 Route::post('/verify-password-reset-code', [PasswordResetController::class, 'verifyCode'])->name('password.verify.code');
 Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+Route::post('/resend-password-reset-code', [PasswordResetController::class, 'resendCode'])
+    ->middleware('throttle:1,1') // 1 attempt per 1 minute
+    ->name('password.resend.code');
 
 
 

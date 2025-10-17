@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Advertisement;
 use Illuminate\Http\Request;
+use App\Models\Advertisement;
 use App\Services\AdvertisementService;
 use App\Http\Resources\AdvertisementResource;
 use Illuminate\Support\Facades\DB; // <-- 1. IMPORT DB FACADE
@@ -51,7 +50,7 @@ class AdvertisementController extends Controller
     {
         // 3. Eager-load all possible relationships needed by the resource.
         $ad->load(['owner', 'carDetails.ImagesForCar', 'realEstateDetails.ImageForRealestate']);
-
+        
         // 4. Return the data formatted by our powerful, unified resource.
         return new AdvertisementResource($ad);
     }

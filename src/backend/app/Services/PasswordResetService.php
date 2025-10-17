@@ -25,7 +25,7 @@ class PasswordResetService
 
         $user->notify(new ResetPasswordWithOtp((string)$code));
 
-        return ['message' => 'A password reset code has been sent to your email.'];
+        return ['message' => 'تم إرسال كود التحقق من أجل تغيير كلمة المرور إلى الإيمل الخاص بك'];
     }
 
     /**
@@ -37,13 +37,13 @@ class PasswordResetService
         
         if (is_null($user->verification_code) || $user->verification_code !== $code || $user->verification_code_expires_at->isBefore(now())) {
             throw ValidationException::withMessages([
-                'code' => ['The verification code is invalid or has expired.'],
+                'code' => ['رمز التحقق غير صالح او انتهت مدته! الرجاء إعادة طلب رمز التحقق'],
             ]);
         }
         
         // The code is valid, but we don't clear it yet.
         // It's needed for the final password reset step as a security measure.
-        return ['message' => 'Verification code is valid. You can now reset your password.'];
+        return ['message' => 'رمز التحقق صحيح, يمكنك الآن تغيير كلمة المرور'];
     }
 
     /**
@@ -52,11 +52,11 @@ class PasswordResetService
     public function resetPassword(string $email, string $code, string $newPassword): array
     {
         $user = User::where('email', $email)->firstOrFail();
-
+    
         // Re-verify the code one last time before changing the password.
         if (is_null($user->verification_code) || $user->verification_code !== $code || $user->verification_code_expires_at->isBefore(now())) {
             throw ValidationException::withMessages([
-                'code' => ['The verification code is invalid or has expired. Please start over.'],
+                'code' => ['رمز التحقق غير صالح او انتهت مدته! الرجاء إعادة طلب رمز التحقق'],
             ]);
         }
 
@@ -67,6 +67,6 @@ class PasswordResetService
             'verification_code_expires_at' => null,
         ])->save();
 
-        return ['message' => 'Your password has been reset successfully.'];
+        return ['message' => 'تم تغيير كلمة المرور بنجاح!'];
     }
 }

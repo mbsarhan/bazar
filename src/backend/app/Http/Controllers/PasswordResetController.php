@@ -37,4 +37,14 @@ class PasswordResetController extends Controller
         $response = $this->passwordResetService->resetPassword($validated['email'], $validated['code'], $validated['password']);
         return response()->json($response);
     }
+
+
+    public function resendCode(ForgotPasswordRequest $request)
+    {
+        $response = $this->passwordResetService->sendResetCode($request->validated()['email']);
+
+        $response['message'] = 'تم إرسال كود التحقق الجديد إلى الإيميل الخاص بك';
+
+        return response()->json($response);
+    }
 }

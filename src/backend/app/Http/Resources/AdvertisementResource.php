@@ -87,11 +87,11 @@ class AdvertisementResource extends JsonResource
             $realEstateImages = $this->realEstateDetails->ImageForRealestate;
             $videoUrl = null;
             if ($this->realEstateDetails->hls_url) {
-                $videoUrl = Storage::url($this->realEstateDetails->hls_url);
+                $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->hls_url}";
             } 
             // Priority 2: Fall back to the original video URL if HLS isn't ready.
             elseif ($this->realEstateDetails->video_url) {
-                $videoUrl = Storage::url($this->realEstateDetails->video_url);
+                $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->video_url}";
             }
             $realEstateData = [
                 'governorate'           => $this->governorate,
@@ -110,9 +110,6 @@ class AdvertisementResource extends JsonResource
                 'imageUrls' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
                     return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");
                 }),
-                // 'videoUrl' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
-                //     return $this->realEstateDetails->video_url ? "{$baseUrl}/storage/{$this->realEstateDetails->video_url}" : null;
-                // }),
                 'videoUrl' => $videoUrl,
             ];
             return array_merge($baseData, $realEstateData);

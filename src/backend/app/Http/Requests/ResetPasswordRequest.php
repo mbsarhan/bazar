@@ -23,15 +23,14 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'email' => ['required', 'string', 'email', 'exists:users,email'],
-            // 'code' => ['required', 'string', 'size:6'],
+            'email' => ['required', 'string', 'email', 'exists:users,email'],
+            'code' => ['required', 'string', 'size:6'],
             'password' => [
                 'required',
                 'string',
                 'confirmed',
                 Password::min(8)->mixedCase()->numbers(),
             ],
-            'password_confirmation' =>['required','string']
         ];
     }
 }
