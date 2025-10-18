@@ -23,7 +23,7 @@ class UpdateCarAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'transaction_type' => ['sometimes', 'required', Rule::in(['بيع', 'إيجار', 'استثمار'])],
+            'transaction_type' => ['sometimes', 'required', Rule::in(['بيع', 'أجار', 'استثمار'])],
             'manufacturer'      => 'sometimes|required|string|max:255',
             'model'             => 'sometimes|required|string|max:255',
             'model_year'        => 'sometimes|required|digits:4|integer|min:1900',
