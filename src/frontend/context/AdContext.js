@@ -34,28 +34,15 @@ export const AdProvider = ({ children }) => {
         return result;
     };
     /**
-     * NEW FUNCTION: Fetches the car ads for the logged-in user.
+     * Fetches the car ads for the logged-in user, with optional filters.
+     * @param {object} filters - e.g., { status: 'فعال' }
      */
-    const getMyCarAds = async () => {
-        const token = localStorage.getItem('authToken');
-        if (!token) throw new Error('User not authenticated.');
-
-        const response = await fetch(`${API_URL}/user/car-ads`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+    const getMyCarAds = async (filters = {}) => {
+        // The axios client adds the token and uses 'params' to create the query string
+        const response = await api.get('/user/car-ads', {
+            params: filters
         });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Failed to fetch ads.');
-        }
-
-        // The API now returns a 'data' key because we used a Resource Collection
-        return result.data;
+        return response.data.data;
     };
     /**
      * NEW UNIFIED FUNCTION: Fetches any ad by its ID from the public endpoint.

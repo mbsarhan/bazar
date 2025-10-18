@@ -24,7 +24,7 @@ const MyCarAds = () => {
         const fetchAds = async () => {
             setIsLoading(true);
             try {
-                const data = await getMyCarAds();
+                const data = await getMyCarAds({ status: activeStatus });
                 setAds(data);
             } catch (err) {
                 setError(err.message);
@@ -32,7 +32,7 @@ const MyCarAds = () => {
                 setIsLoading(false);
             }
         }; fetchAds();
-    }, [getMyCarAds]); // The empty array [] ensures this runs only once on mount
+    }, [getMyCarAds,activeStatus]); // The empty array [] ensures this runs only once on mount
 
 
     // --- 4. CREATE FUNCTIONS TO HANDLE THE DELETE FLOW ---

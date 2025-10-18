@@ -29,13 +29,11 @@ class CarAdsController extends Controller
      */
     public function index(Request $request)
     {
-        // 3. Get the authenticated user from the request
         $user = $request->user();
 
-        // 4. Call the service to get the ads
-        $ads = $this->carAdService->getAdsForUser($user);
+        // Pass the entire request object to the service so it can read the query parameters
+        $ads = $this->carAdService->getAdsForUser($user, $request);
 
-        // 5. Return the data formatted by our API Resource collection
         return CarAdResource::collection($ads);
     }
 
