@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import { AdProvider } from './context/AdContext'; // <-- IMPORT
 import { DashboardProvider } from './context/DashboardContext'; // <-- IMPORT
 import { UserProvider } from './context/UserContext'; // <-- IMPORT
+import { PasswordResetProvider } from './context/PasswordResetContext'; // <-- IMPORT
 import ScrollToTop from './components/ScrollToTop';
 
 // --- Import pages and layouts ---
@@ -43,39 +44,42 @@ function App() {
         <AdProvider>
           <DashboardProvider>
             <UserProvider>
-              <Router>
-                <ScrollToTop />
-                <Header />
+              <PasswordResetProvider>
+                <Router>
+                  <ScrollToTop />
+                  <Header />
 
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/ad/:adId" element={<AdDetailPage />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<SignUp />} />
-                  <Route path="/verify-account" element={<VerificationPage />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/add-ad" element={<AddAdChoice />} />
-                  <Route path="/add-car" element={<AddCarForm />} />
-                  <Route path="edit-car/:adId" element={<AddCarForm />} />
-                  <Route path="/add-real-estate" element={<AddRealEstateForm />} />
-                  <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
-                  <Route path="/profile/:userId" element={<PublicProfile />} />
-                  <Route path="add-review/:userIdToReview" element={<AddReview />} />
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/ad/:adId" element={<AdDetailPage />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    {/*          <Route path="/verify-account" element={<VerificationPage />} />*/}
+                    <Route path="/verification" element={<VerificationPage />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/add-ad" element={<AddAdChoice />} />
+                    <Route path="/add-car" element={<AddCarForm />} />
+                    <Route path="edit-car/:adId" element={<AddCarForm />} />
+                    <Route path="/add-real-estate" element={<AddRealEstateForm />} />
+                    <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
+                    <Route path="/profile/:userId" element={<PublicProfile />} />
+                    <Route path="add-review/:userIdToReview" element={<AddReview />} />
 
-                  {/* Dashboard Routes */}
-                  <Route path="/dashboard" element={<DashboardLayout />}>
-                    <Route index element={<DashboardOverview />} />
-                    <Route path="my-profile" element={<MyProfile />} />
-                    <Route path="my-profile/security-settings" element={<SecuritySettings />} />
-                    <Route path="car-ads" element={<MyCarAds />} />
-                    <Route path="real-estate-ads" element={<MyRealEstateAds />} />
-                    <Route path="reviews" element={<Reviews />} />
-                  </Route>
+                    {/* Dashboard Routes */}
+                    <Route path="/dashboard" element={<DashboardLayout />}>
+                      <Route index element={<DashboardOverview />} />
+                      <Route path="my-profile" element={<MyProfile />} />
+                      <Route path="my-profile/security-settings" element={<SecuritySettings />} />
+                      <Route path="car-ads" element={<MyCarAds />} />
+                      <Route path="real-estate-ads" element={<MyRealEstateAds />} />
+                      <Route path="reviews" element={<Reviews />} />
+                    </Route>
 
-                </Routes>
-              </Router>
+                  </Routes>
+                </Router>
+              </PasswordResetProvider>
             </UserProvider>
           </DashboardProvider>
         </AdProvider>

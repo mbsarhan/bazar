@@ -16,7 +16,7 @@ class StoreCarAdRequest extends FormRequest
     {
         return [
             // --- Advertisement Table Fields ---
-            'transaction_type' => ['required', Rule::in(['بيع', 'إيجار', 'استثمار'])],
+            'transaction_type' => ['required', Rule::in(['بيع', 'أجار', 'استثمار'])],
             'price'            => 'required|numeric|min:0',
             'governorate'      => 'required|string|max:255',
             'city'             => 'required|string|max:255',

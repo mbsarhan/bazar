@@ -126,11 +126,25 @@ export const AuthProvider = ({ children }) => {
         return response.data; // Return the success message from the verify endpoint
     };
 
+
+
+    const verifyAccountOtp = async (email, code) => {
+        const response = await api.post('/email/verify-otp', { email, code });
+        return response.data;
+    };
+    
+    const resendAccountOtp = async (email) => {
+        const response = await api.post('/email/verify-otp/resend', { email });
+        return response.data;
+    };
+
     // Make sure the rest of your file (like the 'value' object and return statement) is correct.
 // The 'value' object should look like this:
 const value = {
     user,
     token,
+    verifyAccountOtp,
+    resendAccountOtp,
     login,
     logout, // The new async logout function
     verifyPassword, // <-- 3. EXPOSE THE NEW FUNCTIONS

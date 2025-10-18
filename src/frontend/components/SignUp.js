@@ -27,7 +27,7 @@ const SignUp = () => {
         }
 
         const isEmail = credential.includes('@');
-        const registrationType = isEmail ? 'email' : 'phone';
+        const registrationType = 'account'; 
         const email = isEmail ? credential : null; // Use null for empty fields for backend clarity
         const phone = !isEmail ? credential : null;
 
@@ -52,7 +52,7 @@ const SignUp = () => {
             // --- END OF FIX ---
 
             // 2. Navigate to the verification page, passing the necessary state
-            navigate('/verify-account', { 
+            navigate('/verification', { 
                 state: { 
                     credential: credential,
                     type: registrationType 

@@ -195,7 +195,8 @@ class RealestateAdsService{
         DB::transaction(function () use ($ad, $data) {
             // 1. Update the parent Advertisement table
             $ad->update([
-                'ad_status'       => 'قيد المراجعة',
+                'ad_status'        => 'قيد المراجعة',
+                'title'            => $data['title'],
                 'transaction_type' => $data['transaction_type'],
                 'price'            => $data['price'],
                 'governorate'      => $data['governorate'],

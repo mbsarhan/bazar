@@ -1,15 +1,18 @@
 // src/components/ForgotPassword.js
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { usePasswordReset } from '../context/PasswordResetContext'; // 1. IMPORT
 import '../styles/forms.css'; // إعادة استخدام نفس الأنماط
 
 const ForgotPassword = () => {
   const [credential, setCredential] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { sendResetCode } = usePasswordReset(); // 2. GET THE FUNCTION
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
@@ -19,17 +22,24 @@ const ForgotPassword = () => {
       return;
     }
 
-    // --- منطق وهمي (سيتم استبداله بمنطق حقيقي لاحقاً) ---
-    // في التطبيق الحقيقي، هنا يتم إرسال طلب إلى الخادم
-    console.log('طلب إعادة تعيين كلمة المرور لـ:', credential);
-
-    // عرض رسالة نجاح للمستخدم
-    setMessage('تم إرسال تعليمات إعادة تعيين كلمة المرور. يرجى التحقق من بريدك الإلكتروني أو رسائلك.');
-
-    // يمكننا توجيه المستخدم إلى صفحة إدخال الرمز بعد ثوانٍ قليلة
-    setTimeout(() => {
-      navigate('/reset-password');
-    }, 3000); // 3 ثوانٍ
+    setIsSubmitting(true);
+    try {
+        const result = await sendResetCode(credential);
+        setMessage(result.message);
+        // --- THIS IS THE KEY CHANGE ---
+            // Navigate to the general verification page, but with a specific type.
+            navigate('/verification', { 
+                state: { 
+                    credential: credential, 
+                    type: 'passwordReset' // Identify the purpose of the verification
+                } 
+            });
+    } catch (err) {
+        const errorMessage = err.response?.data?.errors?.email?.[0] || err.response?.data?.message || 'فشل إرسال الرمز.';
+        setError(errorMessage);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (

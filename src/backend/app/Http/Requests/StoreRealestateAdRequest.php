@@ -24,7 +24,7 @@ class StoreRealestateAdRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string','max:50'],
-            'transaction_type'   => ['required', 'string', Rule::in(['بيع', 'إيجار', 'استثمار'])],
+            'transaction_type'   => ['required', 'string', Rule::in(['بيع', 'أجار', 'استثمار'])],
             'realestate_type'    => ['required', 'string'],
             'governorate'        => ['required', 'string'],
             'city'               => ['required', 'string', 'max:255'],
