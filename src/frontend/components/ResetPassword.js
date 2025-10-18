@@ -1,17 +1,24 @@
 // src/components/ResetPassword.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { usePasswordReset } from '../context/PasswordResetContext'; // 2. IMPORT
 import '../styles/forms.css';
 
 const ResetPassword = () => {
-  const [code, setCode] = useState('');
+  
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { resetPassword } = usePasswordReset();
+    // 3. Get the email and code from the previous page
+  const { email, code } = location.state || {}; 
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -25,12 +32,16 @@ const ResetPassword = () => {
       return;
     }
 
-    // --- منطق وهمي ---
-    console.log('رمز التأكيد:', code);
-    console.log('كلمة المرور الجديدة:', password);
-
-    alert('تم تغيير كلمة المرور بنجاح!');
-    navigate('/login');
+    try {
+        const result = await resetPassword(email, code, password, confirmPassword);
+        alert(result.message || 'تم تغيير كلمة المرور بنجاح!');
+        navigate('/login');
+    } catch(err) {
+        const errorMessage = err.response?.data?.errors?.password?.[0] || err.response?.data?.message || 'فشل تغيير كلمة المرور.';
+        setError(errorMessage);
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (

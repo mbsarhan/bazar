@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import api from '../api';
+import { useAuth } from '../context/AuthContext'; // For account verification
+import { usePasswordReset } from '../context/PasswordResetContext'; // For password reset   
 import VerificationInput from './VerificationInput';
 import '../styles/forms.css';
 
@@ -11,6 +12,10 @@ const VerificationPage = () => {
     const location = useLocation();
 
     const { credential, type } = location.state || {};
+
+     // Get functions from BOTH contexts
+    const { verifyAccountOtp, resendAccountOtp } = useAuth();
+    const { verifyResetCode } = usePasswordReset();
     
     const [code, setCode] = useState('');
     const [timer, setTimer] = useState(0);
@@ -45,6 +50,10 @@ const VerificationPage = () => {
     }, []); // Run only once
 
     const verificationMethodText = type === 'email' ? 'بريدك الإلكتروني' : 'رقم هاتفك';
+    // --- DYNAMIC TEXT based on the 'type' ---
+    const pageTitle = type === 'passwordReset' ? 'تأكيد الرمز' : 'تأكيد حسابك';
+    const buttonText = type === 'passwordReset' ? 'تأكيد' : 'تأكيد الحساب';
+    const successNavPath = type === 'passwordReset' ? '/reset-password' : '/login';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -58,31 +67,21 @@ const VerificationPage = () => {
 
         setIsSubmitting(true);
         try {
-            const payload = { code };
-            if (type === 'email') {
-                payload.email = credential;
+            if (type === 'passwordReset') {
+                // --- PASSWORD RESET LOGIC ---
+                await verifyResetCode(credential, code);
+                // On success, navigate to the final step, passing state
+                navigate(successNavPath, { state: { email: credential, code } });
             } else {
-                payload.phone = credential;
+                // --- ACCOUNT VERIFICATION LOGIC (your original code) ---
+                await verifyAccountOtp(credential, code);
+                localStorage.removeItem('verificationTimerExpiresAt');
+                setSuccessMessage('تم تأكيد حسابك بنجاح! سيتم توجيهك لتسجيل الدخول.');
+                setTimeout(() => navigate(successNavPath), 2000);
             }
-
-            await api.post('/email/verify-otp', payload);
-            
-            localStorage.removeItem('verificationTimerExpiresAt');
-            setSuccessMessage('تم تأكيد حسابك بنجاح! سيتم توجيهك لتسجيل الدخول.');
-
-            setTimeout(() => {
-                navigate('/login');
-            }, 2000);
 
         } catch (err) {
-            let errorMessage = 'فشلت عملية التأكيد.';
-            if (err.response?.data) {
-                if (err.response.data.errors) {
-                    errorMessage = Object.values(err.response.data.errors).flat().join(' ');
-                } else if (err.response.data.message) {
-                    errorMessage = err.response.data.message;
-                }
-            }
+            const errorMessage = err.response?.data?.errors?.code?.[0] || err.response?.data?.message || 'فشلت عملية التأكيد.';
             setError(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -96,20 +95,20 @@ const VerificationPage = () => {
         setSuccessMessage(''); // Clear success message on resend
         setIsResending(true);
         try {
-            const payload = {};
-            if (type === 'email') {
-                payload.email = credential;
+            if (type === 'passwordReset') {
+                // For now, password reset resend requires navigating back.
+                // A dedicated resend endpoint would be needed for a better UX.
+                // Let's keep it simple.
+                alert('لإعادة إرسال الرمز، يرجى العودة إلى صفحة "نسيت كلمة المرور".');
+                navigate('/forgot-password');
             } else {
-                payload.phone = credential;
+                // --- ACCOUNT VERIFICATION RESEND (your original code) ---
+                await resendAccountOtp(credential);
+                setSuccessMessage('تم إرسال رمز جديد بنجاح.');
+                const newExpirationTime = Date.now() + TIMER_DURATION * 1000;
+                localStorage.setItem('verificationTimerExpiresAt', newExpirationTime);
+                setTimer(TIMER_DURATION);
             }
-
-            await api.post('/email/verify-otp/resend', payload);
-            
-            setSuccessMessage('تم إرسال رمز جديد بنجاح.');
-
-            const newExpirationTime = Date.now() + TIMER_DURATION * 1000;
-            localStorage.setItem('verificationTimerExpiresAt', newExpirationTime);
-            setTimer(TIMER_DURATION);
 
         } catch (err) {
             console.error("Failed to resend OTP:", err);
@@ -125,6 +124,13 @@ const VerificationPage = () => {
         const secs = (seconds % 60).toString().padStart(2, '0');
         return `${minutes}:${secs}`;
     };
+
+
+    // If a user lands here without state, redirect them to a safe place
+    if (!credential || !type) {
+        navigate('/login');
+        return null;
+    }
 
     return (
         <div className="centered-page-container">

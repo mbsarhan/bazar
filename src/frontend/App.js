@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import { AdProvider } from './context/AdContext'; // <-- IMPORT
 import { DashboardProvider } from './context/DashboardContext'; // <-- IMPORT
 import { UserProvider } from './context/UserContext'; // <-- IMPORT
+import { PasswordResetProvider } from './context/PasswordResetContext'; // <-- IMPORT
 import ScrollToTop from './components/ScrollToTop';
 
 // --- Import pages and layouts ---
@@ -41,6 +42,7 @@ function App() {
       <AdProvider>
       <DashboardProvider>
       <UserProvider>
+      <PasswordResetProvider>
       <Router>
         <ScrollToTop />
         <Header /> 
@@ -51,7 +53,8 @@ function App() {
           <Route path="/ad/:adId" element={<AdDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/verify-account" element={<VerificationPage />} />
+{/*          <Route path="/verify-account" element={<VerificationPage />} />*/}
+          <Route path="/verification" element={<VerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/add-ad" element={<AddAdChoice />} />
@@ -70,10 +73,14 @@ function App() {
             <Route path="car-ads" element={<MyCarAds />} />
             <Route path="real-estate-ads" element={<MyRealEstateAds />} />
             <Route path="reviews" element={<Reviews />} />
+
+
+            
           </Route>
 
         </Routes>
       </Router>
+      </PasswordResetProvider>
       </UserProvider>
       </DashboardProvider>
       </AdProvider>
