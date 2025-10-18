@@ -35,7 +35,7 @@ class AdvertisementResource extends JsonResource
         $baseData = [
             'id'                => $this->id,
             'title'             => $this->title,
-            'price'             => number_format($this->price),
+            'price'             => $this->price,
             'location'          => "{$this->governorate}, {$this->city}",
             'description'       => $this->description,
             'status'            => $this->ad_status,
