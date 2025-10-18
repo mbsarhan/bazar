@@ -29,7 +29,7 @@ class RealestateAdsController extends Controller
         $user = $request->user();
 
         // Call the service to get the ads
-        $ads = $this->realestateAdsService->getAdsForUser($user);
+        $ads = $this->realestateAdsService->getAdsForUser($user,$request);
 
         // Return the data formatted as a collection by our API Resource
         return RealestateAdResource::collection($ads);

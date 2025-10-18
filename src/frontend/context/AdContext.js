@@ -99,15 +99,16 @@ export const AdProvider = ({ children }) => {
 
 
     /**
-     * NEW: Fetches the real estate ads for the logged-in user.
+     * Fetches the Real-Estate ads for the logged-in user, with optional filters.
+     * @param {object} filters - e.g., { status: 'فعال' }
      */
-    const getMyRealEstateAds = async () => {
-        // The axios client automatically adds the auth token.
-        const response = await api.get('/user/realestate-ads');
-        // A resource collection is wrapped in a 'data' key by Laravel.
+    const getMyRealEstateAds = async (filters = {}) => {
+        // The axios client adds the token and uses 'params' to create the query string
+        const response = await api.get('/user/realestate-ads', {
+            params: filters
+        });
         return response.data.data;
     };
-
 
     /**
      * NEW: Deletes a specific Real Estate ad by its ID.

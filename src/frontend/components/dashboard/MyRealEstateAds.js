@@ -25,7 +25,7 @@ const MyRealEstateAds = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const data = await getMyRealEstateAds();
+                const data = await getMyRealEstateAds({ status: activeStatus });
                 setAds(data);
             } catch (err) {
                 setError(err.message || 'An error occurred while fetching ads.');
@@ -35,7 +35,7 @@ const MyRealEstateAds = () => {
         };
 
         fetchAds();
-    }, [getMyRealEstateAds]); // Runs once on mount
+    }, [getMyRealEstateAds,activeStatus]); // Runs once on mount
 
 
     // --- 4. Create functions to handle the delete flow ---
