@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // <-- 1. IMPORT THE NEW HOOK
+import { useLocation } from '../context/LocationContext'; // 1. Import location hook
+import { locationData } from '../context/locationData'; // 2. Import location data
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
 
@@ -18,7 +20,7 @@ const AddCarForm = () => {
     const { adId } = useParams(); // 2. Get the adId from the URL
     const isEditMode = Boolean(adId); // 3. Determine if we are in Edit Mode
 
-
+    const { country } = useLocation();
     const { createCarAd, getAdById, updateCarAd } = useAds(); // Get functions from context
 
     // This state object is now perfect. Do not change it.
@@ -33,7 +35,7 @@ const AddCarForm = () => {
         distance_traveled: '',
         price: '',
         negotiable_check: false,
-        governorate: 'دمشق',
+        governorate: locationData[country.code].provinces[0],
         city: '',
         description: '',
     });
@@ -111,6 +113,10 @@ const AddCarForm = () => {
 
     // --- 4. NEW useEffect to fetch data in Edit Mode ---
     useEffect(() => {
+        setFormData(prev => ({
+            ...prev,
+            governorate: locationData[country.code].provinces[0]
+        }));
         if (isEditMode && adId) {
             const fetchAdData = async () => {
                 try {
@@ -155,7 +161,7 @@ const AddCarForm = () => {
             };
             fetchAdData();
         }
-    }, [adId, getAdById, isEditMode]);
+    }, [country, adId, getAdById, isEditMode]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -262,7 +268,8 @@ const AddCarForm = () => {
     const conditions = ['جديدة', 'مستعملة', 'متضررة'];
     const transmissions = ['أوتوماتيك', 'عادي', 'الإثنان معا'];
     const fuelTypes = ['بنزين', 'ديزل', 'كهرباء', 'هايبرد'];
-    const provinces = ["دمشق", "ريف دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "دير الزور", "الحسكة", "الرقة", "إدلب", "السويداء", "درعا", "القنيطرة"];
+    const provinces = locationData[country.code].provinces;
+    const currencyLabel = locationData[country.code].currency;
 
     const MandatoryImageUploaderSlot = ({ fieldName, label }) => {
         const image = mandatoryImages[fieldName];
@@ -391,7 +398,7 @@ const AddCarForm = () => {
                     <legend>السعر والموقع</legend>
                     <div className="form-grid">
                         <div className="form-group price-group">
-                            <label htmlFor="price">السعر (دولار أمريكي)</label>
+                            <label htmlFor="price">السعر ({currencyLabel})</label>
                             <input type="text" id="price" name="price" value={formData.price} onChange={handleChange} />
                             <div className="checkbox-group">
                                 <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
@@ -400,7 +407,9 @@ const AddCarForm = () => {
                         </div>
                         <div className="form-group">
                             <label htmlFor="governorate">المحافظة *</label>
-                            <select id="governorate" name="governorate" value={formData.governorate} onChange={handleChange}>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select>
+                            <select id="governorate" name="governorate" value={formData.governorate} onChange={handleChange}>
+                                {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+                            </select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="city">المدينة / المنطقة *</label>
