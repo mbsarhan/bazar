@@ -24,7 +24,7 @@ class UpdateRealestateAdRequest extends FormRequest
     {
         // 'sometimes' means the rule only applies if the field is present in the request.
         return [
-            'transaction_type'   => ['sometimes', 'required', Rule::in(['بيع', 'إيجار', 'استثمار'])],
+            'transaction_type'   => ['sometimes', 'required', Rule::in(['بيع', 'أجار', 'استثمار'])],
             'realestate_type'    => ['sometimes', 'required', 'string'],
             'governorate'        => ['sometimes', 'required', 'string'],
             'city'               => ['sometimes', 'required', 'string', 'max:255'],

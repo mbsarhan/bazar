@@ -212,7 +212,7 @@ const AddRealEstateForm = () => {
     // (I have removed it for brevity, but you should not change anything in your return statement)
     // The `name` attributes like `name="transactionType"` and `name="propertyType"`
     // are now correctly mapped in the handleSubmit function.
-    const transactionTypes = ['بيع', 'إيجار', 'استثمار'];
+    const transactionTypes = ['بيع', 'أجار', 'استثمار'];
     const propertyTypes = ['شقة', 'فيلا', 'محل تجاري', 'مكتب', 'أرض', 'مزرعة', 'شاليه', 'مستودع', 'سوق تجاري'];
     const constructionStatuses = ['جاهز', 'على الهيكل', 'قيد الإنشاء'];
     const finishingStatuses = ['سوبر ديلوكس', 'جيد جداً', 'جيد', 'عادي', 'بحاجة لتجديد'];

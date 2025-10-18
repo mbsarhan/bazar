@@ -258,7 +258,7 @@ const AddCarForm = () => {
         }
     };
 
-    const dealTypes = ['بيع', 'إيجار'];
+    const dealTypes = ['بيع', 'أجار'];
     const conditions = ['جديدة', 'مستعملة', 'متضررة'];
     const transmissions = ['أوتوماتيك', 'عادي', 'الإثنان معا'];
     const fuelTypes = ['بنزين', 'ديزل', 'كهرباء', 'هايبرد'];
