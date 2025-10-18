@@ -2,10 +2,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from '../context/LocationContext';
 import '../styles/Header.css';
+import { Globe } from 'lucide-react';
 
 const Header = () => {
     const { user } = useAuth();
+    const { country, setCountry } = useLocation();
     const navigate = useNavigate();
 
     const handleAddAdClick = () => {
@@ -32,6 +35,16 @@ const Header = () => {
                     بازار
                 </Link>
                 <div className="header-actions">
+                    <div className="country-selector">
+                        <Globe size={20} />
+                        <select 
+                            value={country.code} 
+                            onChange={(e) => setCountry(e.target.value)}
+                        >
+                            <option value="SY">Syria</option>
+                            <option value="SA">Saudi Arabia</option>
+                        </select>
+                    </div>
                     <button onClick={handleAddAdClick} className="add-ad-btn">
                         + أضف إعلاناً
                     </button>

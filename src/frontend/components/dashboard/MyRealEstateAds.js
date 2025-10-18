@@ -4,6 +4,7 @@ import AdCard from './AdCard';
 import AdCardSkeleton from './AdCardSkeleton';
 import Modal from './Modal'; // 1. Import your Modal component
 import { useAds } from '../../context/AdContext';
+import '../../styles/StatusFilter.css';
 // We are not using the context for now, so the import can be removed if you wish
 
 const MyRealEstateAds = () => {
@@ -11,6 +12,7 @@ const MyRealEstateAds = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const { getMyRealEstateAds ,deleteRealEstateAd} = useAds();
+    const [activeStatus, setActiveStatus] = useState('all');
 
     // --- 3. Add state for the delete modal ---
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -65,6 +67,16 @@ const MyRealEstateAds = () => {
             <div className="content-header">
                 <h1>إعلاناتي للعقارات</h1>
             </div>
+
+            <div className="status-filter-bar">
+                <button className={activeStatus === 'all' ? 'active' : ''} onClick={() => setActiveStatus('all')}>الكل</button>
+                <button className={activeStatus === 'فعال' ? 'active' : ''} onClick={() => setActiveStatus('فعال')}>فعال</button>
+                <button className={activeStatus === 'قيد المراجعة' ? 'active' : ''} onClick={() => setActiveStatus('قيد المراجعة')}>قيد المراجعة</button>
+                <button className={activeStatus === 'مباع' ? 'active' : ''} onClick={() => setActiveStatus('مباع')}>مباع</button>
+                <button className={activeStatus === 'مؤجر' ? 'active' : ''} onClick={() => setActiveStatus('مؤجر')}>مؤجر</button>
+            </div>
+
+
             <div className="ads-list-container">
                 {isLoading ? (
                     // If loading, render the skeletons

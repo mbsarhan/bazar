@@ -135,7 +135,7 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
                 </div>
                 <div className="ad-card-details">
                     <h3>{ad.title}</h3>
-                    <p className="ad-card-price">{`${ad.price == 0 ? 'السعر عند التواصل' : `${ad.price} $`}
+                    <p className="ad-card-price">{`${ad.price === '0' ? 'السعر عند التواصل' : `${ad.price} $`}
                      ${ad.negotiable_check ? '(قابل للتفاوض)' : ''}`}</p>
                     <div className="ad-card-specs">
                         {ad.model_year && (

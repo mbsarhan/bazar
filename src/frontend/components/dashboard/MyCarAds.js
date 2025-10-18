@@ -4,6 +4,7 @@ import AdCard from './AdCard';
 import Modal from './Modal'; // <-- 1. IMPORT YOUR MODAL COMPONENT
 import { useAds } from '../../context/AdContext'; // 1. Import the hook
 import AdCardSkeleton from './AdCardSkeleton';
+import '../../styles/StatusFilter.css';
 
 const MyCarAds = () => {
     // 2. Set up state for ads, loading, and errors
@@ -11,6 +12,7 @@ const MyCarAds = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const { getMyCarAds, deleteCarAd } = useAds(); // <-- 2. GET deleteCarAd FROM CONTEXT
+    const [activeStatus, setActiveStatus] = useState('all');
 
     // --- 3. ADD STATE FOR THE DELETE MODAL ---
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -74,6 +76,15 @@ const MyCarAds = () => {
             <div className="content-header">
                 <h1>إعلاناتي للسيارات</h1>
             </div>
+
+            <div className="status-filter-bar">
+                <button className={activeStatus === 'all' ? 'active' : ''} onClick={() => setActiveStatus('all')}>الكل</button>
+                <button className={activeStatus === 'فعال' ? 'active' : ''} onClick={() => setActiveStatus('فعال')}>فعال</button>
+                <button className={activeStatus === 'قيد المراجعة' ? 'active' : ''} onClick={() => setActiveStatus('قيد المراجعة')}>قيد المراجعة</button>
+                <button className={activeStatus === 'مباع' ? 'active' : ''} onClick={() => setActiveStatus('مباع')}>مباع</button>
+                <button className={activeStatus === 'مؤجر' ? 'active' : ''} onClick={() => setActiveStatus('مؤجر')}>مؤجر</button>
+            </div>
+
             <div className="ads-list-container">
                 {isLoading ? (
                     // 2. If loading, render the skeletons

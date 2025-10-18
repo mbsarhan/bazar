@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import 'rc-slider/assets/index.css';
 
+import { LocationProvider } from './context/LocationContext';
 import { AuthProvider } from './context/AuthContext';
 import { AdProvider } from './context/AdContext'; // <-- IMPORT
 import { DashboardProvider } from './context/DashboardContext'; // <-- IMPORT
@@ -37,47 +38,49 @@ import Reviews from './components/dashboard/Reviews';
 
 function App() {
   return (
-    <AuthProvider>
-      <AdProvider>
-      <DashboardProvider>
-      <UserProvider>
-      <Router>
-        <ScrollToTop />
-        <Header /> 
-        
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/ad/:adId" element={<AdDetailPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/verify-account" element={<VerificationPage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/add-ad" element={<AddAdChoice />} />
-          <Route path="/add-car" element={<AddCarForm />} />
-          <Route path="edit-car/:adId" element={<AddCarForm />} />
-          <Route path="/add-real-estate" element={<AddRealEstateForm />} />
-          <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
-          <Route path="/profile/:userId" element={<PublicProfile />} />
-          <Route path="add-review/:userIdToReview" element={<AddReview />} />
+    <LocationProvider>
+      <AuthProvider>
+        <AdProvider>
+          <DashboardProvider>
+            <UserProvider>
+              <Router>
+                <ScrollToTop />
+                <Header />
 
-          {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardOverview />} />
-            <Route path="my-profile" element={<MyProfile />} />
-            <Route path="my-profile/security-settings" element={<SecuritySettings />} />
-            <Route path="car-ads" element={<MyCarAds />} />
-            <Route path="real-estate-ads" element={<MyRealEstateAds />} />
-            <Route path="reviews" element={<Reviews />} />
-          </Route>
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/ad/:adId" element={<AdDetailPage />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/verify-account" element={<VerificationPage />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/add-ad" element={<AddAdChoice />} />
+                  <Route path="/add-car" element={<AddCarForm />} />
+                  <Route path="edit-car/:adId" element={<AddCarForm />} />
+                  <Route path="/add-real-estate" element={<AddRealEstateForm />} />
+                  <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
+                  <Route path="/profile/:userId" element={<PublicProfile />} />
+                  <Route path="add-review/:userIdToReview" element={<AddReview />} />
 
-        </Routes>
-      </Router>
-      </UserProvider>
-      </DashboardProvider>
-      </AdProvider>
-    </AuthProvider>
+                  {/* Dashboard Routes */}
+                  <Route path="/dashboard" element={<DashboardLayout />}>
+                    <Route index element={<DashboardOverview />} />
+                    <Route path="my-profile" element={<MyProfile />} />
+                    <Route path="my-profile/security-settings" element={<SecuritySettings />} />
+                    <Route path="car-ads" element={<MyCarAds />} />
+                    <Route path="real-estate-ads" element={<MyRealEstateAds />} />
+                    <Route path="reviews" element={<Reviews />} />
+                  </Route>
+
+                </Routes>
+              </Router>
+            </UserProvider>
+          </DashboardProvider>
+        </AdProvider>
+      </AuthProvider>
+    </LocationProvider>
   );
 }
 
