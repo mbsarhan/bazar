@@ -71,6 +71,7 @@ class RealestateAdsService{
                     'owner_id'         => $user->id,
                     'title'            => $data['title'],
                     'price'            => $data['price'],
+                    'geo_location'     => $data['geo_location'],
                     'description'      => $data['description'] ?? null,
                     'transaction_type' => $data['transaction_type'],
                     'governorate'      => $data['governorate'],

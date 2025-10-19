@@ -24,6 +24,7 @@ class CarAdService
                     'owner_id'         => $user->id,
                     'title'            => $data['manufacturer']." ".$data['model']." ".$data['model_year'],
                     'price'            => $data['price'],
+                    'geo_location'     => $data['geo_location'],
                     'description'      => $data['description'] ?? null,
                     'transaction_type' => $data['transaction_type'],
                     'governorate'      => $data['governorate'],

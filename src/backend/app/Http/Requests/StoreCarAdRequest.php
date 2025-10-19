@@ -21,6 +21,7 @@ class StoreCarAdRequest extends FormRequest
             'governorate'      => 'required|string|max:255',
             'city'             => 'required|string|max:255',
             'description'      => 'nullable|string',
+            'geo_location'     => ['required', 'string', Rule::in(['Syria', 'Saudi Arabia'])],
 
             // --- CarAds Table Fields ---
             'manufacturer'      => 'required|string|max:255',
