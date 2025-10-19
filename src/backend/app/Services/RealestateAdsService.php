@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request; // <-- 1. IMPOR
 
 class RealestateAdsService{
    
@@ -43,23 +44,22 @@ class RealestateAdsService{
     }
 
 
-    public function getAdsForUser(User $user)
+    public function getAdsForUser(User $user, Request $request)
     {
-        try {
+        
             // 1. Fetch Advertisements owned by the user that have Real Estate Details.
-            $ads = Advertisement::where('owner_id', $user->id)
-                ->has('realEstateDetails') // Ensure it's a real estate ad
-            // Eager-load all necessary relationships for the API Resource
-            ->with(['realEstateDetails.ImageForRealestate', 'owner'])
-            ->latest() // Order by newest first
-            ->get();
-
-            return $ads;
-        } catch (Exception $e) {
-            Log::error("Error retrieving user's real estate ads (User ID: {$user->id}): " . $e->getMessage());
-            // Rethrow the exception to be handled by the controller
-            throw new Exception("Failed to retrieve user's real estate ads.");
+            $query = Advertisement::where('owner_id', $user->id)
+                ->has('realEstateDetails'); // Ensure it's a real estate ad
+            if ($request->has('status') && $request->query('status') !== 'all') {
+            $status = $request->query('status');
+            // Add a where clause to filter by the ad_status
+            $query->where('ad_status', $status);
         }
+        
+        // Eager-load relationships and order the final query
+        return $query->with(['realEstateDetails', 'realEstateDetails.ImageForRealestate'])
+            ->latest()
+            ->get();
     }
 
 

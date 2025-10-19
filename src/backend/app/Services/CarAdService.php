@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage; // 1. IMPORT
+use Illuminate\Http\Request; // <-- 1. IMPOR
 use Exception;
 
 class CarAdService
@@ -91,19 +92,25 @@ class CarAdService
         }
     }
     /**
-     * Get all car ads for a specific user.
+     * Get car ads for a specific user, with optional status filtering.
      */
-    public function getAdsForUser(User $user)
+    public function getAdsForUser(User $user, Request $request) // <-- 2. ACCEPT THE REQUEST
     {
-        // 1. Start with the Advertisement model
-        return Advertisement::where('owner_id', $user->id)
-            // 2. Only get ads that have car details (this filters out real estate ads)
-            ->has('carDetails')
-            // 3. Eager-load the necessary relationships to prevent N+1 query problems
-            ->with(['carDetails', 'carDetails.ImagesForCar'])
-            // 4. Order by the most recently created
+        // Start building the query
+        $query = Advertisement::where('owner_id', $user->id)
+            ->has('carDetails'); // Only get car ads
+
+        // --- 3. THE NEW FILTERING LOGIC ---
+        // Check for the 'status' query parameter
+        if ($request->has('status') && $request->query('status') !== 'all') {
+            $status = $request->query('status');
+            // Add a where clause to filter by the ad_status
+            $query->where('ad_status', $status);
+        }
+        
+        // Eager-load relationships and order the final query
+        return $query->with(['carDetails', 'carDetails.ImagesForCar'])
             ->latest()
-            // 5. Get the results
             ->get();
     }
      public function getAdById($ad_id)

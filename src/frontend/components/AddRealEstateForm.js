@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // Import the context hook
+import { useLocation } from '../context/LocationContext'; // 1. Import location hook
+import { locationData } from '../context/locationData'; // 2. Import location data
 import ProgressBar from './ProgressBar'; // Assuming you have this component
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
@@ -20,6 +22,7 @@ const AddRealEstateForm = () => {
     const { adId } = useParams();
     const isEditMode = Boolean(adId);
 
+    const { country } = useLocation(); // 3. Get the current country
     const { createRealEstateAd, getAdById, updateRealEstateAd } = useAds();
 
     // --- All of your state from your original file ---
@@ -27,7 +30,7 @@ const AddRealEstateForm = () => {
         title: '',
         transaction_type: 'بيع',
         realestate_type: 'شقة',
-        governorate: 'دمشق',
+        governorate: locationData[country.code].provinces[0],
         city: '',
         detailed_address: '',
         area: '',
@@ -90,6 +93,10 @@ const AddRealEstateForm = () => {
 
     // --- Data Fetching for Edit Mode ---
     useEffect(() => {
+        setFormData(prev => ({
+            ...prev,
+            governorate: locationData[country.code].provinces[0]
+        }));
         if (isEditMode) {
             const fetchAdData = async () => {
                 try {
@@ -131,7 +138,7 @@ const AddRealEstateForm = () => {
             };
             fetchAdData();
         }
-    }, [adId, getAdById, isEditMode]);
+    }, [country, isEditMode, adId, getAdById]);
 
     // --- THIS IS THE ONLY PART THAT CHANGES ---
     const handleSubmit = async (e) => {
@@ -216,7 +223,8 @@ const AddRealEstateForm = () => {
     const propertyTypes = ['شقة', 'فيلا', 'محل تجاري', 'مكتب', 'أرض', 'مزرعة', 'شاليه', 'مستودع', 'سوق تجاري'];
     const constructionStatuses = ['جاهز', 'على الهيكل', 'قيد الإنشاء'];
     const finishingStatuses = ['سوبر ديلوكس', 'جيد جداً', 'جيد', 'عادي', 'بحاجة لتجديد'];
-    const provinces = ["دمشق", "ريف دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "دير الزور", "الحسكة", "الرقة", "إدلب", "السويداء", "درعا", "القنيطرة"];
+    const provinces = locationData[country.code].provinces;
+    const currencyLabel = locationData[country.code].currency;
 
     if (isLoading) {
         return <div className="form-container wide-form"><p>جاري تحميل بيانات الإعلان...</p></div>;
@@ -266,7 +274,9 @@ const AddRealEstateForm = () => {
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="governorate">المحافظة *</label>
-                            <select name="governorate" value={formData.governorate} onChange={handleChange}>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select>
+                            <select name="governorate" value={formData.governorate} onChange={handleChange}>
+                                {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+                            </select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="city">المدينة / المنطقة *</label>
@@ -313,7 +323,7 @@ const AddRealEstateForm = () => {
                     <legend>السعر</legend>
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="price">السعر المطلوب</label>
+                            <label htmlFor="price">السعر المطلوب ({currencyLabel})</label>
                             <input type="text" name="price" value={formData.price} onChange={handleChange}/>
                         </div>
                         <div className="form-group checkbox-group price-checkbox">
