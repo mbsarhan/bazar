@@ -6,10 +6,12 @@ import SearchFilters from './SearchFilters';
 import '../styles/HomePage.css';
 import { useAds } from '../context/AdContext'; // 1. Import the context hook
 import { ChevronDown } from 'lucide-react';
+import { useLocation } from '../context/LocationContext';
 
 const HomePage = () => {
 
     const [activeFilter, setActiveFilter] = useState('all');
+    const { country } = useLocation();
 
     // 2. Add loading state to the homepage
     const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +33,7 @@ const HomePage = () => {
                     const apiType = activeFilter === 'cars' ? 'car' : 'real_estate';
                     filters.type = apiType;
                 }
+                filters.geo_location = country.name;
                 
                 // 2. Pass the filters to the API call.
                 const data = await getPublicAds(filters);
@@ -44,7 +47,7 @@ const HomePage = () => {
         };
 
         fetchAds();
-    }, [activeFilter, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
+    }, [country, activeFilter, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
     // This handler receives the new filter from the child and updates the state.
     const handleFilterChange = (filter) => {
