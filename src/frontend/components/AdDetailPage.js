@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
 import {
-    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
+    GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
     Home, Square, BedDouble, Bath
 } from 'lucide-react';
 
