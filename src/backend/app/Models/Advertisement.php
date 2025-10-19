@@ -16,6 +16,7 @@ class Advertisement extends Model
         'transaction_type',
         'ad_status', // <-- ADD THIS LINE
         'governorate',
+        'geo_location',
         'city',
         'views_count',
         'currency_type',

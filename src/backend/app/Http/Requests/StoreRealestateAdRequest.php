@@ -41,6 +41,7 @@ class StoreRealestateAdRequest extends FormRequest
             'images'             => 'required|array',
             'images.*'           => 'image|mimes:jpeg,png,jpg|max:2048',
             'video'              => ['nullable', 'file', 'mimes:mp4,mov,avi,webm', 'max:20480'],
+            'geo_location' => ['required', 'string', Rule::in(['Syria', 'Saudi Arabia'])],
         ];
     }
 

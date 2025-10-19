@@ -18,17 +18,32 @@ class AdvertisementService
 
         // --- 3. THE NEW FILTERING LOGIC ---
         // Check if a 'type' parameter was passed in the URL (e.g., /api/advertisements?type=car)
-        if ($request->has('type')) {
-            $type = $request->query('type');
+        // if ($request->has('type')) {
+        //     $type = $request->query('type');
 
-            if ($type === 'car') {
-                // If type is 'car', only include ads that have a carDetails relationship.
-                $query->whereHas('carDetails');
-            } elseif ($type === 'real_estate') {
-                // If type is 'real_estate', only include ads that have a realEstateDetails relationship.
-                $query->whereHas('realEstateDetails');
-            }
+        //     if ($type === 'car') {
+        //         // If type is 'car', only include ads that have a carDetails relationship.
+        //         $query->whereHas('carDetails');
+        //     } elseif ($type === 'real_estate') {
+        //         // If type is 'real_estate', only include ads that have a realEstateDetails relationship.
+        //         $query->whereHas('realEstateDetails');
+        //     }
+        // }
+
+        if ($request->filled('geo_location')) {
+        // Use an exact match '=' instead of 'LIKE' for better performance.
+        $query->where('geo_location', $request->query('geo_location'));
+    }
+
+    // Filter 2: Apply the 'type' filter if it exists.
+    if ($request->filled('type')) {
+        $type = $request->query('type');
+        if ($type === 'car') {
+            $query->whereHas('carDetails');
+        } elseif ($type === 'real_estate') {
+            $query->whereHas('realEstateDetails');
         }
+    }
         
         // These conditions are applied to all queries
         return $query->where('ad_status', 'فعال') // Always filter for active ads
