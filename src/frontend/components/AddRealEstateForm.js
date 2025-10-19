@@ -31,6 +31,7 @@ const AddRealEstateForm = () => {
         transaction_type: 'بيع',
         realestate_type: 'شقة',
         governorate: locationData[country.code].provinces[0],
+        geo_location: country.name,
         city: '',
         detailed_address: '',
         area: '',

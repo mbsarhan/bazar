@@ -31,6 +31,7 @@ const AddCarForm = () => {
         condition: 'مستعملة',
         gear: 'أوتوماتيك',
         fuel_type: 'بنزين',
+        geo_location: country.name,
         model_year: '',
         distance_traveled: '',
         price: '',
