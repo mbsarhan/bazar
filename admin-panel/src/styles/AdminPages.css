@@ -113,3 +113,28 @@ table tbody tr:hover {
 .back-link-btn:hover {
     background-color: var(--color-accent-hover);
 }
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.status-badge.status-active {
+    background-color: #27ae60; /* Green */
+}
+
+.status-badge.status-banned {
+    background-color: #e74c3c; /* Red */
+}
+
+.status-badge.status-pending {
+    background-color: #f39c12; /* Orange */
+}
+
+/* Make action buttons slightly smaller for icon-only look */
+.actions-cell .action-btn {
+    padding: 6px 10px;
+}

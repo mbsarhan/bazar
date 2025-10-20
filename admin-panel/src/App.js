@@ -7,6 +7,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import ManageAds from './components/admin/ManageAds';
 import AdminAdDetailView from './components/admin/AdminAdDetailView';
 import './styles/forms.css';
+import ManageUsers from './components/admin/ManageUsers';
 
 // --- A simple, consistent Header for the Admin Panel ---
 const AdminHeader = () => {
@@ -60,7 +61,7 @@ function App() {
                     <Route path="/" element={<h1>نظرة عامة</h1>} />
                     <Route path="/manage-ads" element={<ManageAds />} />
                     <Route path="/admin/view-ad/:adId" element={<AdminAdDetailView />} />
-                    <Route path="/manage-users" element={<h1>إدارة المستخدمين</h1>} />
+                    <Route path="/manage-users" element={<ManageUsers />} />
                 </Route>
             </Route>
           </Route>
