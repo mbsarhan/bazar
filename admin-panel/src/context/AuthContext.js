@@ -1,72 +1,69 @@
-// admin-panel/src/context/AuthContext.js
-import React, { createContext, useState, useContext, useEffect, useCallback, useMemo } from 'react';
-import api from '../api'; // We will create this file next
+// admin-panel/src/context/AuthContext.js (Simplified for UI Prototyping)
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import api from '../api';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    // State now just holds a fake admin object or null
+    const [admin, setAdmin] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('adminAuthToken'));
-    const [isLoading, setIsLoading] = useState(true); // To handle initial auth check
+    
+    // --- THIS IS THE KEY ---
+    const [isLoading, setIsLoading] = useState(true); // Start in a loading state
 
     useEffect(() => {
-        if (token) {
-            const fetchUserData = async () => {
+        const fetchAdminData = async () => {
+            if (token) {
                 try {
-                    // The interceptor in api.js will automatically add the token
-                    const response = await api.get('/user');
-                    setUser(response.data);
+                    // In a real app, you would fetch the user here
+                    // const response = await api.get('/admin/user');
+                    // setAdmin(response.data);
+                    
+                    // --- SIMULATION ---
+                    // For now, if a token exists, we assume it's a valid admin
+                    setAdmin({ name: 'Admin User', email: 'admin@example.com', is_admin: true });
+
                 } catch (error) {
-                    console.error("Auth token is invalid, logging out:", error);
-                    logout(); // The token is bad, so we clear it
-                } finally {
-                    setIsLoading(false);
+                    console.error("Auto-login failed:", error);
+                    logout(); // If token is bad, log them out
                 }
-            };
-            fetchUserData();
-        } else {
-            setIsLoading(false); // No token, so we're done loading
+            }
+            // Whether there was a token or not, the initial check is complete.
+            setIsLoading(false);
+        };
+
+        fetchAdminData();
+    }, [token]); // This hook runs only when the token changes
+
+    // A simple, instant login function
+    const login = (credentials) => {
+        // --- THIS IS THE FIX ---
+        // We've changed the password to something less common
+        if (credentials.email === 'admin@example.com' && credentials.password === 'AdminPassword123!') {
+            const fakeAdmin = { name: 'Admin', email: 'admin@example.com', is_admin: true };
+            localStorage.setItem('adminAuthToken', 'fake-admin-token-123');
+            setAdmin(fakeAdmin);
+            return Promise.resolve(fakeAdmin);
         }
-    }, [token]); // This hook runs only when the token state changes
+        return Promise.reject(new Error('Invalid credentials'));
+    };
 
-    const login = useCallback(async (credentials) => {
-        try {
-            // IMPORTANT: Use a dedicated admin login route
-            const response = await api.post('/admin/login', credentials);
-            const { user, access_token } = response.data;
-
-            setUser(user);
-
-            setToken(access_token);
-            localStorage.setItem('adminAuthToken', access_token);
-        } catch (error) {
-            // Re-throw the error so the login form can display it
-            throw error;
-        }
-    }, []);
-
-    const logout = useCallback(() => {
-        // We'll make this an async function if you have an API logout endpoint
-        console.log("Logging out...");
-        setUser(null);
-        setToken(null);
+    // A simple, instant logout function
+    const logout = () => {
         localStorage.removeItem('adminAuthToken');
-    }, []);
+        setAdmin(null);
+    };
 
     const value = useMemo(() => ({
-        user,
+        admin,
         token,
-        isLoading,
+        isLoading, // Expose the loading state
         login,
         logout,
-    }), [user, token, isLoading, login, logout]);
+    }), [admin, token, isLoading]);
 
-    // Render children only after the initial loading is complete
-    return (
-        <AuthContext.Provider value={value}>
-            {!isLoading && children}
-        </AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

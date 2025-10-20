@@ -1,0 +1,586 @@
+/* src/frontend/styles/Dashboard.css */
+
+.main-header {
+    background-color: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding: 15px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+.header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+.logo { font-size: 1.5rem; font-weight: 600; color: var(--color-text-dark); }
+.logout-btn-header { background-color: #fddede; border: 1px solid #fab9b9; color: #9c2a2a; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+/* ============================================= */
+/* 1. Main Dashboard Layout                      */
+/* ============================================= */
+.dashboard-sidebar {
+    width: 260px;
+    background-color: var(--color-bg-card);
+    border-left: 1px solid var(--color-border-subtle);
+    position: fixed;
+    top: 65px;
+    right: 0;
+    bottom: 0;
+    z-index: 990;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    transition: width 0.3s ease-in-out;
+}
+
+.dashboard-content {
+    /* The content area has a margin to make space for the sidebar */
+    margin-right: 260px; 
+    padding: 40px;
+    transition: margin-right 0.3s ease-in-out; 
+}
+
+/* ============================================= */
+/* 2. Sidebar Internal Structure                 */
+/* ============================================= */
+.sidebar-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    margin-bottom: 20px;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidebar-footer {
+    flex-shrink: 0;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.sidebar-logo-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0;
+}
+
+.sidebar-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================= */
+/* 3. Sidebar Navigation & Buttons               */
+/* ============================================= */
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav a, 
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease-in-out;
+    overflow: hidden;
+    width: 100%; /* Ensure the element takes full width */
+    box-sizing: border-box; /* Include padding in the width calculation */
+    justify-content: flex-start; /* Align content to the start (right in RTL) */
+}
+
+.sidebar-nav a {
+    color: var(--color-text-dark);
+    text-decoration: none;
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--color-bg-page);
+}
+
+.sidebar-nav a.active {
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-dark);
+}
+
+.logout-btn { 
+    background-color: transparent; 
+    border: none; /* remove 1px solid transparent */
+    color: #9c2a2a; 
+    cursor: pointer; 
+}
+
+.logout-btn:hover {
+    background-color: #fddede;
+}
+
+/* ============================================= */
+/* 4. Collapsed State & Animations               */
+/* ============================================= */
+.dashboard-sidebar.collapsed {
+    width: 75px; 
+}
+
+.dashboard-content.collapsed {
+    margin-right: 75px;
+}
+
+.sidebar-logo-text,
+.sidebar-nav a span,
+.logout-btn span {
+    white-space: nowrap;
+    opacity: 1;
+    max-width: 200px;
+    overflow: hidden;
+    transition: max-width 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.dashboard-sidebar.collapsed .sidebar-logo-text,
+.dashboard-sidebar.collapsed .sidebar-nav a span,
+.dashboard-sidebar.collapsed .logout-btn span {
+    opacity: 0;
+    max-width: 0;
+}
+
+.dashboard-sidebar.collapsed .sidebar-nav a,
+.dashboard-sidebar.collapsed .logout-btn {
+    justify-content: center;
+    padding: 12px;
+    gap: 0; 
+}
+
+.dashboard-sidebar.collapsed .sidebar-nav li,
+.dashboard-sidebar.collapsed .logout-btn {
+    position: relative;
+}
+
+
+/* ============================================= */
+/* 5. Dashboard Content (Headers, Cards, etc.)   */
+/* ============================================= */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: var(--color-bg-card);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card h2 {
+    font-size: 2.5rem;
+    margin: 0 0 10px 0;
+    color: var(--color-accent-primary);
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 1rem;
+    color: #666;
+}
+
+/* ============================================= */
+/* 6. Ad List & Ad Card Styles                   */
+/* ============================================= */
+.ads-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.ad-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.ad-card-details {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.ad-card-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    
+    /* 2. Hide any text that overflows the container's width */
+    overflow: hidden;
+    
+    /* 3. Add the "..." ellipsis to the end of the hidden text */
+    text-overflow: ellipsis;
+    
+    /* 4. (Optional but good) Set a max-width to be safe */
+    max-width: 100%;
+}
+
+.ad-card-price {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    margin: 0 0 10px 0;
+}
+
+.ad-card-status {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.status-active { background-color: rgba(80, 200, 120, 0.9); }
+.status-pending { background-color: rgba(255, 165, 0, 0.9); }
+.status-sold { background-color: rgba(231, 76, 60, 0.9); }
+
+.ad-card-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.spec-item svg {
+    color: #888;
+    flex-shrink: 0;
+}
+
+.ad-card-actions {
+    display: flex;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.ad-card-actions .action-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: transparent;
+    border: none;
+    border-left: 1px solid var(--color-border-subtle);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.ad-card-actions .action-btn:last-child {
+    border-left: none;
+}
+
+.ad-card-actions .action-btn:hover {
+    background-color: var(--color-bg-page);
+}
+
+.action-btn.view-btn { color: #3498db; }
+.action-btn.edit-btn { color: #f39c12; }
+.action-btn.delete-btn { color: #e74c3c; }
+
+.ad-card-clickable-area {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* ============================================= */
+/* 7. Image Carousel in Ad Card                  */
+/* ============================================= */
+.ad-card-image {
+    position: relative;
+    height: 200px;
+}
+
+.ad-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    z-index: 10;
+    opacity: 0;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-arrow.left { left: 10px; }
+.nav-arrow.right { right: 10px; }
+
+.ad-card:hover .nav-arrow {
+    opacity: 1;
+}
+
+.nav-arrow:hover {
+    background-color: white;
+    box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
+}
+
+.pagination-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+    direction: ltr;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.dot.active {
+    background-color: white;
+}
+
+.dot:hover {
+    background-color: white;
+    box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================= */
+/* 8. NEW Tippy.js Tooltip Styles                */
+/* ============================================= */
+.tippy-box[data-theme~='bazaar'] {
+    background-color: #333;
+    color: white;
+    font-family: 'Cairo', sans-serif;
+}
+.tippy-box[data-theme~='bazaar'][data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: #333;
+}
+
+/* ============================================= */
+/* 9. Dashboard Overview Page Styles             */
+/* ============================================= */
+
+.chart-container {
+    background-color: var(--color-bg-card);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+}
+
+.stats-header {
+    font-size: 1.5rem;
+    color: var(--color-text-dark);
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+/* Stat card colors */
+.stat-card-active h2 {
+    color: #50C878; /* Green */
+}
+.stat-card-pending h2 {
+    color: #f39c12; /* Orange */
+}
+.stat-card-sold h2 {
+    color: #e74c3c; /* Red */
+}
+
+/* ============================================= */
+/* 10. Ad Card View Counter Styles                */
+/* ============================================= */
+.ad-card-views {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    /* Create the ribbon shape */
+    padding: 10px 15px 10px 20px;
+    border-bottom-right-radius: 16px; /* Rounded corner to complete the look */
+    
+    /* The "Frosted Glass" effect */
+    background-color: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    /* Text and Icon styling */
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* Add a subtle shadow for readability */
+    z-index: 5;
+    
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ============================================= */
+/* 11. Chart View Changer (Toggle) Styles         */
+/* ============================================= */
+.stats-header.with-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-changer {
+    /* The position:absolute is removed */
+    background-color: var(--color-bg-page);
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    border: 1px solid var(--color-border-subtle);
+}
+
+.view-changer button {
+    background-color: transparent;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    color: #666;
+    transition: all 0.2s ease-in-out;
+}
+
+.view-changer button.active {
+    background-color: var(--color-bg-card);
+    color: var(--color-text-dark);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================= */
+/* 12. Chart Skeleton Loader Styles              */
+/* ============================================= */
+.chart-skeleton-loader {
+    /* Make it fill the container */
+    width: 100%;
+    height: 100%;
+    
+    /* Style it to look like a placeholder */
+    background-color: #f0f0f0; /* A light grey */
+    border-radius: 16px; /* Match the container's border-radius */
+    
+    /* Add the pulsing animation */
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* The keyframes for the pulsing animation */
+@keyframes pulse {
+    0% {
+        background-color: #f0f0f0;
+    }
+    50% {
+        background-color: #e0e0e0; /* A slightly darker grey */
+    }
+    100% {
+        background-color: #f0f0f0;
+    }
+}
+
+/* ============================================= */
+/* 13. Dynamic Ad Card Dots Styles                */
+/* ============================================= */
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    /* Add a transition for the size change */
+    transition: all 0.2s ease; 
+}
+
+.dot.active {
+    background-color: white;
+}
+
+.dot:hover {
+    background-color: white;
+    box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.7);
+}
+
+/* --- This is the new style for the smaller dots --- */
+.dot.small {
+    width: 6px;
+    height: 6px;
+    /* Optionally make them slightly more transparent */
+    background-color: rgba(255, 255, 255, 0.4);
+}

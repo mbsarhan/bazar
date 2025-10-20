@@ -1,17 +1,23 @@
-// admin-panel/src/components/AdminLogin.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/forms.css';
 
 const AdminLogin = () => {
+    const { login, admin } = useAuth();
     const navigate = useNavigate();
-    const { login } = useAuth();
     
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // This useEffect is no longer needed here, as the PublicRoute in App.js handles the redirect.
+    // useEffect(() => {
+    //     if (admin) {
+    //         navigate('/');
+    //     }
+    // }, [admin, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,12 +25,16 @@ const AdminLogin = () => {
         setIsSubmitting(true);
 
         try {
-            // Call the login function from our context
+            // This calls the login function from your AuthContext.
+            // The navigation will happen automatically when the 'admin' state changes
+            // and the Protected/Public routes re-evaluate.
             await login({ email, password });
-            navigate('/'); // Navigate to dashboard on success
+            
+            // We can still navigate here for an immediate redirect
+            navigate('/');
+
         } catch (err) {
-            // The context's login function will throw an error on failure
-            setError(err.response?.data?.message || 'فشل تسجيل الدخول.');
+            setError(err.message || 'Login failed. Please check your credentials.');
         } finally {
             setIsSubmitting(false);
         }
