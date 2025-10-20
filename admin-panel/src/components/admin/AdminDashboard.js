@@ -46,7 +46,7 @@ const AdminDashboard = () => {
             </div>
             
             {/* --- Chart and Recent Activity Section --- */}
-            <div className="dashboard-grid-two-cols">
+            <div className="chart-container">
                 <h3 className="chart-title">الإعلانات الجديدة في آخر 7 أيام</h3>
                 {/* 2. The new Recharts component */}
                 <ResponsiveContainer width="100%" height={300}>
