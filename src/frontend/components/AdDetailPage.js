@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
 import {
-    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
+    GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
     Home, Square, BedDouble, Bath
 } from 'lucide-react';
 
@@ -126,7 +126,7 @@ const AdDetailPage = () => {
         <div className="ad-detail-container">
             <div className="ad-detail-header">
                 <h1>{ad.title}</h1>
-                <span className="ad-detail-price">{`${ad.price === '0' ? 'السعر عند التواصل' : `${ad.price} $`}
+                <span className="ad-detail-price">{`${ad.price == 0 ? 'السعر عند التواصل' : `${ad.price} $`}
                      ${ad.negotiable_check ? '(قابل للتفاوض)' : ''}`}</span>
             </div>
 
