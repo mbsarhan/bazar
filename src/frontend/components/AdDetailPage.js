@@ -1,5 +1,5 @@
 // src/frontend/components/AdDetailPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // 1. Use the context
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,8 @@ import {
     Home, Square, BedDouble, Bath
 } from 'lucide-react';
 
+import VideoPlayer from './VideoPlayer'; // <-- EDIT: Import the new reusable component
+
 const AdDetailPage = () => {
     const { adId } = useParams();
     const { getAdById } = useAds(); // 3. Get the fetching function from context
@@ -21,7 +23,8 @@ const AdDetailPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const thumbnailScrollerRef = React.useRef(null);
+    const thumbnailScrollerRef = useRef(null);
+    const [videoPlayerOptions, setVideoPlayerOptions] = useState(null);
 
     useEffect(() => {
         const fetchAd = async () => {
@@ -30,7 +33,27 @@ const AdDetailPage = () => {
             setAd(null);
             try {
                 const data = await getAdById(parseInt(adId, 10));
+                // --- ADD THIS LOG ---
+                console.log("API Response for Ad:", data);
+                // You can be more specific:
+                console.log("Received videoUrl:", data.videoUrl);
+                console.log("Received videoType:", data.videoType);
+                // --- END LOG ---
                 setAd(data);
+                 if (data && data.videoUrl && data.videoType) {
+                    setVideoPlayerOptions({
+                        autoplay: false,
+                        controls: true,
+                        responsive: true,
+                        fluid: true,
+                        sources: [{
+                            src: data.videoUrl,
+                            type: data.videoType // Use the type from the backend
+                        }]
+                    });
+                } else {
+                    setVideoPlayerOptions(null); // Ensure it's null if no video
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -53,6 +76,11 @@ const AdDetailPage = () => {
             }
         }
     }, [currentIndex, ad]);
+
+    const handlePlayerReady = (player) => {
+        console.log('Video.js player is ready on the detail page!', player);
+        // Video.js will automatically add the quality selector for HLS streams.
+    };
 
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
 
@@ -106,10 +134,8 @@ const AdDetailPage = () => {
                 <div className="ad-detail-image-gallery">
                     {/* Main Image Display */}
                     <div className="main-image-container">
-                        {currentIndex === -1 && ad.videoUrl ? (
-                            <video controls width="100%" height="auto" className="main-image">
-                                <source src={ad.videoUrl} type="video/mp4" />
-                            </video>
+                        {currentIndex === -1 && videoPlayerOptions ? (
+                        <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady} />
                         ) : (
                             <img
                                 src={ad.imageUrls[currentIndex]}
@@ -123,11 +149,11 @@ const AdDetailPage = () => {
                     <div className="thumbnail-container-wrapper">
                         {/* Video Thumbnails - Left Side (space always reserved) */}
                         <div className="video-thumbnails">
-                            {ad.realestate_type && ad.videoUrl && (
-                                <div className="video-thumbnail" onClick={() => setCurrentIndex(-1)}>
-                                    <video muted preload="metadata">
-                                        <source src={ad.videoUrl} type="video/mp4" />
-                                    </video>
+                            {videoPlayerOptions && (
+                                <div className={`video-thumbnail ${currentIndex === -1 ? 'active' : ''}`} onClick={() => setCurrentIndex(-1)}>
+                                    <div style={{width: '100%', height: '100%', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                                    </div>
                                 </div>
                             )}
                         </div>
