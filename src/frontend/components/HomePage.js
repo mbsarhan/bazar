@@ -1,5 +1,6 @@
 // src/frontend/components/HomePage.js
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import AdCard from './dashboard/AdCard';
 import AdCardSkeleton from './dashboard/AdCardSkeleton'; // 1. Import the skeleton
 import SearchFilters from './SearchFilters';
@@ -9,8 +10,10 @@ import { ChevronDown } from 'lucide-react';
 import { useLocation } from '../context/LocationContext';
 
 const HomePage = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const [activeFilter, setActiveFilter] = useState('all');
+    const activeFilter = searchParams.get('type') || 'all';
+    const sortOrder = searchParams.get('sort') || 'newest-first';
     const { country } = useLocation();
 
     // 2. Add loading state to the homepage
@@ -18,7 +21,6 @@ const HomePage = () => {
     const [ads, setAds] = useState([]);
     const [error, setError] = useState(null); // Add error state
     const { getPublicAds } = useAds(); // 2. Get the function from context
-    const [sortOrder, setSortOrder] = useState('newest-first'); // Default sort
 
     // This useEffect hook is now the "engine". It depends on activeFilter.
     useEffect(() => {
@@ -52,9 +54,19 @@ const HomePage = () => {
         fetchAds();
     }, [country, activeFilter,sortOrder, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
-    // This handler receives the new filter from the child and updates the state.
     const handleFilterChange = (filter) => {
-        setActiveFilter(filter);
+        setSearchParams(prevParams => {
+            prevParams.set('type', filter);
+            return prevParams;
+        });
+    };
+    
+    // This handler receives the new filter from the child and updates the state.
+    const handleSortChange = (sort) => {
+         setSearchParams(prevParams => {
+            prevParams.set('sort', sort);
+            return prevParams;
+        });
     };
 
     return (
@@ -66,7 +78,7 @@ const HomePage = () => {
                     <select
                         className="sort-dropdown"
                         value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value)}
+                        onChange={(e) => handleSortChange(e.target.value)}
                     >
                         <option value="newest-first">الأحدث أولاً</option>
                         <option value="oldest-first">الأقدم أولاً</option>

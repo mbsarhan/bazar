@@ -1,5 +1,5 @@
 // src/frontend/App.js
-import React from 'react';
+import React, { useState } from 'react'; // 1. Import useState
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import 'rc-slider/assets/index.css';
@@ -38,6 +38,9 @@ import Reviews from './components/dashboard/Reviews';
 
 
 function App() {
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest-first');
+
   return (
     <LocationProvider>
       <AuthProvider>
@@ -51,7 +54,17 @@ function App() {
 
                   <Routes>
                     {/* Public Routes */}
-                    <Route path="/" element={<HomePage />} />
+                    <Route
+                      path="/"
+                      element={
+                        <HomePage
+                          activeFilter={activeFilter}
+                          setActiveFilter={setActiveFilter}
+                          sortOrder={sortOrder}
+                          setSortOrder={setSortOrder}
+                        />
+                      }
+                    />
                     <Route path="/ad/:adId" element={<AdDetailPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<SignUp />} />
