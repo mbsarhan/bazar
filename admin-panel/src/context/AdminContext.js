@@ -54,6 +54,19 @@ export const AdminProvider = ({ children }) => {
     };
 
 
+
+
+    /**
+     * Fetches the list of all users for the admin panel.
+     */
+    const getAllUsers = useCallback(async () => {
+        const response = await api.get('/admin/users');
+        // A paginated resource collection is wrapped in a 'data' key
+        return response.data.data;
+    }, []);
+
+
+
     const value = {
         pendingUpdates,
         isLoading,
@@ -62,6 +75,7 @@ export const AdminProvider = ({ children }) => {
         approveUpdate,
         rejectUpdate,
         getPendingUpdateById,
+        getAllUsers,
     };
 
     return (

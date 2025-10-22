@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 import '../../styles/AdminPages.css'; // Reuse the same table styles
+import { useAdmin } from '../../context/AdminContext'; // 1. IMPORT
 
 const ManageUsers = () => {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const { getAllUsers } = useAdmin(); // 2. GET THE FUNCTION
 
     // --- Mock Data (to be replaced by API call) ---
     const mockUsers = [
@@ -16,15 +18,14 @@ const ManageUsers = () => {
         { id: 4, name: 'سارة', email: 'sara@example.com', phone: '0955667788', ads_count: 0 },
     ];
 
-    // --- Simulate fetching data ---
+    // --- 3. FETCH REAL DATA ---
     useEffect(() => {
         const fetchUsers = async () => {
             setIsLoading(true);
+            setError('');
             try {
-                // In a real app: const response = await api.get('/admin/users');
-                // setUsers(response.data);
-                await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
-                setUsers(mockUsers);
+                const data = await getAllUsers();
+                setUsers(data);
             } catch (err) {
                 setError('فشل تحميل قائمة المستخدمين.');
             } finally {
@@ -32,7 +33,7 @@ const ManageUsers = () => {
             }
         };
         fetchUsers();
-    }, []);
+    }, [getAllUsers]);
 
     const handleDeleteUser = (userId) => {
         // In a real app, you would show a confirmation modal first
