@@ -11,6 +11,7 @@ use Exception;
 use App\Models\UserRating; // <-- IMPORT
 use Illuminate\Support\Facades\DB; // <-- IMPORT
 use Ramsey\Uuid\Type\Integer;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator; // <-- IMPORT
 
 class UserService
 {
@@ -123,5 +124,22 @@ class UserService
             // Re-throw the exception to be handled by the controller.
             throw new Exception("An internal server error occurred while fetching review data.");
         }
+    }
+
+    /**
+     * Get a paginated list of all users for the admin panel, excluding the admin themselves.
+     */
+    public function getAllUsers(User $adminUser): LengthAwarePaginator
+    {
+        // Start a query on the User model
+        return User::query()
+            // Exclude the ID of the admin making the request
+            ->where('id', '!=', $adminUser->id)
+            // Efficiently count the number of advertisements for each user
+            ->withCount('advertisements')
+            // Order by newest users first
+            ->latest()
+            // Paginate the results
+            ->paginate(20);
     }
 }

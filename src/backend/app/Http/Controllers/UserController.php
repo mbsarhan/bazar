@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException; // <-- 3. IMPORT
 use App\Http\Requests\UpdateProfileRequest; // <-- 1. IMPORT
 use App\Http\Resources\ReviewResource; // <-- IMPORT
 use Illuminate\Support\Facades\Log; // 1. IMPORT
+use App\Http\Resources\Admin\AdminUserResource; // <-- 1. IMPORT
 use Exception; // 2. IMPORT
 
 class UserController extends Controller
@@ -20,6 +21,23 @@ class UserController extends Controller
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
+    }
+
+
+
+    /**
+     * Display a listing of the resource for an Admin.
+     */
+    public function index(Request $request)
+    {
+        // Authorization is handled by the 'admin' middleware on the route
+        $adminUser = $request->user();
+
+        // Call the service to get the paginated list of users
+        $users = $this->userService->getAllUsers($adminUser);
+
+        // Return the data formatted through our new AdminUserResource
+        return AdminUserResource::collection($users);
     }
 
 
