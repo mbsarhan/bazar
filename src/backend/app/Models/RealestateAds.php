@@ -21,6 +21,7 @@ class RealestateAds extends Model
         'negotiable_check',
         'video_url',
         'hls_url',
+        'video_type',
 
     ];
 

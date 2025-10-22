@@ -87,11 +87,17 @@ class AdvertisementResource extends JsonResource
             $realEstateImages = $this->realEstateDetails->ImageForRealestate;
             $videoUrl = null;
             if ($this->realEstateDetails->hls_url) {
-                $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->hls_url}";
+                // $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->hls_url}";
+
+                // --- THIS IS THE KEY CHANGE ---
+                // Instead of a direct storage link, we generate a URL to our streaming route.
+                $videoUrl = route('video.stream', ['path' => $this->realEstateDetails->hls_url]);
             } 
             // Priority 2: Fall back to the original video URL if HLS isn't ready.
             elseif ($this->realEstateDetails->video_url) {
-                $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->video_url}";
+                // $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->video_url}";
+
+                $videoUrl = route('video.stream', ['path' => $this->realEstateDetails->video_url]);
             }
             $realEstateData = [
                 'governorate'           => $this->governorate,
@@ -111,6 +117,7 @@ class AdvertisementResource extends JsonResource
                     return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");
                 }),
                 'videoUrl' => $videoUrl,
+                'videoType' => $this->realEstateDetails->video_type,
             ];
             return array_merge($baseData, $realEstateData);
         }

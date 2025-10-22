@@ -1,3 +1,21 @@
+# --- CORS AND MIME TYPE CONFIGURATION (SHOULD BE AT THE TOP) ---
+Redirect /test-htaccess http://www.google.com
+# Part 1: Set the correct MIME types for HLS files.
+AddType application/x-mpegURL .m3u8
+AddType video/MP2T .ts
+
+# Part 2: Add the CORS header for HLS files.
+# This block tells Apache: "If a request comes in for a file ending in .m3u8 or .ts,
+# add the Access-Control-Allow-Origin header to the response."
+<IfModule mod_headers.c>
+    <FilesMatch "\.(m3u8|ts)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>
+
+
+# --- LARAVEL'S DEFAULT RULES (SHOULD BE AT THE BOTTOM) ---
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -8,10 +26,6 @@
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d

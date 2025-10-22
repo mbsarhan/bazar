@@ -6,6 +6,8 @@ import AdminLogin from './components/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import ManageAds from './components/admin/ManageAds';
 import AdminAdDetailView from './components/admin/AdminAdDetailView';
+import ManageUsers from './components/admin/ManageUsers';
+import AdminDashboard from './components/admin/AdminDashboard';
 import './styles/forms.css';
 
 // --- Your AdminHeader component is perfect as is ---
@@ -78,10 +80,10 @@ function App() {
               >
                 {/* The AdminLayout provides the sidebar */}
                 <Route element={<AdminLayout />}>
-                    <Route path="/" element={<h1 style={{padding: '20px'}}>نظرة عامة</h1>} />
+                    <Route path="/" element={<AdminDashboard />} />
                     <Route path="/manage-ads" element={<ManageAds />} />
                     <Route path="/admin/view-ad/:adId" element={<AdminAdDetailView />} />
-                    <Route path="/manage-users" element={<h1 style={{padding: '20px'}}>إدارة المستخدمين</h1>} />
+                    <Route path="/manage-users" element={<ManageUsers />} />
                 </Route>
               </Route>
             </Route>
