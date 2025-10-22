@@ -6,6 +6,7 @@ use App\Models\Advertisement;
 use App\Services\AdvertisementService;
 use App\Http\Resources\AdvertisementResource;
 use Illuminate\Support\Facades\DB; // <-- 1. IMPORT DB FACADE
+use Illuminate\Validation\Rule;
 
 class AdvertisementController extends Controller
 {
@@ -22,7 +23,16 @@ class AdvertisementController extends Controller
     {
         // Pass the entire request object to the service.
         $ads = $this->advertisementService->getPublicListing($request);
-
+         // --- 2. ADD VALIDATION FOR ALL FILTERS ---
+        $request->validate([
+            'type' => ['nullable', 'string', Rule::in(['car', 'real_estate'])],
+            'geo_location' => ['nullable', 'string', Rule::in(['Syria', 'Saudi Arabia'])],
+            'sort_by' => [ // <-- ADD THIS NEW RULE
+                'nullable', 
+                'string', 
+                Rule::in(['newest-first', 'oldest-first', 'price-asc', 'price-desc'])
+            ],
+        ]);
         return AdvertisementResource::collection($ads);
     }
 
