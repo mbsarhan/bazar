@@ -5,9 +5,9 @@ import { useLocation } from '../context/LocationContext'; // 1. Import location 
 import { locationData } from '../context/locationData'; // 2. Import location data
 import VideoPlayer from './VideoPlayer';
 import ProgressBar from './ProgressBar'; // Assuming you have this component
+import axios from 'axios';
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
-import { vi } from 'date-fns/locale';
 
 
 const UploadIcon = () => (
@@ -73,7 +73,41 @@ const AddRealEstateForm = () => {
     };
 
     const handleVideoChange = (e) => {
-        setVideoFile(e.target.files[0]);
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setVideoFile(file); // Set the file for preview
+        setIsUploading(true); // Start the uploading state
+        setUploadProgress(0); // Reset progress
+
+        const videoFormData = new FormData();
+        videoFormData.append('video', file);
+
+        // This is a simulation. Replace 'https://httpbin.org/post' with your
+        // dedicated video upload endpoint if you have one.
+        axios.post('https://httpbin.org/post', videoFormData, {
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                setUploadProgress(percentCompleted);
+            },
+        })
+        .then(response => {
+            console.log('Video upload simulation successful.');
+            // When the upload is complete, mark it as finished
+            setIsUploading(false);
+            // In a real app, you might get a URL/path back from the server and
+            // save it here if needed before the final form submission.
+        })
+        .catch(error => {
+            console.error('Video upload failed:', error);
+            setErrorMessage('فشل رفع الفيديو. يرجى المحاولة مرة أخرى.');
+            // Reset everything on failure
+            setIsUploading(false);
+            setVideoFile(null);
+            setUploadProgress(0);
+        });
+        
+        e.target.value = null; // Allow re-uploading the same file
     };
 
     const removeImage = (indexToRemove) => {
@@ -85,12 +119,23 @@ const AddRealEstateForm = () => {
         setImages(prev => prev.filter((_, i) => i !== indexToRemove));
     };
 
-    const removeVideo = () => {
-        if (typeof videoFile === 'string') { // It's an existing URL
+     const removeVideo = () => {
+        // Also remove from your 'removedMedia' state if it's an existing file
+        if (typeof videoFile === 'string') {
             const filename = videoFile.substring(videoFile.lastIndexOf('/') + 1);
             setRemovedMedia(prev => [...prev, filename]);
         }
-        setVideoFile(null);
+
+        // Phase 1: Unmount the VideoPlayer component first by clearing its options.
+        // This allows its internal cleanup (dispose) to run safely.
+        setVideoOptions(null);
+
+        // Phase 2: On the next tick, remove the parent container by clearing the file.
+        setTimeout(() => {
+            setVideoFile(null);
+            setIsUploading(false);
+            setUploadProgress(0);
+        }, 0);
     };
 
     useEffect(() => {
@@ -428,7 +473,10 @@ const AddRealEstateForm = () => {
                 </fieldset>
 
                 <button type="submit" className="submit-btn" disabled={isUploading || isSubmitting}>
-                    {isSubmitting ? 'جاري الحفظ...' : (isEditMode ? 'حفظ التعديلات' : 'نشر إعلان العقار')}
+                    {isSubmitting 
+                        ? 'جاري الحفظ...' 
+                        : (isUploading ? 'جاري رفع الفيديو...' : (isEditMode ? 'حفظ التعديلات' : 'نشر إعلان العقار'))
+                    }
                 </button>
             </form>
         </div>
