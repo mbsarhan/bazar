@@ -5,9 +5,26 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import AdminLogin from './components/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import ManageAds from './components/admin/ManageAds';
-import AdminDashboard from './components/admin/AdminDashboard'; // 1. Import the real component
-import ManageUsers from './components/admin/ManageUsers'; // Also import this for completeness
+import AdminAdDetailView from './components/admin/AdminAdDetailView';
+import ManageUsers from './components/admin/ManageUsers';
+import AdminDashboard from './components/admin/AdminDashboard';
 import './styles/forms.css';
+
+// --- A simple, consistent Header for the Admin Panel ---
+const AdminHeader = () => {
+    const { logout } = useAuth();
+    return (
+        <header className="main-header">
+            <div className="header-content">
+                <div className="logo">لوحة تحكم بازار</div>
+                <div className="header-actions">
+                    <button onClick={logout} className="logout-btn-header">تسجيل الخروج</button>
+                </div>
+            </div>
+        </header>
+    );
+};
+
 
 const ProtectedRoute = () => {
     const { admin, isLoading } = useAuth();
@@ -21,8 +38,6 @@ const PublicRoute = () => {
     return admin ? <Navigate to="/" replace /> : <Outlet />;
 };
 
-// The old placeholder has been removed.
-
 function App() {
   return (
     <AuthProvider>
@@ -33,15 +48,22 @@ function App() {
           </Route>
 
           <Route element={<ProtectedRoute />}>
-            <Route element={<AdminLayout />}>
-              
-              {/* --- THIS IS THE GUARANTEED FIX --- */}
-              {/* The root path now correctly renders the real AdminDashboard component */}
-              <Route path="/" element={<AdminDashboard />} />
-              
-              <Route path="/manage-ads" element={<ManageAds />} />
-              <Route path="/manage-users" element={<ManageUsers />} />
-              
+            {/* --- THIS IS THE FIX --- */}
+            {/* The Header is now part of the protected layout */}
+            <Route 
+                element={
+                    <>
+                        <AdminHeader />
+                        <Outlet />
+                    </>
+                }
+            >
+                <Route element={<AdminLayout />}>
+                    <Route path="/" element={<AdminDashboard />} />
+                    <Route path="/manage-ads" element={<ManageAds />} />
+                    <Route path="/admin/view-ad/:adId" element={<AdminAdDetailView />} />
+                    <Route path="/manage-users" element={<ManageUsers />} />
+                </Route>
             </Route>
           </Route>
         </Routes>
