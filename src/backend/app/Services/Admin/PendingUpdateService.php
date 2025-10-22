@@ -9,6 +9,8 @@ use App\Models\RealestateImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Models\CarAds;
+use App\Models\RealestateAds;
 
 class PendingUpdateService
 {
@@ -117,5 +119,43 @@ class PendingUpdateService
 
             return true;
         });
+    }
+
+
+
+
+
+    /**
+     * Creates a "virtual" Advertisement model from a pending update record.
+     * This allows us to reuse our existing API Resources.
+     */
+    public function buildVirtualAdFromPendingUpdate(PendingAdvertisementUpdate $pendingUpdate): Advertisement
+    {
+        // 1. Create a new, in-memory Advertisement instance and fill it with pending data.
+        $virtualAd = new Advertisement();
+        $virtualAd->forceFill($pendingUpdate->toArray());
+        
+        // Manually set the ID to match the original ad for consistency
+        $virtualAd->id = $pendingUpdate->advertisement_id;
+
+        // 2. Load the original owner relationship onto the virtual ad.
+        $virtualAd->setRelation('owner', $pendingUpdate->advertisement->owner);
+
+        // 3. Conditionally create and attach the correct in-memory details model.
+        if ($pendingUpdate->manufacturer) { // This is a Car Ad
+            $carDetails = new CarAds();
+            $carDetails->forceFill($pendingUpdate->toArray());
+            // We need to simulate the images relationship
+            $carDetails->setRelation('ImagesForCar', collect()); // Start with empty collection
+            $virtualAd->setRelation('carDetails', $carDetails);
+
+        } elseif ($pendingUpdate->realestate_type) { // This is a Real Estate Ad
+            $realEstateDetails = new RealestateAds();
+            $realEstateDetails->forceFill($pendingUpdate->toArray());
+            $realEstateDetails->setRelation('ImageForRealestate', collect());
+            $virtualAd->setRelation('realEstateDetails', $realEstateDetails);
+        }
+
+        return $virtualAd;
     }
 }

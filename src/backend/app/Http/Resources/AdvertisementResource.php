@@ -34,6 +34,7 @@ class AdvertisementResource extends JsonResource
 
         $baseData = [
             'id'                => $this->id,
+            'created_at'        => $this->created_at,
             'title'             => $this->title,
             'price'             => ($this->price==null) ? null : (int) $this->price,
             'location'          => "{$this->governorate}, {$this->city}",
