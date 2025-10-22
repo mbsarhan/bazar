@@ -173,6 +173,7 @@ class ProcessVideoJob implements ShouldQueue
         // The job is done. Now, update the hls_url field.
         RealestateAds::where('ads_id', $this->adId)->update([
             'hls_url' => $masterPlaylistPath,
+            'video_type' => 'application/x-mpegURL',
         ]);
 
         // Now that the HLS versions are ready, we can delete the large original file.

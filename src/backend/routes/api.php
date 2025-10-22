@@ -6,14 +6,15 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\CarAdsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StreamingController;
 use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\UserRatingsController;
 use App\Http\Controllers\VideoUploadController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PublicProfileController;
-use App\Http\Controllers\RealestateAdsController;
 // use App\Http\Controllers\AdvertisementSearchController;
+use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
 
@@ -60,6 +61,12 @@ Route::post('/resend-password-reset-code', [PasswordResetController::class, 'res
     ->middleware('throttle:1,1') // 1 attempt per 1 minute
     ->name('password.resend.code');
 
+
+
+// THIS IS THE CORRECT PLACE FOR THE STREAMING ROUTE
+Route::get('/stream/{path}', [StreamingController::class, 'stream'])
+    ->where('path', '.*')
+    ->name('video.stream');
 
 
 // Protected routes (require Sanctum authentication)
@@ -117,7 +124,6 @@ Route::middleware('auth:sanctum')->group(function () {
     //Video
     Route::post('/advertisements/{advertisement}/video', [VideoUploadController::class, 'store'])
         ->name('api.video.store');
-
 
 
 

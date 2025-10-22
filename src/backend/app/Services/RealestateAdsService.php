@@ -80,9 +80,12 @@ class RealestateAdsService{
                 ]);
 
                 $originalVideoPath = null;
+                $videoMimeType = null;
                 if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
+                    $videoFile = $data['video'];
                     // Store the original video file. Its path is now ready for instant playback.
                     $originalVideoPath = $data['video']->store('videos/real-estate/originals', 'public');
+                    $videoMimeType = $videoFile->getMimeType();
                     
                     // Dispatch the background job to transcode this video.
                     // We pass the original path and the main Advertisement ID.
@@ -102,6 +105,7 @@ class RealestateAdsService{
                     'negotiable_check'    => $data['negotiable_check'],
                     'video_url'           => $originalVideoPath,
                     'hls_url'             => null,
+                    'video_type'          => $videoMimeType,
                 ]);
 
                 $this->uploadImages($realestateAd, $data['images']);
