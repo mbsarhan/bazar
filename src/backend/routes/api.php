@@ -17,6 +17,7 @@ use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 
 
@@ -135,19 +136,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//-------------------------------------------------------------------------------------------------------------
 
 
 // --- ADMIN ROUTES ---
