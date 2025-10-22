@@ -162,4 +162,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- ADD THIS ROUTE TO GET A SINGLE PENDING UPDATE ---
     Route::get('/pending-updates/{pendingUpdate}', [PendingUpdateController::class, 'show']);
+
+    // --- ADD THIS NEW ROUTE FOR THE AdminDASHBOARD ---
+    Route::get('/dashboard/statistics', [AdminDashboardController::class, 'getStatistics']);
 });
