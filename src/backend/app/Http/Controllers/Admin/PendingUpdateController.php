@@ -8,6 +8,7 @@ use App\Services\Admin\PendingUpdateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Resources\Admin\PendingUpdateResource;
+use App\Http\Resources\AdvertisementResource; // <-- 2. IMPORT
 use Exception;
 
 class PendingUpdateController extends Controller
@@ -103,4 +104,28 @@ class PendingUpdateController extends Controller
             return response()->json(['message' => 'An error occurred during the rejection process.'], 500);
         }
     }
+
+
+
+
+
+    /**
+     * Display the specified pending update, formatted as a full Advertisement.
+     */
+    public function show(Request $request, PendingAdvertisementUpdate $pendingUpdate)
+    {
+        if (!$request->user()->admin) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        // 4. Eager-load the necessary relationship from the original ad
+        $pendingUpdate->load('advertisement.owner');
+
+        // 5. Call the service to build our "virtual" ad model
+        $virtualAd = $this->pendingUpdateService->buildVirtualAdFromPendingUpdate($pendingUpdate);
+
+        // 6. Pass the in-memory virtual ad to our existing, powerful AdvertisementResource
+        return new AdvertisementResource($virtualAd);
+    }
+
 }
