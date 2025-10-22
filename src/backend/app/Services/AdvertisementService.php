@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Advertisement;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request; // <-- 1. IMPORT THE REQUEST CLASS
+use Illuminate\Support\Facades\DB;
 
 class AdvertisementService
 {
@@ -44,15 +45,40 @@ class AdvertisementService
             $query->whereHas('realEstateDetails');
         }
     }
+
+        // Always filter for active ads
+        $query->where('ad_status', 'فعال');
+
+        // --- NEW SORTING LOGIC ---
+        $sortBy = $request->query('sort_by', 'newest-first'); // Default to 'newest-first' if not provided
+
+            switch ($sortBy) {
+                case 'oldest-first':
+                    $query->oldest(); // Sorts by created_at ascending
+                    break;
+            case 'price-asc':
+                // This raw expression tells the database:
+                // "First, sort all ads with a price of 0 to the bottom (CASE ... 1),
+                // and then sort the rest by their price in ascending order."
+                $query->orderByRaw('CASE WHEN price = 0 THEN 1 ELSE 0 END, price ASC');
+                break;
+            case 'price-desc':
+                // Similarly, here we push the zero-price ads to the bottom,
+                // and then sort the rest by their price in descending order.
+                $query->orderByRaw('CASE WHEN price = 0 THEN 1 ELSE 0 END, price DESC');
+                break;
+                case 'newest-first':
+                default:
+                    $query->latest(); // Sorts by created_at descending
+                    break;
+        }
         
-        // These conditions are applied to all queries
-        return $query->where('ad_status', 'فعال') // Always filter for active ads
-            ->with([
+        // --- FINAL QUERY EXECUTION (remains the same) ---
+        return $query->with([
                 'owner:id,fname,lname',
                 'carDetails.ImagesForCar',
                 'realEstateDetails.ImageForRealestate'
             ])
-            ->latest() // Always sort by newest first
-            ->paginate(1000);
+            ->paginate(100); // It's better to use a smaller page size like 20
     }
 }

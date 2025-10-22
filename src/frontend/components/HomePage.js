@@ -1,6 +1,6 @@
 // src/frontend/components/HomePage.js
 import React, { useState, useEffect } from 'react';
-import AdCard from './dashboard/AdCard'; 
+import AdCard from './dashboard/AdCard';
 import AdCardSkeleton from './dashboard/AdCardSkeleton'; // 1. Import the skeleton
 import SearchFilters from './SearchFilters';
 import '../styles/HomePage.css';
@@ -20,7 +20,7 @@ const HomePage = () => {
     const { getPublicAds } = useAds(); // 2. Get the function from context
     const [sortOrder, setSortOrder] = useState('newest-first'); // Default sort
 
-     // This useEffect hook is now the "engine". It depends on activeFilter.
+    // This useEffect hook is now the "engine". It depends on activeFilter.
     useEffect(() => {
         const fetchAds = async () => {
             setIsLoading(true);
@@ -34,7 +34,10 @@ const HomePage = () => {
                     filters.type = apiType;
                 }
                 filters.geo_location = country.name;
-                
+
+                // --- 1. ADD THE SORT ORDER TO THE FILTERS OBJECT ---
+                filters.sort_by = sortOrder;
+
                 // 2. Pass the filters to the API call.
                 const data = await getPublicAds(filters);
                 setAds(data);
@@ -47,7 +50,7 @@ const HomePage = () => {
         };
 
         fetchAds();
-    }, [country, activeFilter, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
+    }, [country, activeFilter,sortOrder, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
     // This handler receives the new filter from the child and updates the state.
     const handleFilterChange = (filter) => {
@@ -56,11 +59,11 @@ const HomePage = () => {
 
     return (
         <div className="home-page-container">
-            <SearchFilters onFilterChange={handleFilterChange}/>
+            <SearchFilters onFilterChange={handleFilterChange} />
             <div className="list-header">
                 <h1>أحدث الإعلانات</h1>
                 <div className="sort-dropdown-wrapper">
-                    <select 
+                    <select
                         className="sort-dropdown"
                         value={sortOrder}
                         onChange={(e) => setSortOrder(e.target.value)}
