@@ -94,7 +94,7 @@ class RealestateAdsController extends Controller
         }
 
         // --- 3. CALL THE SERVICE ---
-        $result = $this->realestateAdsService->updateAd($ad, $request->validated());
+        $result = $this->realestateAdsService->requestUpdate($ad, $request->validated());
 
         return response()->json($result);
     }
