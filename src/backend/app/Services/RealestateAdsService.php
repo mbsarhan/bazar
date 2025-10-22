@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request; // <-- 1. IMPOR
+use App\Models\PendingAdvertisementUpdate; // <-- 1. IMPORT
 
 class RealestateAdsService{
    
@@ -183,6 +184,57 @@ class RealestateAdsService{
                 Log::error('Error Deleting RealEstate Ad', ['ad_id' => $ad->id, 'error' => $e->getMessage()]);
                 return false;
             }
+        });
+    }
+
+
+
+
+    /**
+     * Creates a pending update request for a Real Estate ad.
+     */
+    public function requestUpdate(Advertisement $ad, array $data): array
+    {
+        return DB::transaction(function () use ($ad, $data) {
+            // Ensure the specific details for the ad are loaded
+            $ad->load('realEstateDetails');
+
+            // 1. Clear any old pending update for this ad to prevent duplicates
+            $ad->pendingUpdate()->delete();
+
+            // 2. Merge the original data with the new incoming data
+            $originalAdData = $ad->toArray();
+            $originalRealEstateData = $ad->realEstateDetails->toArray();
+            $pendingData = array_merge($originalAdData, $originalRealEstateData, $data);
+
+            // 3. Handle new file uploads by storing them in a temporary "pending" directory
+            $pendingMedia = ['new' => [], 'removed' => $data['removed_media'] ?? []];
+
+            if (!empty($data['images'])) {
+                foreach ($data['images'] as $file) {
+                    $path = $file->store('pending/images/real-estate', 'public');
+                    $pendingMedia['new'][] = $path;
+                }
+            }
+            if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
+                $path = $data['video']->store('pending/videos/real-estate', 'public');
+                $pendingMedia['new_video'] = $path; // Store separately for clarity
+            }
+
+            // 4. Add the final required fields to our data array
+            $pendingData['advertisement_id'] = $ad->id;
+            $pendingData['pending_media'] = $pendingMedia;
+            $pendingData['views_count'] = $ad->views_count; // <-- Save the current view count
+            $pendingData['ad_status'] = $ad->ad_status;     // <-- Save the current status
+
+            // 5. Create the new pending update record with the complete snapshot
+            PendingAdvertisementUpdate::create($pendingData);
+
+            // 6. Set the original ad's status to "pending review"
+            $ad->ad_status = 'قيد المراجعة';
+            $ad->save();
+
+            return ['message' => 'تم إرسال تعديلاتك للمراجعة بنجاح.'];
         });
     }
 
