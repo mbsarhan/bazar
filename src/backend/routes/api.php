@@ -17,6 +17,7 @@ use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 
 
@@ -135,19 +136,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//-------------------------------------------------------------------------------------------------------------
 
 // --- ADMIN ROUTES ---
 // We can create a new middleware group for admins to keep things organized.
@@ -173,6 +162,9 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- ADD THIS ROUTE TO GET A SINGLE PENDING UPDATE ---
     Route::get('/pending-updates/{pendingUpdate}', [PendingUpdateController::class, 'show']);
+
+    // --- ADD THIS NEW ROUTE FOR THE AdminDASHBOARD ---
+    Route::get('/dashboard/statistics', [AdminDashboardController::class, 'getStatistics']);
 
 
     // --- ADD THIS ROUTE TO GET THE USERS LIST ---
