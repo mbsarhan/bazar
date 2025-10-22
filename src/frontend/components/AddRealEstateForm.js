@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // Import the context hook
 import { useLocation } from '../context/LocationContext'; // 1. Import location hook
 import { locationData } from '../context/locationData'; // 2. Import location data
+import VideoPlayer from './VideoPlayer';
 import ProgressBar from './ProgressBar'; // Assuming you have this component
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
@@ -46,6 +47,7 @@ const AddRealEstateForm = () => {
     });
     const [images, setImages] = useState([]);
     const [videoFile, setVideoFile] = useState(null);
+    const [videoOptions, setVideoOptions] = useState(null);
     const [removedMedia, setRemovedMedia] = useState([]); // Holds filenames of removed media
     const [uploadProgress, setUploadProgress] = useState(0); // This can be used in the future
     const [isUploading, setIsUploading] = useState(false); // This can be used in the future
@@ -54,7 +56,8 @@ const AddRealEstateForm = () => {
     const [errors, setErrors] = useState({});
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
-    
+    const [isLoading, setIsLoading] = useState(isEditMode);
+
 
     // --- All of your handlers from your original file ---
     const handleChange = (e) => {
@@ -81,7 +84,7 @@ const AddRealEstateForm = () => {
         }
         setImages(prev => prev.filter((_, i) => i !== indexToRemove));
     };
-    
+
     const removeVideo = () => {
         if (typeof videoFile === 'string') { // It's an existing URL
             const filename = videoFile.substring(videoFile.lastIndexOf('/') + 1);
@@ -90,7 +93,34 @@ const AddRealEstateForm = () => {
         setVideoFile(null);
     };
 
-    const [isLoading, setIsLoading] = useState(isEditMode);
+    useEffect(() => {
+        if (!videoFile) {
+            setVideoOptions(null);
+            return;
+        }
+
+        const src = videoFile instanceof File
+            ? URL.createObjectURL(videoFile)
+            : videoFile;
+
+        const type = videoFile instanceof File
+            ? videoFile.type || 'video/mp4'
+            : videoFile.endsWith('.m3u8')
+                ? 'application/x-mpegURL'
+                : 'video/mp4';
+
+        setVideoOptions({
+            controls: true,
+            responsive: true,
+            fluid: true,
+            sources: [{ src, type }],
+        });
+
+        return () => {
+            if (videoFile instanceof File) URL.revokeObjectURL(src);
+        };
+    }, [videoFile]);
+
 
     // --- Data Fetching for Edit Mode ---
     useEffect(() => {
@@ -126,7 +156,7 @@ const AddRealEstateForm = () => {
                         setImages(adData.imageUrls);
                     }
 
-                    if(adData?.videoUrl){
+                    if (adData?.videoUrl) {
                         setVideoFile(adData.videoUrl);
                     }
 
@@ -175,27 +205,27 @@ const AddRealEstateForm = () => {
             const dataToSubmit = new FormData();
 
             Object.keys(formData).forEach(key => {
-            let value = formData[key];
-            if (key === 'negotiable_check') value = value ? '1' : '0';
-            dataToSubmit.append(key, value);
-        });
-        
-        // Append ONLY new images
-        images.forEach(image => {
-            if (image instanceof File) {
-                dataToSubmit.append('images[]', image);
+                let value = formData[key];
+                if (key === 'negotiable_check') value = value ? 1 : 0;
+                dataToSubmit.append(key, value);
+            });
+
+            // Append ONLY new images
+            images.forEach(image => {
+                if (image instanceof File) {
+                    dataToSubmit.append('images[]', image);
+                }
+            });
+
+            // Append ONLY a new video
+            if (videoFile instanceof File) {
+                dataToSubmit.append('video', videoFile);
             }
-        });
 
-        // Append ONLY a new video
-        if (videoFile instanceof File) {
-            dataToSubmit.append('video', videoFile);
-        }
-
-        // Append the list of removed media filenames
-        removedMedia.forEach(filename => {
-            dataToSubmit.append('removed_media[]', filename);
-        });
+            // Append the list of removed media filenames
+            removedMedia.forEach(filename => {
+                dataToSubmit.append('removed_media[]', filename);
+            });
 
             if (isEditMode) {
                 dataToSubmit.append('_method', 'PUT');
@@ -325,7 +355,7 @@ const AddRealEstateForm = () => {
                     <div className="form-grid">
                         <div className="form-group">
                             <label htmlFor="price">السعر المطلوب ({currencyLabel})</label>
-                            <input type="text" name="price" value={formData.price} onChange={handleChange}/>
+                            <input type="text" name="price" value={formData.price} onChange={handleChange} />
                         </div>
                         <div className="form-group checkbox-group price-checkbox">
                             <input type="checkbox" id="negotiable_check" name="negotiable_check" checked={formData.negotiable_check} onChange={handleChange} />
@@ -375,12 +405,14 @@ const AddRealEstateForm = () => {
                         <div className="video-uploader">
                             {videoFile ? (
                                 <div className="video-preview">
-                                    {isUploading ? <ProgressBar progress={uploadProgress} /> : <video controls src={
-                                                    videoFile instanceof File
-                                                        ? URL.createObjectURL(videoFile) // for new uploads
-                                                        : videoFile                      // for URLs from backend
-                                                } />}
-                                    <button type="button" onClick={removeVideo} className="remove-image-btn">&times;</button>
+                                    {isUploading ? (
+                                        <ProgressBar progress={uploadProgress} />
+                                    ) : (
+                                        videoOptions && <VideoPlayer options={videoOptions} />
+                                    )}
+                                    <button type="button" onClick={removeVideo} className="remove-image-btn">
+                                        &times;
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="upload-box video-upload-box" onClick={() => videoInputRef.current.click()}>
