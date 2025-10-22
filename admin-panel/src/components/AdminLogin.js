@@ -4,37 +4,24 @@ import { useAuth } from '../context/AuthContext';
 import '../styles/forms.css';
 
 const AdminLogin = () => {
-    const { login, admin } = useAuth();
-    const navigate = useNavigate();
-    
-    const [email, setEmail] = useState('');
+    const [credential, setCredential] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // This useEffect is no longer needed here, as the PublicRoute in App.js handles the redirect.
-    // useEffect(() => {
-    //     if (admin) {
-    //         navigate('/');
-    //     }
-    // }, [admin, navigate]);
+    const { login } = useAuth();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setIsSubmitting(true);
-
         try {
-            // This calls the login function from your AuthContext.
-            // The navigation will happen automatically when the 'admin' state changes
-            // and the Protected/Public routes re-evaluate.
-            await login({ email, password });
-            
-            // We can still navigate here for an immediate redirect
-            navigate('/');
-
+            await login({ credential, password });
+            // On successful admin login, navigate to the dashboard/manage-ads page
+            navigate('/manage-ads');
         } catch (err) {
-            setError(err.message || 'Login failed. Please check your credentials.');
+            setError(err.response?.data?.message || err.message || 'Login failed.');
         } finally {
             setIsSubmitting(false);
         }
@@ -54,8 +41,8 @@ const AdminLogin = () => {
                         <input
                             type="email"
                             id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={credential}
+                            onChange={(e) => setCredential(e.target.value)}
                             required
                         />
                     </div>

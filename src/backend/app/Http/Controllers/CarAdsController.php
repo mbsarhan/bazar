@@ -93,7 +93,7 @@ class CarAdsController extends Controller
             return response()->json(['message' => 'This action is unauthorized.'], 403);
         }
 
-        $result = $this->carAdService->updateAd($ad, $request->validated());
+        $result = $this->carAdService->requestUpdate($ad, $request->validated());
 
         return response()->json($result);
     }

@@ -40,4 +40,11 @@ class Advertisement extends Model
         return $this->hasOne(RealestateAds::class,'ads_id');
 
     }
+    /**
+     * Get the pending update for this advertisement, if one exists.
+     */
+    public function pendingUpdate()
+    {
+        return $this->hasOne(PendingAdvertisementUpdate::class);
+    }
 }

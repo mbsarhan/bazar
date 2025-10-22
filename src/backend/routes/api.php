@@ -19,6 +19,11 @@ use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
 
 
 
+
+use App\Http\Controllers\Admin\PendingUpdateController; // <-- IMPORT THE CONTROLLER
+
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -121,4 +126,42 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// --- ADMIN ROUTES ---
+// We can create a new middleware group for admins to keep things organized.
+// The 'auth:sanctum' ensures they are logged in. We can add a custom 'is_admin' middleware later.
+Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(function () {
+
+
+
+    // --- ADD THIS ROUTE TO GET THE LIST ---
+    Route::get('/pending-updates', [PendingUpdateController::class, 'index'])->name('pending-updates.index');
+    
+    // Route for an admin to approve a pending update
+    Route::post('/pending-updates/{pendingUpdate}/approve', [PendingUpdateController::class, 'approve'])
+        ->name('pending-updates.approve');
+
+    // Route for an admin to reject a pending update
+    Route::post('/pending-updates/{pendingUpdate}/reject', [PendingUpdateController::class, 'reject'])
+        ->name('pending-updates.reject');
+        
+    // You can add a route to list all pending updates here later
+    // Route::get('/pending-updates', [PendingUpdateController::class, 'index']);
 });

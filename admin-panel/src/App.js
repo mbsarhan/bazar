@@ -1,14 +1,14 @@
-// admin-panel/src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { AdminProvider } from './context/AdminContext';
 import AdminLogin from './components/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import ManageAds from './components/admin/ManageAds';
 import AdminAdDetailView from './components/admin/AdminAdDetailView';
 import './styles/forms.css';
 
-// --- A simple, consistent Header for the Admin Panel ---
+// --- Your AdminHeader component is perfect as is ---
 const AdminHeader = () => {
     const { logout } = useAuth();
     return (
@@ -24,50 +24,80 @@ const AdminHeader = () => {
 };
 
 
+// --- The ProtectedRoute, corrected to use 'user' from your AuthContext ---
 const ProtectedRoute = () => {
-    const { admin, isLoading } = useAuth();
-    if (isLoading) { return <p>Loading session...</p>; }
-    return admin ? <Outlet /> : <Navigate to="/login" replace />;
+    // 1. Get 'user' and 'isLoading' from the context
+    const { user, isLoading } = useAuth();
+
+    if (isLoading) {
+        // You can return a full-page loader here for a better UX
+        return <div className="full-page-loader">Loading Session...</div>;
+    }
+    
+    // 2. The logic is now: if a 'user' object exists (meaning they are an authenticated admin), allow access.
+    return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
+// --- The PublicRoute, corrected to use 'user' ---
 const PublicRoute = () => {
-    const { admin, isLoading } = useAuth();
-    if (isLoading) { return <p>Loading...</p>; }
-    return admin ? <Navigate to="/" replace /> : <Outlet />;
+    // 1. Get 'user' and 'isLoading'
+    const { user, isLoading } = useAuth();
+
+    if (isLoading) {
+        return <div className="full-page-loader">Loading...</div>;
+    }
+    
+    // 2. If a 'user' exists, redirect from the login page to the main dashboard.
+    return user ? <Navigate to="/" replace /> : <Outlet />;
 };
 
+// --- The Main App Component ---
 function App() {
   return (
+    // 1. The Providers should wrap the Router
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route element={<PublicRoute />}>
-            <Route path="/login" element={<AdminLogin />} />
-          </Route>
+      <AdminProvider>
+        <Router>
+          {/* Your routing structure is excellent, we just adapt it slightly */}
+          <Routes>
+            {/* --- Public Routes (like the login page) --- */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<AdminLogin />} />
+            </Route>
 
-          <Route element={<ProtectedRoute />}>
-            {/* --- THIS IS THE FIX --- */}
-            {/* The Header is now part of the protected layout */}
-            <Route 
-                element={
-                    <>
-                        <AdminHeader />
-                        <Outlet />
-                    </>
-                }
-            >
+            {/* --- Protected Routes (the main admin panel) --- */}
+            <Route element={<ProtectedRoute />}>
+              {/* This wrapper ensures the header is on every protected page */}
+              <Route 
+                  element={
+                      <>
+                          <AdminHeader />
+                          <Outlet />
+                      </>
+                  }
+              >
+                {/* The AdminLayout provides the sidebar */}
                 <Route element={<AdminLayout />}>
-                    <Route path="/" element={<h1>نظرة عامة</h1>} />
+                    <Route path="/" element={<h1 style={{padding: '20px'}}>نظرة عامة</h1>} />
                     <Route path="/manage-ads" element={<ManageAds />} />
                     <Route path="/admin/view-ad/:adId" element={<AdminAdDetailView />} />
-                    <Route path="/manage-users" element={<h1>إدارة المستخدمين</h1>} />
+                    <Route path="/manage-users" element={<h1 style={{padding: '20px'}}>إدارة المستخدمين</h1>} />
                 </Route>
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </AdminProvider>
     </AuthProvider>
   );
 }
 
-export default App;
+// Wrap the entire app in the main App component in index.js
+// This makes the structure cleaner.
+const Root = () => (
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
+);
+
+export default Root; // In index.js, you would just render <Root />

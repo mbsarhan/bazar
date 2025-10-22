@@ -3,18 +3,35 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { carAdsData, realEstateAdsData } from './mockDataForAdmin';
 import '../../styles/AdminPages.css';
+import { useAdmin } from '../../context/AdminContext'; // 1. IMPORT
+
 
 const ManageAds = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const navigate = useNavigate();
+
+    const { 
+        getPendingUpdates, 
+        approveUpdate, 
+        rejectUpdate 
+    } = useAdmin(); // 2. GET FUNCTIONS
     const [pendingAds, setPendingAds] = useState([]);
     useEffect(() => {
-        // ... (data fetching simulation is the same)
-        const allPending = [...carAdsData, ...realEstateAdsData];
-        setPendingAds(allPending);
-        setIsLoading(false);
-    }, []);
+        const fetchPending = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const data = await getPendingUpdates();
+                setPendingAds(data);
+            } catch (err) {
+                setError(err.response?.data?.message || "Failed to fetch pending ads.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchPending();
+    }, [getPendingUpdates]);
 
     const handleActionClick = (e) => {
         // Prevent the row's click event from firing when a button is clicked
@@ -23,15 +40,24 @@ const ManageAds = () => {
 
     // No more isLoading or error state needed for this prototype
     
-    // --- Button handlers now only modify local state ---
-    const handleApprove = (adId) => {
-        console.log(`Approving ad ${adId}`);
-        setPendingAds(prev => prev.filter(ad => ad.id !== adId));
+    // 4. CONNECT a handler to the real API call
+    const handleApprove = async (adId) => {
+        try {
+            await approveUpdate(adId);
+            // On success, filter the ad from the local state for instant UI update
+            setPendingAds(prev => prev.filter(ad => ad.id !== adId));
+        } catch (err) {
+            alert("Failed to approve the ad."); // Simple error handling
+        }
     };
 
-    const handleReject = (adId) => {
-        console.log(`Rejecting ad ${adId}`);
-        setPendingAds(prev => prev.filter(ad => ad.id !== adId));
+    const handleReject = async (adId) => {
+        try {
+            await rejectUpdate(adId);
+            setPendingAds(prev => prev.filter(ad => ad.id !== adId));
+        } catch (err) {
+            alert("Failed to reject the ad.");
+        }
     };
 
     if (isLoading) return <p>جاري تحميل الإعلانات...</p>;

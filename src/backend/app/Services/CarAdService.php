@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage; // 1. IMPORT
 use Illuminate\Http\Request; // <-- 1. IMPOR
+use App\Models\PendingAdvertisementUpdate; // <-- IMPORT
 use Exception;
 
 class CarAdService
@@ -164,7 +165,63 @@ class CarAdService
         });
     }
 
+    /**
+     * Creates a pending update request for a car ad.
+     */
+    public function requestUpdate(Advertisement $ad, array $data): array
+    {
+        return DB::transaction(function () use ($ad, $data) {
+            // 1. Clear any old pending update for this ad
+            $ad->pendingUpdate()->delete();
 
+            // 2. Handle new file uploads - store them in a temporary "pending" directory
+            $pendingMedia = ['new' => [], 'removed' => $data['removed_images'] ?? []];
+            $fileKeys = ['front', 'back', 'side1', 'side2', 'extra_images'];
+            foreach ($fileKeys as $key) {
+                if (isset($data[$key])) {
+                    $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
+                    foreach ($files as $file) {
+                        // Store in a pending path and save the path
+                        $path = $file->store('pending/images/cars', 'public');
+                        $pendingMedia['new'][] = $path;
+                    }
+                }
+            }
+            
+            // 3. Create the new pending update record
+            PendingAdvertisementUpdate::create([
+                'advertisement_id' => $ad->id,
+                
+                // Advertisement fields
+                'title' => $data['manufacturer'] .$data['model'] .$data['model_year'],
+                'price' => $data['price'],
+                'description' => $data['description'] ?? null,
+                'transaction_type' => $data['transaction_type'],
+                'governorate' => $data['governorate'],
+                'city' => $data['city'],
+                'negotiable_check' => $data['negotiable_check'],
+                'geo_location' => $ad->geo_location,
+                
+                // Car ad fields
+                'manufacturer' => $data['manufacturer'],
+                'model' => $data['model'],
+                'model_year' => $data['model_year'],
+                'condition' => $data['condition'],
+                'gear' => $data['gear'],
+                'fuel_type' => $data['fuel_type'],
+                'distance_traveled' => $data['distance_traveled'],
+                
+                // Media tracking
+                'pending_media' => $pendingMedia,
+            ]);
+
+            // 4. Set the original ad's status to "pending review"
+            $ad->ad_status = 'قيد المراجعة';
+            $ad->save();
+
+            return ['message' => 'تم إرسال تعديلاتك للمراجعة بنجاح.'];
+        });
+    }
     /**
      * Update a car advertisement based on your detailed plan.
      */

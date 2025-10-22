@@ -1,69 +1,66 @@
-// admin-panel/src/context/AuthContext.js (Simplified for UI Prototyping)
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import api from '../api';
+import React, { useState, createContext, useContext, useEffect } from 'react';
+import api from '../api'; // The admin panel's axios client
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    // State now just holds a fake admin object or null
-    const [admin, setAdmin] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('adminAuthToken'));
-    
-    // --- THIS IS THE KEY ---
-    const [isLoading, setIsLoading] = useState(true); // Start in a loading state
+    // State will hold the admin user object or null
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchAdminData = async () => {
+        const checkLoggedInAdmin = async () => {
+            const token = localStorage.getItem('authToken');
             if (token) {
                 try {
-                    // In a real app, you would fetch the user here
-                    // const response = await api.get('/admin/user');
-                    // setAdmin(response.data);
-                    
-                    // --- SIMULATION ---
-                    // For now, if a token exists, we assume it's a valid admin
-                    setAdmin({ name: 'Admin User', email: 'admin@example.com', is_admin: true });
-
+                    const response = await api.get('/user');
+                    // --- THIS IS THE FIX ---
+                    // Check for the 'is_admin' property from the Laravel User model.
+                    if (response.data && response.data.admin === 1) {
+                        setUser(response.data);
+                    } else {
+                        localStorage.removeItem('authToken');
+                    }
                 } catch (error) {
-                    console.error("Auto-login failed:", error);
-                    logout(); // If token is bad, log them out
+                    localStorage.removeItem('authToken');
                 }
             }
-            // Whether there was a token or not, the initial check is complete.
             setIsLoading(false);
         };
+        checkLoggedInAdmin();
+    }, []);
 
-        fetchAdminData();
-    }, [token]); // This hook runs only when the token changes
+    const login = async (credentials) => {
+        const response = await api.post('/login', credentials);
+        
+        const loggedInUser = response.data.user;
+        const token = response.data.access_token;
 
-    // A simple, instant login function
-    const login = (credentials) => {
-        // --- THIS IS THE FIX ---
-        // We've changed the password to something less common
-        if (credentials.email === 'admin@example.com' && credentials.password === 'AdminPassword123!') {
-            const fakeAdmin = { name: 'Admin', email: 'admin@example.com', is_admin: true };
-            localStorage.setItem('adminAuthToken', 'fake-admin-token-123');
-            setAdmin(fakeAdmin);
-            return Promise.resolve(fakeAdmin);
+        // --- THIS IS THE CRITICAL FIX ---
+        // We must check for the property that the API actually sends: `is_admin`.
+        if (loggedInUser && loggedInUser.admin === 1) {
+            localStorage.setItem('authToken', token);
+            setUser(loggedInUser);
+        } else {
+            // This is the error you are seeing.
+            throw new Error('Access Denied: You do not have administrative privileges.');
         }
-        return Promise.reject(new Error('Invalid credentials'));
     };
 
-    // A simple, instant logout function
     const logout = () => {
-        localStorage.removeItem('adminAuthToken');
-        setAdmin(null);
+        localStorage.removeItem('authToken');
+        setUser(null);
+        // We can also call the API to invalidate the token on the server
+        api.post('/logout').catch(err => console.error("Logout API call failed:", err));
     };
 
-    const value = useMemo(() => ({
-        admin,
-        token,
-        isLoading, // Expose the loading state
-        login,
-        logout,
-    }), [admin, token, isLoading]);
+    const value = { user, isLoading, login, logout };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = () => {
