@@ -12,6 +12,7 @@ use App\Http\Requests\UpdateProfileRequest; // <-- 1. IMPORT
 use App\Http\Resources\ReviewResource; // <-- IMPORT
 use Illuminate\Support\Facades\Log; // 1. IMPORT
 use App\Http\Resources\Admin\AdminUserResource; // <-- 1. IMPORT
+use App\Models\User; // <-- 1. IMPORT
 use Exception; // 2. IMPORT
 
 class UserController extends Controller
@@ -122,5 +123,30 @@ class UserController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+
+
+    /**
+     * Remove the specified user from storage.
+     */
+    public function destroy(Request $request, User $user) // <-- 2. TYPE-HINT THE USER MODEL
+    {
+        $adminUser = $request->user();
+
+        // --- 3. SECURITY CHECK: PREVENT SELF-DELETION ---
+        if ($adminUser->id === $user->id) {
+            return response()->json(['message' => 'Admins cannot delete their own account.'], 403);
+        }
+
+        // Call the service to perform the deletion
+        $success = $this->userService->deleteUser($user);
+
+        if ($success) {
+            return response()->json(['message' => 'User and all their data deleted successfully.']);
+        }
+
+        return response()->json(['message' => 'Failed to delete the user.'], 500);
     }
 }

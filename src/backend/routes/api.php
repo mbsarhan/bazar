@@ -177,4 +177,8 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- ADD THIS ROUTE TO GET THE USERS LIST ---
     Route::get('/users', [UserController::class, 'index']);
+
+
+    // --- ADD THIS ROUTE FOR DELETING A USER ---
+    Route::delete('/users/{user}', [UserController::class, 'destroy']);
 });

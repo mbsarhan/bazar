@@ -66,6 +66,15 @@ export const AdminProvider = ({ children }) => {
     }, []);
 
 
+    /**
+     * Deletes a user by their ID.
+     */
+    const deleteUser = useCallback(async (userId) => {
+        const response = await api.delete(`/admin/users/${userId}`);
+        return response.data;
+    }, []);
+
+
 
     const value = {
         pendingUpdates,
@@ -76,6 +85,7 @@ export const AdminProvider = ({ children }) => {
         rejectUpdate,
         getPendingUpdateById,
         getAllUsers,
+        deleteUser,
     };
 
     return (

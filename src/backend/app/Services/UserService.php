@@ -12,6 +12,7 @@ use App\Models\UserRating; // <-- IMPORT
 use Illuminate\Support\Facades\DB; // <-- IMPORT
 use Ramsey\Uuid\Type\Integer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator; // <-- IMPORT
+use Illuminate\Support\Facades\Storage; // <-- 2. IMPORT
 
 class UserService
 {
@@ -141,5 +142,54 @@ class UserService
             ->latest()
             // Paginate the results
             ->paginate(20);
+    }
+
+
+
+    /**
+     * Delete a user and all of their associated ads and media files.
+     */
+    public function deleteUser(User $userToDelete): bool
+    {
+        return DB::transaction(function () use ($userToDelete) {
+            // 1. Eager-load all nested relationships needed for file cleanup.
+            $userToDelete->load([
+                'advertisements.carDetails.ImagesForCar',
+                'advertisements.realEstateDetails.ImageForRealestate'
+            ]);
+
+            // 2. Loop through all of the user's advertisements to delete stored files.
+            foreach ($userToDelete->advertisements as $ad) {
+                // Delete Car Ad Images
+                if ($ad->carDetails && $ad->carDetails->ImagesForCar) {
+                    foreach ($ad->carDetails->ImagesForCar as $image) {
+                        Storage::disk('public')->delete($image->image_url);
+                    }
+                }
+
+                // Delete Real Estate Ad Images and Videos
+                if ($ad->realEstateDetails) {
+                    // Delete images
+                    foreach ($ad->realEstateDetails->ImageForRealestate as $image) {
+                        Storage::disk('public')->delete($image->image_url);
+                    }
+                    // Delete video files (originals and HLS folders)
+                    if ($ad->realEstateDetails->video_url) {
+                        Storage::disk('public')->delete($ad->realEstateDetails->video_url);
+                    }
+                    if ($ad->realEstateDetails->hls_url) {
+                        // The hls_url is a path to a file (master.m3u8). We delete its parent directory.
+                        $hlsDirectory = dirname($ad->realEstateDetails->hls_url);
+                        Storage::disk('public')->deleteDirectory($hlsDirectory);
+                    }
+                }
+            }
+
+            // 3. Delete the user from the database.
+            // The `onDelete('cascade')` on the 'advertisements' table's foreign key
+            // will automatically delete all of the user's ads, which will in turn
+            // cascade down to delete all their car_ads, realestate_ads, and image records.
+            return $userToDelete->delete();
+        });
     }
 }

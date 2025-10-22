@@ -8,7 +8,7 @@ const ManageUsers = () => {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const { getAllUsers } = useAdmin(); // 2. GET THE FUNCTION
+    const { getAllUsers, deleteUser } = useAdmin(); // 1. GET THE deleteUser FUNCTION
 
     // --- Mock Data (to be replaced by API call) ---
     const mockUsers = [
@@ -35,12 +35,17 @@ const ManageUsers = () => {
         fetchUsers();
     }, [getAllUsers]);
 
-    const handleDeleteUser = (userId) => {
-        // In a real app, you would show a confirmation modal first
-        if (window.confirm(`هل أنت متأكد أنك تريد حذف المستخدم رقم ${userId}؟`)) {
-            // API call: await api.delete(`/admin/users/${userId}`);
-            console.log(`Deleting user ${userId}`);
-            setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+    // --- 2. UPDATE THE handleDeleteUser FUNCTION ---
+    const handleDeleteUser = async (userId) => {
+        if (window.confirm(`هل أنت متأكد أنك تريد حذف المستخدم رقم ${userId}؟ سيتم حذف جميع إعلاناته وبياناته بشكل دائم.`)) {
+            try {
+                await deleteUser(userId);
+                // On success, filter the user from the local state for an instant UI update
+                setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+            } catch (err) {
+                // Display the error message from the server (e.g., "Admins cannot delete their own account.")
+                alert(err.response?.data?.message || 'Failed to delete the user.');
+            }
         }
     };
 
