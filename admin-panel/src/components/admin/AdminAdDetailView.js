@@ -1,31 +1,61 @@
 // admin-panel/src/components/admin/AdminAdDetailView.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link ,useNavigate } from 'react-router-dom';
 import { carAdsData, realEstateAdsData } from './mockDataForAdmin';
+import { useAdmin } from '../../context/AdminContext'; // Use the admin context
 
 const AdminAdDetailView = () => {
     const { adId } = useParams();
+    const navigate = useNavigate();
+    const { getPendingUpdateById, approveUpdate, rejectUpdate } = useAdmin();
+
+
 
     const [ad, setAd] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
+    // Fetch the detailed pending update data
     useEffect(() => {
-        const fetchAd = async () => {
+        const fetchDetails = async () => {
+            setIsLoading(true);
+            setError(null);
             try {
-                const allAds = [...carAdsData, ...realEstateAdsData];
-                const foundAd = allAds.find(a => a.id == adId);
-                if (!foundAd) throw new Error("Ad not found");
-                setAd(foundAd);
+                const data = await getPendingUpdateById(adId);
+                setAd(data);
             } catch (err) {
-                console.error(err);
+                setError("Failed to fetch ad details.");
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchAd();
-    }, [adId]);
+        fetchDetails();
+    }, [adId, getPendingUpdateById]);
+
+
+    const handleApprove = async () => {
+        try {
+            await approveUpdate(adId);
+            alert("Update Approved!");
+            navigate('/manage-ads');
+        } catch (err) {
+            alert("Failed to approve update.");
+        }
+    };
+
+
+    const handleReject = async () => {
+        try {
+            await rejectUpdate(adId);
+            alert("Update Rejected!");
+            navigate('/manage-ads');
+        } catch (err) {
+            alert("Failed to reject update.");
+        }
+    };
 
     if (isLoading) return <p>جاري تحميل تفاصيل الإعلان...</p>;
+    if (error) return <p className="error-message">{error}</p>;
     if (!ad) return <p>لم يتم العثور على الإعلان.</p>;
 
     return (
@@ -43,8 +73,8 @@ const AdminAdDetailView = () => {
                     <li><strong>المعرف:</strong> {ad.id}</li>
                     <li><strong>العنوان:</strong> {ad.title}</li>
                     <li><strong>السعر:</strong> {ad.price}</li>
-                    <li><strong>صاحب الإعلان:</strong> {ad.user.name} (ID: {ad.user.id})</li>
-                    <li><strong>تاريخ النشر:</strong> {ad.date}</li>
+                    <li><strong>صاحب الإعلان:</strong> {ad.owner.name} (ID: {ad.owner.id})</li>
+                    <li><strong>تاريخ النشر:</strong> {ad.created_at}</li>
                     <li><strong>الحالة الحالية:</strong> {ad.status}</li>
                 </ul>
 
@@ -55,8 +85,8 @@ const AdminAdDetailView = () => {
                 </ul>
                 
                 <div className="actions-cell" style={{ marginTop: '30px' }}>
-                    <button className="action-btn approve">موافقة على الإعلان</button>
-                    <button className="action-btn reject">رفض الإعلان</button>
+                    <button className="action-btn approve" onClick={handleApprove}>موافقة على الإعلان</button>
+                    <button className="action-btn reject" onClick={handleReject}>رفض الإعلان</button>
                 </div>
             </div>
         </div>

@@ -188,6 +188,7 @@ class CarAdService
                 }
             }
             
+            $ad->ad_status = 'قيد المراجعة';
             // 3. Create the new pending update record
             PendingAdvertisementUpdate::create([
                 'advertisement_id' => $ad->id,
@@ -201,6 +202,8 @@ class CarAdService
                 'city' => $data['city'],
                 'negotiable_check' => $data['negotiable_check'],
                 'geo_location' => $ad->geo_location,
+                'views_count' => $ad->views_count,
+                'ad_status' =>  $ad->ad_status,
                 
                 // Car ad fields
                 'manufacturer' => $data['manufacturer'],
@@ -216,7 +219,6 @@ class CarAdService
             ]);
 
             // 4. Set the original ad's status to "pending review"
-            $ad->ad_status = 'قيد المراجعة';
             $ad->save();
 
             return ['message' => 'تم إرسال تعديلاتك للمراجعة بنجاح.'];

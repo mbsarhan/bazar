@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAds } from '../context/AdContext'; // <-- 1. IMPORT THE NEW HOOK
 import { useLocation } from '../context/LocationContext'; // 1. Import location hook
 import { locationData } from '../context/locationData'; // 2. Import location data
+import { carData } from '../context/carData';
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
 
@@ -41,6 +42,8 @@ const AddCarForm = () => {
         description: '',
     });
 
+    const [availableModels, setAvailableModels] = useState([]);
+    const [availableYears, setAvailableYears] = useState([]);
     const [mandatoryImages, setMandatoryImages] = useState({
         front: null, back: null, side1: null, side2: null,
     });
@@ -65,6 +68,48 @@ const AddCarForm = () => {
         // إزالة الخطأ من الحقل عند بدء الكتابة فيه
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: false }));
+        }
+    };
+
+    const handleManufacturerChange = (e) => {
+        const selectedMakeName = e.target.value;
+        setFormData(prev => ({
+            ...prev,
+            manufacturer: selectedMakeName,
+            model: '', // Reset model
+            model_year: '' // Reset year
+        }));
+
+        const selectedMake = carData.find(make => make.make_name === selectedMakeName);
+        if (selectedMake) {
+            setAvailableModels(Object.keys(selectedMake.models));
+        } else {
+            setAvailableModels([]);
+        }
+        setAvailableYears([]); // Clear years when make changes
+        if (errors.manufacturer) {
+            setErrors(prev => ({ ...prev, manufacturer: false }));
+        }
+    };
+
+    // --- NEW HANDLER FOR MODEL SELECTION ---
+    const handleModelChange = (e) => {
+        const selectedModelName = e.target.value;
+        setFormData(prev => ({
+            ...prev,
+            model: selectedModelName,
+            model_year: '' // Reset year
+        }));
+
+        const selectedMake = carData.find(make => make.make_name === formData.manufacturer);
+        if (selectedMake && selectedMake.models[selectedModelName]) {
+            const years = [...selectedMake.models[selectedModelName].years].sort((a, b) => b - a); // Sort descending
+            setAvailableYears(years);
+        } else {
+            setAvailableYears([]);
+        }
+        if (errors.model) {
+            setErrors(prev => ({ ...prev, model: false }));
         }
     };
 
@@ -163,6 +208,21 @@ const AddCarForm = () => {
             fetchAdData();
         }
     }, [country, adId, getAdById, isEditMode]);
+
+    useEffect(() => {
+        if (isEditMode && formData.manufacturer) {
+            const selectedMake = carData.find(make => make.make_name === formData.manufacturer);
+            if (selectedMake) {
+                const models = Object.keys(selectedMake.models);
+                setAvailableModels(models);
+
+                if (formData.model && selectedMake.models[formData.model]) {
+                    const years = [...selectedMake.models[formData.model].years].sort((a, b) => b - a);
+                    setAvailableYears(years);
+                }
+            }
+        }
+    }, [isEditMode, formData.manufacturer, formData.model]); // Re-run when fetched data is ready
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -344,16 +404,30 @@ const AddCarForm = () => {
                         </div>
                         <div className="form-group">
                             <label htmlFor="manufacturer">الشركة المصنّعة *</label>
-                            <input type="text" id="manufacturer" name="manufacturer" value={formData.manufacturer} onChange={handleChange} className={errors.manufacturer ? 'input-error' : ''} />
+                            <select id="manufacturer" name="manufacturer" value={formData.manufacturer} onChange={handleManufacturerChange} className={errors.manufacturer ? 'input-error' : ''}>
+                                <option value="">-- اختر الشركة --</option>
+                                {carData.map(make => <option key={make.make_id} value={make.make_name}>{make.make_name}</option>)}
+                            </select>
                         </div>
+
+                        {/* --- UPDATED MODEL DROPDOWN --- */}
                         <div className="form-group">
                             <label htmlFor="model">الموديل *</label>
-                            <input type="text" id="model" name="model" value={formData.model} onChange={handleChange} className={errors.model ? 'input-error' : ''} />
+                            <select id="model" name="model" value={formData.model} onChange={handleModelChange} disabled={!formData.manufacturer} className={errors.model ? 'input-error' : ''}>
+                                <option value="">-- اختر الموديل --</option>
+                                {availableModels.map(modelName => <option key={modelName} value={modelName}>{modelName}</option>)}
+                            </select>
                         </div>
+
+                        {/* --- UPDATED YEAR DROPDOWN --- */}
                         <div className="form-group">
                             <label htmlFor="model_year">سنة الصنع *</label>
-                            <input type="text" id="model_year" name="model_year" value={formData.model_year} onChange={handleChange} placeholder="مثال: 2022" className={errors.model_year ? 'input-error' : ''} />
+                            <select id="model_year" name="model_year" value={formData.model_year} onChange={handleChange} disabled={!formData.model} className={errors.model_year ? 'input-error' : ''}>
+                                <option value="">-- اختر السنة --</option>
+                                {availableYears.map(year => <option key={year} value={year}>{year}</option>)}
+                            </select>
                         </div>
+
                         <div className="form-group">
                             <label htmlFor="condition">الحالة</label>
                             <select id="condition" name="condition" value={formData.condition} onChange={handleChange}>{conditions.map(c => <option key={c} value={c}>{c}</option>)}</select>

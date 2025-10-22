@@ -138,7 +138,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 //-------------------------------------------------------------------------------------------------------------
 
-
 // --- ADMIN ROUTES ---
 // We can create a new middleware group for admins to keep things organized.
 // The 'auth:sanctum' ensures they are logged in. We can add a custom 'is_admin' middleware later.
@@ -159,4 +158,8 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
         
     // You can add a route to list all pending updates here later
     // Route::get('/pending-updates', [PendingUpdateController::class, 'index']);
+
+
+    // --- ADD THIS ROUTE TO GET A SINGLE PENDING UPDATE ---
+    Route::get('/pending-updates/{pendingUpdate}', [PendingUpdateController::class, 'show']);
 });

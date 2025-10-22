@@ -42,6 +42,18 @@ export const AdminProvider = ({ children }) => {
         return response.data;
     }, []); // And this one too
 
+
+
+     /**
+     * Fetches the full details of a single pending update.
+     */
+    const getPendingUpdateById = async (pendingUpdateId) => {
+        const response = await api.get(`/admin/pending-updates/${pendingUpdateId}`);
+        // A single resource is wrapped in a 'data' key
+        return response.data.data;
+    };
+
+
     const value = {
         pendingUpdates,
         isLoading,
@@ -49,6 +61,7 @@ export const AdminProvider = ({ children }) => {
         getPendingUpdates,
         approveUpdate,
         rejectUpdate,
+        getPendingUpdateById,
     };
 
     return (
