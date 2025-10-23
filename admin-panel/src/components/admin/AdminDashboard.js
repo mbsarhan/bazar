@@ -1,15 +1,18 @@
 // admin-panel/src/components/admin/AdminDashboard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // 1. Import the necessary components from recharts
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, FileText, Clock } from 'lucide-react';
 import '../../styles/AdminPages.css';
+import { useAdmin } from '../../context/AdminContext';
 
 
 const AdminDashboard = () => {
-    // --- Mock Data (to be replaced by API calls) ---
-    const [stats, setStats] = useState({ totalUsers: 125, totalAds: 210, pendingAds: 3 });
+    const [stats, setStats] = useState({ totalUsers: 0, totalAds: 0, pendingAds: 0 });
+    // const [isLoading, setIsLoading] = useState(true);
+    // const [error, setError] = useState(null);
+    const { getDashboardStats, isLoading, error } = useAdmin(); // <-- 2. GET THE FUNCTION FROM THE CONTEXT
     const chartData = [
         { name: 'السبت', 'عدد الإعلانات': 12 },
         { name: 'الأحد', 'عدد الإعلانات': 19 },
@@ -19,6 +22,29 @@ const AdminDashboard = () => {
         { name: 'الخميس', 'عدد الإعلانات': 9 },
         { name: 'الجمعة', 'عدد الإعلانات': 13 },
     ];
+
+    // --- 3. FETCH DATA WHEN THE COMPONENT MOUNTS ---
+    useEffect(() => {
+        const fetchStats = async () => {
+            // The context will automatically handle setting loading and error states.
+            // We just need to get the data and update our local 'stats' state.
+            try {
+                const data = await getDashboardStats();
+                if (data) { // Check if data is not null/undefined
+                    setStats(data);
+                }
+            } catch (err) {
+                // The context already logged the error, but we can have a fallback.
+                console.error("Dashboard component failed to get stats.");
+            }
+        };
+
+        fetchStats();
+    }, [getDashboardStats]); // Dependency array ensures it runs once
+
+    if (error) {
+        return <div className="error-message" style={{ margin: '20px' }}>حدث خطأ: {error}</div>;
+    }
 
     return (
         <div>
@@ -44,7 +70,7 @@ const AdminDashboard = () => {
                     <p>إعلانات قيد المراجعة</p>
                 </Link>
             </div>
-            
+
             {/* --- Chart and Recent Activity Section --- */}
             <div className="chart-container">
                 <h3 className="chart-title">الإعلانات الجديدة في آخر 7 أيام</h3>
@@ -59,11 +85,11 @@ const AdminDashboard = () => {
                         <YAxis tick={{ fontFamily: 'Cairo', fontSize: 12 }} />
                         <Tooltip
                             cursor={{ fill: 'rgba(144, 238, 144, 0.1)' }}
-                            contentStyle={{ 
-                                backgroundColor: '#33363b', 
+                            contentStyle={{
+                                backgroundColor: '#33363b',
                                 border: 'none',
                                 borderRadius: '8px',
-                                fontFamily: 'Cairo' 
+                                fontFamily: 'Cairo'
                             }}
                             labelStyle={{ color: 'white' }}
                         />

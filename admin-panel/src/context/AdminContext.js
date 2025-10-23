@@ -74,7 +74,19 @@ export const AdminProvider = ({ children }) => {
         return response.data;
     }, []);
 
-
+    // --- 1. ADD THE NEW FUNCTION FOR DASHBOARD STATISTICS ---
+    const getDashboardStats = useCallback(async () => {
+        try {
+            // This calls your backend route: GET /api/dashboard/statistics
+            // The 'api' client automatically sends the auth token.
+            const response = await api.get('/admin/dashboard/statistics');
+            return response.data; // This endpoint returns the data directly, not wrapped in a 'data' key
+        } catch (err) {
+            console.error("Failed to fetch dashboard statistics:", err);
+            // Re-throw the error so the component can see it failed
+            throw err;
+        }
+    }, []);
 
     const value = {
         pendingUpdates,
@@ -86,6 +98,7 @@ export const AdminProvider = ({ children }) => {
         getPendingUpdateById,
         getAllUsers,
         deleteUser,
+        getDashboardStats,
     };
 
     return (

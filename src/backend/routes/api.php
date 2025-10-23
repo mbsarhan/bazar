@@ -173,4 +173,8 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- ADD THIS ROUTE FOR DELETING A USER ---
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
+
+
+    // --- THIS IS THE NEW ROUTE FOR THE CHART ---
+    Route::get('/dashboard/weekly-ads-chart', [AdminDashboardController::class, 'getWeeklyAdsChart']);
 });

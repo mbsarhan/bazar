@@ -8,11 +8,11 @@ use App\Services\Admin\AdminDashboardService;
 
 class AdminDashboardController extends Controller
 {
-    protected AdminDashboardService $admindashboardService;
+    protected AdminDashboardService $adminDashboardService;
 
-    public function __construct(AdminDashboardService $admindashboardService)
+    public function __construct(AdminDashboardService $adminDashboardService)
     {
-        $this->admindashboardService = $admindashboardService;
+        $this->adminDashboardService = $adminDashboardService;
     }
 
     /**
@@ -33,9 +33,30 @@ class AdminDashboardController extends Controller
         }
 
         // Delegate the logic to the service.
-        $statistics = $this->admindashboardService->getStatistics();
+        $statistics = $this->adminDashboardService->getStatistics();
 
         // Return the statistics as a JSON response.
         return response()->json($statistics);
+    }
+
+
+
+    /**
+     * --- THIS IS THE NEW METHOD ---
+     * Get data for the weekly ads chart.
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getWeeklyAdsChart(Request $request)
+    {
+        // We still need the security check to ensure only admins can access this data.
+        if (!$request->user()->admin) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        // Call the new service method
+        $chartData = $this->adminDashboardService->getWeeklyAdsChartData();
+
+        return response()->json($chartData);
     }
 }
