@@ -20,17 +20,19 @@ class AdminDashboardService
         $totalUsers = User::count();
 
         // 2. Get the total number of advertisements.
+        // --- 2. Get Detailed Car Ad Stats ---
+        // This is a powerful query that counts all statuses in a single database trip.
+        // 2. Get the ABSOLUTE total number of advertisements, regardless of status.
         $totalAds = Advertisement::count();
 
-        // 3. Get the number of ads with the specific 'pending' status.
-        // Make sure the string here exactly matches what you save in the database.
+      // 3. Get the count of ONLY pending advertisements.
         $pendingAds = Advertisement::where('ad_status', 'قيد المراجعة')->count();
 
         // 4. Return the data in a structured array.
         return [
             'totalUsers' => $totalUsers,
-            'totalAds' => $totalAds,
-            'pendingAds' => $pendingAds,
+        'totalAds'   => $totalAds,
+        'pendingAds' => $pendingAds,
         ];
     }
 

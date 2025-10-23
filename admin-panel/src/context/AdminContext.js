@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext , useCallback } from 'react';
+import React, { createContext, useState, useContext, useCallback } from 'react';
 import api from '../api'; // Your central axios client
 
 const AdminContext = createContext(null);
@@ -8,7 +8,7 @@ export const AdminProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-   
+
     const getPendingUpdates = useCallback(async () => {
         setIsLoading(true);
         setError(null);
@@ -24,9 +24,9 @@ export const AdminProvider = ({ children }) => {
         }
     }, []); // 3. The dependency array for useCallback is empty because it has no external dependencies
 
-   /**
-     * Approves a specific pending update by its ID.
-     */
+    /**
+      * Approves a specific pending update by its ID.
+      */
     const approveUpdate = useCallback(async (pendingUpdateId) => {
         const response = await api.post(`/admin/pending-updates/${pendingUpdateId}/approve`);
         setPendingUpdates(prev => prev.filter(update => update.id !== pendingUpdateId));
@@ -44,9 +44,9 @@ export const AdminProvider = ({ children }) => {
 
 
 
-     /**
-     * Fetches the full details of a single pending update.
-     */
+    /**
+    * Fetches the full details of a single pending update.
+    */
     const getPendingUpdateById = async (pendingUpdateId) => {
         const response = await api.get(`/admin/pending-updates/${pendingUpdateId}`);
         // A single resource is wrapped in a 'data' key
@@ -88,6 +88,19 @@ export const AdminProvider = ({ children }) => {
         }
     }, []);
 
+    // --- 1. ADD THE NEW FUNCTION FOR THE CHART DATA ---
+    const getWeeklyChartData = useCallback(async () => {
+        try {
+            // This calls your new backend route: GET /api/admin/dashboard/weekly-ads-chart
+            // Note: If your route is not in an 'admin' group, the URL would be '/dashboard/weekly-ads-chart'
+            const response = await api.get('/admin/dashboard/weekly-ads-chart');
+            return response.data; // The backend returns the array directly.
+        } catch (err) {
+            console.error("Failed to fetch weekly chart data:", err);
+            throw err; // Re-throw the error for the component to handle
+        }
+    }, []); // Empty dependency array makes this function stable
+
     const value = {
         pendingUpdates,
         isLoading,
@@ -99,6 +112,7 @@ export const AdminProvider = ({ children }) => {
         getAllUsers,
         deleteUser,
         getDashboardStats,
+        getWeeklyChartData,
     };
 
     return (

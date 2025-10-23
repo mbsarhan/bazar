@@ -10,37 +10,48 @@ import { useAdmin } from '../../context/AdminContext';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({ totalUsers: 0, totalAds: 0, pendingAds: 0 });
-    // const [isLoading, setIsLoading] = useState(true);
-    // const [error, setError] = useState(null);
-    const { getDashboardStats, isLoading, error } = useAdmin(); // <-- 2. GET THE FUNCTION FROM THE CONTEXT
-    const chartData = [
-        { name: 'السبت', 'عدد الإعلانات': 12 },
-        { name: 'الأحد', 'عدد الإعلانات': 19 },
-        { name: 'الاثنين', 'عدد الإعلانات': 8 },
-        { name: 'الثلاثاء', 'عدد الإعلانات': 15 },
-        { name: 'الأربعاء', 'عدد الإعلانات': 11 },
-        { name: 'الخميس', 'عدد الإعلانات': 9 },
-        { name: 'الجمعة', 'عدد الإعلانات': 13 },
-    ];
+    const { getDashboardStats, getWeeklyChartData, isLoading, error } = useAdmin();
+    // const chartData = [
+    //     { name: 'السبت', 'عدد الإعلانات': 12 },
+    //     { name: 'الأحد', 'عدد الإعلانات': 19 },
+    //     { name: 'الاثنين', 'عدد الإعلانات': 8 },
+    //     { name: 'الثلاثاء', 'عدد الإعلانات': 15 },
+    //     { name: 'الأربعاء', 'عدد الإعلانات': 11 },
+    //     { name: 'الخميس', 'عدد الإعلانات': 9 },
+    //     { name: 'الجمعة', 'عدد الإعلانات': 13 },
+    // ];
 
-    // --- 3. FETCH DATA WHEN THE COMPONENT MOUNTS ---
+    // --- 1. NEW STATE FOR THE CHART DATA ---
+    const [chartData, setChartData] = useState([]);
+
+    // --- 2. COMBINE DATA FETCHING INTO ONE useEffect HOOK ---
     useEffect(() => {
-        const fetchStats = async () => {
-            // The context will automatically handle setting loading and error states.
-            // We just need to get the data and update our local 'stats' state.
+        const fetchDashboardData = async () => {
             try {
-                const data = await getDashboardStats();
-                if (data) { // Check if data is not null/undefined
-                    setStats(data);
+                // Fetch both sets of data in parallel for better performance
+                const [statsData, weeklyData] = await Promise.all([
+                    getDashboardStats(),
+                    getWeeklyChartData()
+                ]);
+
+                // Update state for stat cards
+                if (statsData) {
+                    setStats(statsData);
                 }
+
+                // Update state for the chart
+                if (weeklyData) {
+                    setChartData(weeklyData);
+                }
+
             } catch (err) {
-                // The context already logged the error, but we can have a fallback.
-                console.error("Dashboard component failed to get stats.");
+                // The context already logs errors, but you can have a fallback
+                console.error("Dashboard component failed to fetch data.");
             }
         };
 
-        fetchStats();
-    }, [getDashboardStats]); // Dependency array ensures it runs once
+        fetchDashboardData();
+    }, [getDashboardStats, getWeeklyChartData]); // Depends on both functions from context
 
     if (error) {
         return <div className="error-message" style={{ margin: '20px' }}>حدث خطأ: {error}</div>;
