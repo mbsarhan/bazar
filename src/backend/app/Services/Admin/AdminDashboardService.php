@@ -2,6 +2,7 @@
 
 namespace App\Services\Admin;
 
+use App\Models\PendingAdvertisement;
 use App\Models\User;
 use App\Models\Advertisement;
 use Illuminate\Support\Facades\DB; 
@@ -26,7 +27,7 @@ class AdminDashboardService
         $totalAds = Advertisement::count();
 
       // 3. Get the count of ONLY pending advertisements.
-        $pendingAds = Advertisement::where('ad_status', 'قيد المراجعة')->count();
+        $pendingAds = PendingAdvertisement::count();
 
         // 4. Return the data in a structured array.
         return [
