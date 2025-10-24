@@ -22,7 +22,7 @@ class AdminUserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             // 'withCount' automatically creates a property named '{relation}_count'
-            'ads_count' => $this->advertisements_count, 
+            'ads_count' => $this->ads_num, 
         ];
     }
 }

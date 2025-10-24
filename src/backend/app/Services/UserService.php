@@ -132,15 +132,12 @@ class UserService
      */
     public function getAllUsers(User $adminUser): LengthAwarePaginator
     {
-        // Start a query on the User model
+        // --- THIS QUERY IS NOW SIMPLER AND FASTER ---
         return User::query()
-            // Exclude the ID of the admin making the request
             ->where('id', '!=', $adminUser->id)
-            // Efficiently count the number of advertisements for each user
-            ->withCount('advertisements')
-            // Order by newest users first
+            // We no longer need withCount(). We can just select the column.
+            ->select('id', 'fname', 'lname', 'email', 'phone', 'ads_num')
             ->latest()
-            // Paginate the results
             ->paginate(20);
     }
 

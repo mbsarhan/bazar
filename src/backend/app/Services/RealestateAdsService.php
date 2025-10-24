@@ -111,6 +111,11 @@ class RealestateAdsService{
 
                 $this->uploadImages($realestateAd, $data['images']);
 
+
+                // --- ADD THIS LINE ---
+                $user->increment('ads_num');
+
+
                 return $advertisement;
 
             } catch (Exception $e) {
@@ -160,6 +165,12 @@ class RealestateAdsService{
     {
         return DB::transaction(function () use ($ad) {
             try {
+
+
+                $owner = $ad->owner;
+
+
+
                 // 3. Delete associated images from storage
                 $ad->load(['realEstateDetails', 'realEstateDetails.ImageForRealestate']);
 
@@ -178,7 +189,13 @@ class RealestateAdsService{
 
                 // 4. Delete the advertisement record from the database.
                 // Cascading deletes will handle the rest.
-                return $ad->delete();
+                $deleted = $ad->delete() ;
+
+                // --- ADD THIS LOGIC ---
+            if ($deleted && $owner) {
+                $owner->decrement('ads_num');
+            }
+                return $deleted;
 
             } catch (Exception $e) {
                 Log::error('Error Deleting RealEstate Ad', ['ad_id' => $ad->id, 'error' => $e->getMessage()]);
