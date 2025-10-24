@@ -49,6 +49,11 @@ class CarAdService
                 // 3. Handle Image Uploads
                 $this->uploadImages($carAd, $data);
 
+                
+                // --- ADD THIS LINE ---
+                // Increment the ads_num counter on the user's record.
+                $user->increment('ads_num');
+
                 return ['message' => 'تم إنشاء إعلانك بنجاح وسيكون متاحاً بعد المراجعة.'];
 
             } catch (Exception $e) {
@@ -145,6 +150,8 @@ class CarAdService
         */
         return DB::transaction(function () use ($ad) {
             try {
+                // Get the owner before deleting the ad
+                $owner = $ad->owner;
                 // 3. Delete associated images from storage
                 $ad->load(['carDetails', 'carDetails.ImagesForCar']);
 
@@ -156,7 +163,15 @@ class CarAdService
 
                 // 4. Delete the advertisement record from the database.
                 // Cascading deletes will handle the rest.
-                return $ad->delete();
+                
+
+                $deleted = $ad->delete();
+                // --- ADD THIS LOGIC ---
+                // If the deletion was successful and an owner exists, decrement their count.
+                if ($deleted && $owner) {
+                    $owner->decrement('ads_num');
+                }
+                return $deleted ;
 
             } catch (Exception $e) {
                 Log::error('Error Deleting Car Ad', ['ad_id' => $ad->id, 'error' => $e->getMessage()]);
