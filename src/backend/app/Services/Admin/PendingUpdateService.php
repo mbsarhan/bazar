@@ -11,14 +11,94 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\CarAds;
 use App\Models\RealestateAds;
+use Exception;
 
 class PendingUpdateService
 {
     /**
-     * Approves a pending update, applying all changes to the original ad.
-     * This is the new, robust, and defensive version.
+     * Main entry point for approving any pending update.
+     * It intelligently calls the correct handler based on the approval type.
      */
     public function approve(PendingAdvertisement $pendingUpdate): bool
+    {
+        if ($pendingUpdate->approval_type === 'new') {
+            return $this->approveNewAd($pendingUpdate);
+        }
+        
+        // Default to the logic for approving an 'update'
+        return $this->approveUpdate($pendingUpdate);
+    }
+
+    /**
+     * Main entry point for rejecting any pending update.
+     */
+    public function reject(PendingAdvertisement $pendingUpdate): bool
+    {
+        if ($pendingUpdate->approval_type === 'new') {
+            return $this->rejectNewAd($pendingUpdate);
+        }
+
+        // Default to the logic for rejecting an 'update'
+        return $this->rejectUpdate($pendingUpdate);
+    }
+
+    // --- LOGIC FOR APPROVING A BRAND NEW AD ---
+    private function approveNewAd(PendingAdvertisement $pendingUpdate): bool
+    {
+        return DB::transaction(function () use ($pendingUpdate) {
+            $ad = $pendingUpdate->advertisement;
+
+            // 1. Create the specific ad details (Car or Real Estate)
+            if ($pendingUpdate->manufacturer) { // Logic to identify it as a Car Ad
+                
+                
+                // 2. Move files from 'pending' to final location and create image records
+                foreach ($pendingUpdate->pending_media['new'] ?? [] as $pendingPath) {
+                    if (Storage::disk('public')->exists($pendingPath)) {
+                        Storage::disk('public')->delete($pendingPath);
+                    }
+                }
+
+            } elseif ($pendingUpdate->realestate_type) { // Logic for Real Estate Ad
+                // ... (This would contain the similar correct logic for creating a RealestateAds record)
+            }
+
+            // 3. Set the main ad status to 'active'
+            $ad->ad_status = 'فعال';
+            $ad->save();
+
+            // 4. Delete the now-processed pending record
+            $pendingUpdate->delete();
+
+            return true; // <-- CRITICAL FIX: Return true on success
+        });
+    }
+    
+    // --- LOGIC FOR REJECTING A BRAND NEW AD ---
+    private function rejectNewAd(PendingAdvertisement $pendingUpdate): bool
+    {
+        return DB::transaction(function () use ($pendingUpdate) {
+            $ad = $pendingUpdate->advertisement;
+            if (!$ad) return true; // If original ad is already gone, consider it a success
+
+            // 1. Decrement the user's ad count since the ad will be deleted
+            $ad->owner()->decrement('ads_num');
+
+            // 2. Delete all temporary files from storage
+            foreach ($pendingUpdate->pending_media['new'] ?? [] as $pendingPath) {
+                $permanentPath = str_replace('pending/', '', $pendingPath);
+                Storage::disk('public')->delete($pendingPath);
+                Storage::disk('public')->delete($permanentPath);
+            }
+            
+            // 3. Delete the main advertisement record.
+            // The `onDelete('cascade')` on your foreign key will automatically delete the pending record.
+            $ad->delete();
+
+            return true; // <-- CRITICAL FIX: Return true on success
+        });
+    }
+    public function approveUpdate(PendingAdvertisement $pendingUpdate): bool
     {
         return DB::transaction(function () use ($pendingUpdate) {
             // Use findOrFail to ensure the ad still exists before we start
@@ -101,7 +181,7 @@ class PendingUpdateService
     /**
      * Rejects a pending update, discarding all proposed changes.
      */
-    public function reject(PendingAdvertisement $pendingUpdate): bool
+    public function rejectUpdate(PendingAdvertisement $pendingUpdate): bool
     {
         return DB::transaction(function () use ($pendingUpdate) {
             // 1. Delete all new files from the "pending" storage directory

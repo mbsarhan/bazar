@@ -49,6 +49,49 @@ class CarAdService
                 // 3. Handle Image Uploads
                 $this->uploadImages($carAd, $data);
 
+
+                // 2. Handle new file uploads - store them in the "pending" directory
+            $pendingMedia = ['new' => [], 'removed' => []]; // No removed images for a new ad
+            $fileKeys = ['front', 'back', 'side1', 'side2', 'extra_images'];
+            foreach ($fileKeys as $key) {
+                if (isset($data[$key])) {
+                    $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
+                    foreach ($files as $file) {
+                        $path = $file->store('pending/images/cars', 'public');
+                        $pendingMedia['new'][] = $path;
+                    }
+                }
+            }
+
+            // 3. Create the pending record with the full ad snapshot
+            PendingAdvertisement::create([
+                'advertisement_id' => $advertisement->id,
+                'approval_type'    => 'new', // <-- Mark this as a 'new' ad approval
+
+                // Advertisement fields
+                'title'            => $data['manufacturer']." ".$data['model']." ".$data['model_year'],
+                'price' => $data['price'],
+                'description' => $data['description'] ?? null,
+                'transaction_type' => $data['transaction_type'],
+                'governorate' => $data['governorate'],
+                'city' => $data['city'],
+                'geo_location' => $data['geo_location'],
+                'negotiable_check' => $data['negotiable_check'],
+                'views_count' => 0, // Set defaults
+                'ad_status' => 'قيد المراجعة',
+                
+                // Car ad fields
+                'manufacturer' => $data['manufacturer'],
+                'model' => $data['model'],
+                'model_year' => $data['model_year'],
+                'condition' => $data['condition'],
+                'gear' => $data['gear'],
+                'fuel_type' => $data['fuel_type'],
+                'distance_traveled' => $data['distance_traveled'],
+                
+                'pending_media' => $pendingMedia,
+            ]);
+
                 
                 // --- ADD THIS LINE ---
                 // Increment the ads_num counter on the user's record.
@@ -231,6 +274,9 @@ class CarAdService
                 
                 // Media tracking
                 'pending_media' => $pendingMedia,
+
+
+                'approval_type' => 'update', // Mark as an 'update'
             ]);
 
             // 4. Set the original ad's status to "pending review"
