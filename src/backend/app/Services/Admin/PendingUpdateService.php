@@ -61,6 +61,12 @@ class PendingUpdateService
 
             } elseif ($pendingUpdate->realestate_type) { // Logic for Real Estate Ad
                 // ... (This would contain the similar correct logic for creating a RealestateAds record)
+                // 2. Move files from 'pending' to final location and create image records
+                foreach ($pendingUpdate->pending_media['new'] ?? [] as $pendingPath) {
+                    if (Storage::disk('public')->exists($pendingPath)) {
+                        Storage::disk('public')->delete($pendingPath);
+                    }
+                }
             }
 
             // 3. Set the main ad status to 'active'

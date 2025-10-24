@@ -112,6 +112,61 @@ class RealestateAdsService{
                 $this->uploadImages($realestateAd, $data['images']);
 
 
+                // 2. Handle new file uploads - store them in the "pending" directory
+            $pendingMedia = ['new' => [], 'removed' => []]; // No removed images for a new ad
+            $fileKeys = ['images'];
+            foreach ($fileKeys as $key) {
+                if (isset($data[$key])) {
+                    $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
+                    foreach ($files as $file) {
+                        $path = $file->store('pending/images/real-estate', 'public');
+                        $pendingMedia['new'][] = $path;
+                    }
+                }
+            }
+
+            if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
+                $path = $data['video']->store('pending/videos/real-estate', 'public');
+                $pendingMedia['new_video'] = $path; // Store separately for clarity
+            }
+
+
+
+            // 3. Create the pending record with the full ad snapshot
+            PendingAdvertisement::create([
+                'advertisement_id' => $advertisement->id,
+                'approval_type'    => 'new', // <-- Mark this as a 'new' ad approval
+
+                // Advertisement fields
+                'title'            => $data['title'],
+                'price' => $data['price'],
+                'description' => $data['description'] ?? null,
+                'transaction_type' => $data['transaction_type'],
+                'governorate' => $data['governorate'],
+                'city' => $data['city'],
+                'geo_location' => $data['geo_location'],
+                'negotiable_check' => $data['negotiable_check'],
+                'views_count' => 0, // Set defaults
+                'ad_status' => 'قيد المراجعة',
+                
+                // Real-Estate ad fields
+                'ads_id'              => $advertisement->id,
+                'realestate_type'     => $data['realestate_type'],
+                'detailed_address'    => $data['detailed_address'],
+                'area'                => $data['area'],
+                'bedroom_num'         => $data['bedroom_num'] ?? null,
+                'bathroom_num'        => $data['bathroom_num'] ?? null,
+                'floor_num'           => $data['floor_num'] ?? null,
+                'building_status'     => $data['building_status'],
+                'cladding_condition'  => $data['cladding_condition'],
+                
+
+
+                
+                'pending_media' => $pendingMedia,
+            ]);
+
+
                 // --- ADD THIS LINE ---
                 $user->increment('ads_num');
 
