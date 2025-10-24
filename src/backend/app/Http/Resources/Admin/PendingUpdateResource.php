@@ -15,7 +15,7 @@ class PendingUpdateResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-       // $this refers to the PendingAdvertisementUpdate model
+       // $this refers to the PendingAdvertisement model
         return [
             'id' => $this->id, // The ID of the pending update itself
             'advertisement_id' => $this->advertisement_id,

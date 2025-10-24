@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\PendingAdvertisementUpdate;
+use App\Models\PendingAdvertisement;
 use App\Services\Admin\PendingUpdateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -33,7 +33,7 @@ class PendingUpdateController extends Controller
         }
 
         // --- UPDATE THIS LINE to include the owner ---
-        $pendingUpdates = PendingAdvertisementUpdate::with('advertisement.owner:id,fname,lname')
+        $pendingUpdates = PendingAdvertisement::with('advertisement.owner:id,fname,lname')
                                                     ->latest()
                                                     ->paginate(15);
 
@@ -44,7 +44,7 @@ class PendingUpdateController extends Controller
 
 
 
-    public function approve(Request $request, PendingAdvertisementUpdate $pendingUpdate)
+    public function approve(Request $request, PendingAdvertisement $pendingUpdate)
     {
         if (!$request->user()->admin) {
             return response()->json(['message' => 'Unauthorized.'], 403);
@@ -80,7 +80,7 @@ class PendingUpdateController extends Controller
     /**
      * Reject a pending advertisement update.
      */
-    public function reject(Request $request, PendingAdvertisementUpdate $pendingUpdate)
+    public function reject(Request $request, PendingAdvertisement $pendingUpdate)
     {
         // --- AUTHORIZATION ---
         if (!$request->user()->admin) {
@@ -112,7 +112,7 @@ class PendingUpdateController extends Controller
     /**
      * Display the specified pending update, formatted as a full Advertisement.
      */
-    public function show(Request $request, PendingAdvertisementUpdate $pendingUpdate)
+    public function show(Request $request, PendingAdvertisement $pendingUpdate)
     {
         if (!$request->user()->admin) {
             return response()->json(['message' => 'Unauthorized.'], 403);

@@ -45,6 +45,6 @@ class Advertisement extends Model
      */
     public function pendingUpdate()
     {
-        return $this->hasOne(PendingAdvertisementUpdate::class);
+        return $this->hasOne(PendingAdvertisement::class);
     }
 }

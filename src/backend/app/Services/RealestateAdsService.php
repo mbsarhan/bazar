@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request; // <-- 1. IMPOR
-use App\Models\PendingAdvertisementUpdate; // <-- 1. IMPORT
+use App\Models\PendingAdvertisement; // <-- 1. IMPORT
 
 class RealestateAdsService{
    
@@ -245,7 +245,7 @@ class RealestateAdsService{
             $pendingData['ad_status'] = $ad->ad_status;     // <-- Save the current status
 
             // 5. Create the new pending update record with the complete snapshot
-            PendingAdvertisementUpdate::create($pendingData);
+            PendingAdvertisement::create($pendingData);
 
             // 6. Set the original ad's status to "pending review"
             $ad->ad_status = 'قيد المراجعة';

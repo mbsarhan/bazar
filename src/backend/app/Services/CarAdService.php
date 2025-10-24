@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage; // 1. IMPORT
 use Illuminate\Http\Request; // <-- 1. IMPOR
-use App\Models\PendingAdvertisementUpdate; // <-- IMPORT
+use App\Models\PendingAdvertisement; // <-- IMPORT
 use Exception;
 
 class CarAdService
@@ -205,7 +205,7 @@ class CarAdService
             
             $ad->ad_status = 'قيد المراجعة';
             // 3. Create the new pending update record
-            PendingAdvertisementUpdate::create([
+            PendingAdvertisement::create([
                 'advertisement_id' => $ad->id,
                 
                 // Advertisement fields

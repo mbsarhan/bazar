@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PendingAdvertisementUpdate extends Model
+class PendingAdvertisement extends Model
 {
     use HasFactory;
+
+
+    protected $table = 'pending_advertisements'; // <-- UPDATE THIS LINE
 
     // Use a guarded property to allow all other fields to be mass-assignable
     protected $guarded = ['id'];

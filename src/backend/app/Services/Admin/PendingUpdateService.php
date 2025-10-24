@@ -4,7 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\Advertisement;
 use App\Models\CarAdImage;
-use App\Models\PendingAdvertisementUpdate;
+use App\Models\PendingAdvertisement;
 use App\Models\RealestateImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +18,7 @@ class PendingUpdateService
      * Approves a pending update, applying all changes to the original ad.
      * This is the new, robust, and defensive version.
      */
-    public function approve(PendingAdvertisementUpdate $pendingUpdate): bool
+    public function approve(PendingAdvertisement $pendingUpdate): bool
     {
         return DB::transaction(function () use ($pendingUpdate) {
             // Use findOrFail to ensure the ad still exists before we start
@@ -101,7 +101,7 @@ class PendingUpdateService
     /**
      * Rejects a pending update, discarding all proposed changes.
      */
-    public function reject(PendingAdvertisementUpdate $pendingUpdate): bool
+    public function reject(PendingAdvertisement $pendingUpdate): bool
     {
         return DB::transaction(function () use ($pendingUpdate) {
             // 1. Delete all new files from the "pending" storage directory
@@ -129,7 +129,7 @@ class PendingUpdateService
      * Creates a "virtual" Advertisement model from a pending update record.
      * This allows us to reuse our existing API Resources.
      */
-    public function buildVirtualAdFromPendingUpdate(PendingAdvertisementUpdate $pendingUpdate): Advertisement
+    public function buildVirtualAdFromPendingUpdate(PendingAdvertisement $pendingUpdate): Advertisement
     {
         // 1. Create a new, in-memory Advertisement instance and fill it with pending data.
         $virtualAd = new Advertisement();
