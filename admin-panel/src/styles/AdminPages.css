@@ -258,3 +258,33 @@ table tbody tr:hover {
     margin-top: 0;
     margin-bottom: 25px;
 }
+
+/* ============================================= */
+/* Shimmer Animation (copied from other project) */
+/* ============================================= */
+.skeleton {
+    background-color: #f0f0f0;
+    position: relative;
+    overflow: hidden;
+}
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
+    transform: translateX(-100%);
+    animation: shimmer 1.8s infinite;
+}
+@keyframes shimmer {
+    100% { transform: translateX(100%); }
+}
+
+.stat-card-skeleton {
+    height: 150px;
+    border-radius: 16px;
+}
+
+.chart-skeleton-loader {
+    height: 377px; /* Matches the chart container height (300px + padding) */
+    border-radius: 16px;
+}
