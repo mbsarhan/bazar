@@ -6,7 +6,8 @@ use App\Models\PendingAdvertisement;
 use App\Models\User;
 use App\Models\Advertisement;
 use Illuminate\Support\Facades\DB; 
-use Carbon\Carbon;                // <-- 2. IMPORT CARBON FOR DATE HANDLING
+use Carbon\Carbon;      
+use App\Models\DailyAdCount;  
 
 class AdminDashboardService
 {
@@ -32,8 +33,8 @@ class AdminDashboardService
         // 4. Return the data in a structured array.
         return [
             'totalUsers' => $totalUsers,
-        'totalAds'   => $totalAds,
-        'pendingAds' => $pendingAds,
+            'totalAds'   => $totalAds,
+            'pendingAds' => $pendingAds,
         ];
     }
 
@@ -42,40 +43,27 @@ class AdminDashboardService
      * Gathers the count of new ads for each of the last 7 days.
      * @return array
      */
-    public function getWeeklyAdsChartData(): array
+    public function getWeeklyAdsChartData()
     {
         // Set the locale to Arabic to get Arabic day names
         Carbon::setLocale('ar');
+        // Step A: Get the pre-calculated counts from our new, fast summary table.
+        $adCounts = DailyAdCount::where('date', '>=', now()->subDays(6)->toDateString())
+            ->pluck('ad_count', 'date'); // Pluck into an associative array ['YYYY-MM-DD' => count]
 
-        // Step A: Create an array representing the last 7 days, with initial counts of 0.
-        $dateRange = [];
+        // Step B: Build the final chart data array, filling in any missing days with 0.
+        $chartData = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = now()->subDays($i);
-            // We use 'Y-m-d' as a key and get the translated day name.
-            $dateRange[$date->format('Y-m-d')] = [
-                'name' => $date->translatedFormat('l'), // 'l' gives the full day name (e.g., السبت)
-                'عدد الإعلانات' => 0
+            $dateString = $date->format('Y-m-d');
+            
+            $chartData[] = [
+                'name' => $date->translatedFormat('l'),
+                // If a count exists for this date, use it. Otherwise, use 0.
+                'عدد الإعلانات' => $adCounts[$dateString] ?? 0,
             ];
         }
 
-        // Step B: Query the database to get the actual counts for the days that have ads.
-        $adCounts = Advertisement::where('created_at', '>=', now()->subDays(6)->startOfDay())
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get([
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('count(*) as count')
-            ])
-            ->keyBy('date'); // Use keyBy() to make merging easier
-
-        // Step C: Merge the database results into our template array.
-        foreach ($adCounts as $date => $data) {
-            if (isset($dateRange[$date])) {
-                $dateRange[$date]['عدد الإعلانات'] = $data->count;
-            }
-        }
-
-        // Step D: Return only the values of the array to get the final list format.
-        return array_values($dateRange);
+        return $chartData;
     }
 }
