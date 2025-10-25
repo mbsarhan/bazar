@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CarAds;
 use App\Http\Requests\StoreCarAdRequest;
 use App\Http\Resources\CarAdResource; // <-- 1. IMPORT THE RESOURCE
+use App\Http\Resources\AdvertisementResource; // <-- 1. IMPORT THE RESOURCE
 use App\Http\Requests\UpdateCarAdRequest; // <-- 1. IMPORT
 use App\Services\CarAdService;
 use Illuminate\Http\Request;
@@ -34,7 +35,7 @@ class CarAdsController extends Controller
         // Pass the entire request object to the service so it can read the query parameters
         $ads = $this->carAdService->getAdsForUser($user, $request);
 
-        return CarAdResource::collection($ads);
+        return AdvertisementResource::collection($ads);
     }
 
     /**
