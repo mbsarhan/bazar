@@ -288,3 +288,52 @@ table tbody tr:hover {
     height: 377px; /* Matches the chart container height (300px + padding) */
     border-radius: 16px;
 }
+
+.sort-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.sort-dropdown {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border-subtle);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    cursor: pointer;
+}
+
+.sort-dropdown:focus {
+    outline: none;
+    border-color: var(--color-accent-primary);
+}
+
+.filter-label {
+    font-weight: 600;
+    color: #666;
+    margin-left: 10px; /* RTL equivalent of margin-right */
+}
+
+/* Vertically align the label and dropdown */
+.sort-dropdown-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.admin-actions-box {
+    background-color: #fff9e6;
+    border: 1px solid #f39c12;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.admin-actions-box h4 {
+    margin-top: 0;
+}

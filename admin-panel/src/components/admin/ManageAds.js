@@ -7,6 +7,8 @@ import { useAdmin } from '../../context/AdminContext'; // 1. IMPORT
 
 
 const ManageAds = () => {
+    const [statusFilter, setStatusFilter] = useState('pending');
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const navigate = useNavigate();
@@ -63,10 +65,25 @@ const ManageAds = () => {
     if (isLoading) return <p>جاري تحميل الإعلانات...</p>;
     if (error) return <p className="error-message">{error}</p>;
 
+    const dynamicTitle = statusFilter === 'pending' 
+        ? 'الإعلانات قيد المراجعة' 
+        : 'الإعلانات الفعالة';
+
     return (
         <div>
             <div className="content-header">
-                <h1>الإعلانات قيد المراجعة</h1>
+                <h1>{dynamicTitle}</h1>
+                {/* --- 3. NEW: The Dropdown Filter --- */}
+                <div className="sort-dropdown-wrapper">
+                    <select 
+                        className="sort-dropdown"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="pending">قيد المراجعة</option>
+                        <option value="active">الفعالة</option>
+                    </select>
+                </div>
             </div>
 
             <div className="admin-table-container">

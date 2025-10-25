@@ -1,0 +1,328 @@
+/* ============================================= */
+/* 1. Main Page Layout & Header                  */
+/* ============================================= */
+.ad-detail-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.ad-detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.ad-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.ad-detail-header h1 {
+    margin: 0;
+}
+
+.ad-detail-price {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    white-space: nowrap;
+}
+
+
+/* ============================================= */
+/* 2. Main Content Column (Gallery & Video)      */
+/* ============================================= */
+.ad-detail-image-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* --- Main Image Viewer --- */
+.main-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #f0f0f0;
+}
+
+.main-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+}
+
+.video-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.video-player-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #000;
+    padding-top: 56.25%;
+}
+
+.video-player-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* --- Navigation Arrows --- */
+.gallery-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    z-index: 10;
+    opacity: 0;
+    transition: all 0.2s ease-in-out; 
+}
+.gallery-arrow.left { left: 15px; }
+.gallery-arrow.right { right: 15px; }
+.main-image-container:hover .gallery-arrow { opacity: 1; }
+.gallery-arrow:hover {
+    background-color: white;
+    box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
+}
+
+/* --- Thumbnail Container Wrapper --- */
+.thumbnail-container-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px 0;
+    background-color: #f9f9f9;
+    border-radius: 0 0 16px 16px;
+    margin-top: -16px;
+}
+
+@media (max-width: 1140px) {
+    .thumbnail-container-wrapper {
+        padding: 20px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .thumbnail-container-wrapper {
+        flex-direction: column;
+    }
+}
+
+/* --- Video Thumbnails (Left Side) --- */
+.video-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 120px; /* Reserve space even when empty */
+    flex-shrink: 0;
+}
+
+.video-thumbnail {
+    width: 120px;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+    opacity: 0.7;
+    position: relative;
+    background-color: #000;
+}
+
+.video-thumbnail:hover {
+    opacity: 1;
+    border-color: #aaa;
+}
+
+.video-thumbnail.active {
+    border-color: var(--color-accent-primary);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.video-thumbnail video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Play icon overlay */
+.video-thumbnail::after {
+    content: '▶';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* --- Photo Thumbnails Scroller (Right Side) --- */
+.thumbnail-scroller {
+    direction: rtl;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+    font-size: 0;
+    max-width: 450px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .thumbnail-scroller {
+        max-width: 100%;
+        direction: ltr;
+    }
+}
+
+.thumbnail-image {
+    display: inline-block;
+    width: 80px;
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+    opacity: 0.7;
+    margin-left: 10px;
+    vertical-align: top;
+}
+
+.thumbnail-image:first-child {
+    margin-left: 0;
+}
+
+.thumbnail-image:hover {
+    opacity: 1;
+    border-color: #aaa;
+}
+
+.thumbnail-image.active {
+    border-color: var(--color-accent-primary);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.thumbnail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail-scroller::-webkit-scrollbar { height: 8px; }
+.thumbnail-scroller::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+.thumbnail-scroller::-webkit-scrollbar-track { background: transparent; }
+
+
+/* ============================================= */
+/* 3. Ad Information Column                      */
+/* ============================================= */
+.ad-detail-info {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.ad-detail-info h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--color-bg-page);
+    padding: 12px 15px;
+    border-radius: 8px;
+    align-items: center;
+}
+
+.info-item strong {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+}
+
+.info-item span {
+    font-weight: 600;
+    color: #555;
+}
+
+.ad-detail-description {
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.seller-info {
+    background-color: var(--color-bg-page);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.seller-info h4 {
+    margin-top: 0;
+}
+
+
+/* ============================================= */
+/* 4. Not Found / Error Page Styles              */
+/* ============================================= */
+.not-found {
+    text-align: center;
+    padding-top: 50px;
+}
+
+.not-found a {
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.seller-name-link {
+    text-decoration: none;
+    color: var(--color-text-dark);
+    margin-right: 5px;
+}
+.seller-name-link:hover {
+    text-decoration: underline;
+    color: var(--color-accent-primary);
+}
