@@ -126,7 +126,7 @@ const AdDetailPage = () => {
         <div className="ad-detail-container">
             <div className="ad-detail-header">
                 <h1>{ad.title}</h1>
-                <span className="ad-detail-price">{`${ad.price == 0 ? 'السعر عند التواصل' : `${ad.price} $`}
+                <span className="ad-detail-price">{`${!ad.price ? 'السعر عند التواصل' : `${ad.price} $`}
                      ${ad.negotiable_check ? '(قابل للتفاوض)' : ''}`}</span>
             </div>
 
