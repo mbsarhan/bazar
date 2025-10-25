@@ -10,14 +10,6 @@ const ManageUsers = () => {
     const [error, setError] = useState('');
     const { getAllUsers, deleteUser } = useAdmin(); // 1. GET THE deleteUser FUNCTION
 
-    // --- Mock Data (to be replaced by API call) ---
-    const mockUsers = [
-        { id: 1, name: 'أحمد', email: 'ahmad@example.com', phone: '0987654321', ads_count: 5 },
-        { id: 2, name: 'فاطمة', email: 'fatima@example.com', phone: '0912345678', ads_count: 2 },
-        { id: 3, name: 'خالد', email: 'khaled@example.com', phone: '0933445566', ads_count: 8 },
-        { id: 4, name: 'سارة', email: 'sara@example.com', phone: '0955667788', ads_count: 0 },
-    ];
-
     // --- 3. FETCH REAL DATA ---
     useEffect(() => {
         const fetchUsers = async () => {

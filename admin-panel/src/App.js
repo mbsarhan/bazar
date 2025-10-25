@@ -82,9 +82,9 @@ function App() {
                 <Route element={<AdminLayout />}>
                     <Route path="/" element={<AdminDashboard />} />
                     <Route path="/manage-ads" element={<ManageAds />} />
-                    <Route path="/admin/view-ad/:adId" element={<AdminAdDetailView />} />
                     <Route path="/manage-users" element={<ManageUsers />} />
                 </Route>
+                <Route path="/admin/view-ad/:adId" element={<AdminAdDetailView />} />
               </Route>
             </Route>
           </Routes>

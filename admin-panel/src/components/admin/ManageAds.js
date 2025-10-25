@@ -1,7 +1,6 @@
 // admin-panel/src/components/admin/ManageAds.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import { carAdsData, realEstateAdsData } from './mockDataForAdmin';
 import '../../styles/AdminPages.css';
 import { useAdmin } from '../../context/AdminContext'; // 1. IMPORT
 
