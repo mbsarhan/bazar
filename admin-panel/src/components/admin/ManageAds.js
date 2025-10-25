@@ -8,32 +8,40 @@ import { useAdmin } from '../../context/AdminContext'; // 1. IMPORT
 
 const ManageAds = () => {
     const [statusFilter, setStatusFilter] = useState('pending');
+    const [ads, setAds] = useState([]); // This state will hold either pending or active ads
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null); // Use null for initial error state
     const navigate = useNavigate();
 
     const { 
         getPendingUpdates, 
         approveUpdate, 
+        getActiveAds, // <-- 1. GET THE NEW FUNCTION
         rejectUpdate 
     } = useAdmin(); // 2. GET FUNCTIONS
-    const [pendingAds, setPendingAds] = useState([]);
     useEffect(() => {
-        const fetchPending = async () => {
+        const fetchAds = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const data = await getPendingUpdates();
-                setPendingAds(data);
+                let data;
+                if (statusFilter === 'pending') {
+                    // Fetch pending updates (which are a type of ad)
+                    data = await getPendingUpdates();
+                } else {
+                    // Fetch active ads
+                    data = await getActiveAds();
+                }
+                setAds(data);
             } catch (err) {
-                setError(err.response?.data?.message || "Failed to fetch pending ads.");
+                setError(err.response?.data?.message || `Failed to fetch ${statusFilter} ads.`);
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchPending();
-    }, [getPendingUpdates]);
+        fetchAds();
+    }, [statusFilter, getPendingUpdates, getActiveAds]); // Re-run when filter changes
 
     const handleActionClick = (e) => {
         // Prevent the row's click event from firing when a button is clicked
@@ -47,7 +55,7 @@ const ManageAds = () => {
         try {
             await approveUpdate(adId);
             // On success, filter the ad from the local state for instant UI update
-            setPendingAds(prev => prev.filter(ad => ad.id !== adId));
+            setAds(prev => prev.filter(ad => ad.id !== adId));
         } catch (err) {
             alert("Failed to approve the ad."); // Simple error handling
         }
@@ -56,7 +64,7 @@ const ManageAds = () => {
     const handleReject = async (adId) => {
         try {
             await rejectUpdate(adId);
-            setPendingAds(prev => prev.filter(ad => ad.id !== adId));
+            setAds(prev => prev.filter(ad => ad.id !== adId));
         } catch (err) {
             alert("Failed to reject the ad.");
         }
@@ -98,8 +106,8 @@ const ManageAds = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {pendingAds.length > 0 ? (
-                            pendingAds.map(ad => (
+                        {ads.length > 0 ? (
+                            ads.map(ad => (
                                 // 3. Add onClick to the table row
                                 <tr key={ad.id} className="clickable-row" onClick={() => navigate(`/admin/view-ad/${ad.id}`)}>
                                     <td>{ad.title}</td>
