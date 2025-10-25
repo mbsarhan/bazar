@@ -9,6 +9,7 @@ use App\Models\RealestateAds;
 use App\Services\RealestateAdsService;
 use App\Http\Requests\StoreRealestateAdRequest;
 use App\Http\Requests\UpdateRealestateAdRequest; // <-- 1. IMPORT
+use App\Http\Resources\AdvertisementResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Http\Resources\RealestateAdResource; // Import the resource
 
@@ -32,7 +33,7 @@ class RealestateAdsController extends Controller
         $ads = $this->realestateAdsService->getAdsForUser($user,$request);
 
         // Return the data formatted as a collection by our API Resource
-        return RealestateAdResource::collection($ads);
+        return AdvertisementResource::collection($ads);
 
         } catch (Exception $e) {
             // 5. Handle any generic error thrown by the service
