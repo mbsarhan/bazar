@@ -35,7 +35,7 @@ class StoreRealestateAdRequest extends FormRequest
             'floor_num'          => ['nullable', 'integer'],
             'building_status'    => ['required', 'string'],
             'cladding_condition' => ['required', 'string'],
-            'price'              => ['min:0'],
+            'price'              => ['nullable','integer','min:0'],
             'negotiable_check'   => ['required', 'boolean'],
             'description'        => ['nullable', 'string', 'max:5000'],
             'images'             => 'required|array',
