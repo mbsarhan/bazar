@@ -101,6 +101,22 @@ export const AdminProvider = ({ children }) => {
         }
     }, []); // Empty dependency array makes this function stable
 
+
+
+
+    /**
+     * Fetches the list of active advertisements.
+     */
+    const getActiveAds = useCallback(async () => {
+        // We call the new admin endpoint with the 'active' status filter
+        const response = await api.get('/admin/advertisements', {
+            params: { status: 'فعال' }
+        });
+        return response.data.data;
+    }, []);
+
+
+
     const value = {
         pendingUpdates,
         isLoading,
@@ -113,6 +129,7 @@ export const AdminProvider = ({ children }) => {
         deleteUser,
         getDashboardStats,
         getWeeklyChartData,
+        getActiveAds,
     };
 
     return (

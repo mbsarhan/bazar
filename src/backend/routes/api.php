@@ -147,6 +147,9 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- ADD THIS ROUTE TO GET THE LIST ---
     Route::get('/pending-updates', [PendingUpdateController::class, 'index'])->name('pending-updates.index');
+
+    // --- ADD THIS ROUTE FOR GETTING THE MAIN AD LIST ---
+    Route::get('/advertisements', [AdvertisementController::class, 'adminIndex']);
     
     // Route for an admin to approve a pending update
     Route::post('/pending-updates/{pendingUpdate}/approve', [PendingUpdateController::class, 'approve'])

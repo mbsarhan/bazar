@@ -81,4 +81,24 @@ class AdvertisementService
             ])
             ->paginate(100); // It's better to use a smaller page size like 20
     }
+
+
+
+    /**
+     * Get a paginated list of all advertisements for the admin panel, with filtering.
+     */
+    public function getAdminListing(Request $request): LengthAwarePaginator
+    {
+        $query = Advertisement::query();
+
+        // Check for the 'status' query parameter
+        if ($request->has('status') && $request->query('status') !== 'all') {
+            $query->where('ad_status', $request->query('status'));
+        }
+
+        // Eager-load relationships needed by the AdminAdListResource
+        return $query->with(['owner:id,fname,lname', 'carDetails', 'realEstateDetails'])
+            ->latest()
+            ->paginate(15);
+    }
 }

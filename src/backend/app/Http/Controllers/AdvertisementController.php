@@ -7,6 +7,7 @@ use App\Services\AdvertisementService;
 use App\Http\Resources\AdvertisementResource;
 use Illuminate\Support\Facades\DB; // <-- 1. IMPORT DB FACADE
 use Illuminate\Validation\Rule;
+use App\Http\Resources\Admin\AdminAdListResource; // <-- 1. IMPORT
 
 class AdvertisementController extends Controller
 {
@@ -106,5 +107,19 @@ class AdvertisementController extends Controller
         }
 
         return response()->noContent();
+    }
+
+
+    /**
+     * Display a listing of advertisements for the admin panel.
+     */
+    public function adminIndex(Request $request)
+    {
+        // Authorization is handled by the 'admin' middleware on the route group
+
+        $ads = $this->advertisementService->getAdminListing($request);
+
+        // Return the data formatted through our new AdminAdListResource
+        return AdminAdListResource::collection($ads);
     }
 }
