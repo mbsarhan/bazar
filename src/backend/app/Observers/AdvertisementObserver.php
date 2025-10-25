@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\DailyAdCount;
 use App\Models\Advertisement;
+use Illuminate\Support\Facades\Storage;
 
 class AdvertisementObserver
 {
@@ -43,6 +44,30 @@ class AdvertisementObserver
         // If a record exists and the count is greater than 0, decrement it.
         if ($dailyCount && $dailyCount->ad_count > 0) {
             $dailyCount->decrement('ad_count');
+        }
+
+
+        if ($advertisement->realEstateDetails) {
+            
+            $details = $advertisement->realEstateDetails;
+
+            // 2. Delete the original uploaded video file, if the path still exists.
+            // (It might have already been deleted by the ProcessVideoJob).
+            if ($details->video_url && Storage::disk('public')->exists($details->video_url)) {
+                Storage::disk('public')->delete($details->video_url);
+            }
+
+            // 3. Delete the entire HLS folder, if the path exists.
+            if ($details->hls_url) {
+                // The hls_url is something like 'videos/hls/filename/master.m3u8'.
+                // We just need the directory part: 'videos/hls/filename'.
+                $hlsDirectory = dirname($details->hls_url);
+
+                if (Storage::disk('public')->exists($hlsDirectory)) {
+                    // deleteDirectory() will remove the folder and all its contents (playlists and video segments).
+                    Storage::disk('public')->deleteDirectory($hlsDirectory);
+                }
+            }
         }
     }
 
