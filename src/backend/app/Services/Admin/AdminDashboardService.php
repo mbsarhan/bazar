@@ -19,7 +19,7 @@ class AdminDashboardService
     public function getStatistics(): array
     {
         // 1. Get the total number of registered users.
-        $totalUsers = User::count();
+        $totalUsers = User::where("admin",'=',"0")->count();
 
         // 2. Get the total number of advertisements.
         // --- 2. Get Detailed Car Ad Stats ---
