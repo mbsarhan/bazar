@@ -35,7 +35,7 @@ class PendingUpdateController extends Controller
         // --- UPDATE THIS LINE to include the owner ---
         $pendingUpdates = PendingAdvertisement::with('advertisement.owner:id,fname,lname')
                                                     ->latest()
-                                                    ->paginate(15);
+                                                    ->paginate(10000);
 
         // Return a paginated resource collection
         return PendingUpdateResource::collection($pendingUpdates);
