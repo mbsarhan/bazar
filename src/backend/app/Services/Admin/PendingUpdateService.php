@@ -213,32 +213,44 @@ class PendingUpdateService
 
     /**
      * Creates a "virtual" Advertisement model from a pending update record.
-     * This allows us to reuse our existing API Resources.
+     * This is the new, media-aware version.
      */
     public function buildVirtualAdFromPendingUpdate(PendingAdvertisement $pendingUpdate): Advertisement
     {
-        // 1. Create a new, in-memory Advertisement instance and fill it with pending data.
         $virtualAd = new Advertisement();
         $virtualAd->forceFill($pendingUpdate->toArray());
-        
-        // Manually set the ID to match the original ad for consistency
         $virtualAd->id = $pendingUpdate->advertisement_id;
-
-        // 2. Load the original owner relationship onto the virtual ad.
         $virtualAd->setRelation('owner', $pendingUpdate->advertisement->owner);
 
-        // 3. Conditionally create and attach the correct in-memory details model.
+        // --- THE CRITICAL MEDIA FIX ---
+        $pendingMedia = $pendingUpdate->pending_media ?? ['new' => [], 'removed' => []];
+        $newImagePaths = $pendingMedia['new'] ?? [];
+
+        // Create a collection of in-memory image models from the pending paths
+        $virtualImages = collect($newImagePaths)->map(function ($path) {
+            // We need to know if it's a Car or Real Estate image to create the right model type
+            if (str_contains($path, 'cars')) {
+                return new CarAdImage(['image_url' => $path]);
+            }
+            return new RealestateImage(['image_url' => $path]);
+        });
+        // -----------------------------
+
+        // Conditionally create and attach the details model
         if ($pendingUpdate->manufacturer) { // This is a Car Ad
             $carDetails = new CarAds();
             $carDetails->forceFill($pendingUpdate->toArray());
-            // We need to simulate the images relationship
-            $carDetails->setRelation('ImagesForCar', collect()); // Start with empty collection
+            
+            // Attach the virtual images to the in-memory details model
+            $carDetails->setRelation('ImagesForCar', $virtualImages);
             $virtualAd->setRelation('carDetails', $carDetails);
 
         } elseif ($pendingUpdate->realestate_type) { // This is a Real Estate Ad
             $realEstateDetails = new RealestateAds();
             $realEstateDetails->forceFill($pendingUpdate->toArray());
-            $realEstateDetails->setRelation('ImageForRealestate', collect());
+
+            // Attach the virtual images to the in--memory details model
+            $realEstateDetails->setRelation('ImageForRealestate', $virtualImages);
             $virtualAd->setRelation('realEstateDetails', $realEstateDetails);
         }
 
