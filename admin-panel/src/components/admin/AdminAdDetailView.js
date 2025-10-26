@@ -1,6 +1,6 @@
 // admin-panel/src/components/admin/AdminAdDetailView.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
     Home, Square, BedDouble, Bath } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -13,8 +13,13 @@ import '../../styles/AdminPages.css';
 const AdminAdDetailView = () => {
     const { adId } = useParams();
     const navigate = useNavigate();
-    const { getPendingUpdateById, approveUpdate, rejectUpdate } = useAdmin();
+    const { getPendingUpdateById, approveUpdate, rejectUpdate, getAdById } = useAdmin();
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
+
+    const location = useLocation(); // 2. Get the location object
+
+    // Determine what type of ad we're viewing from the state passed by the link
+    const viewType = location.state?.type || 'pending'; // Default to 'active' if state is missing
 
 
     const [ad, setAd] = useState(null);
@@ -28,7 +33,14 @@ const AdminAdDetailView = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const data = await getPendingUpdateById(adId);
+                let data;
+                if (viewType === 'pending') {
+                    // If it's a pending ad, fetch the pending details
+                    data = await getPendingUpdateById(adId);
+                } else {
+                    // If it's an active ad, use the general ad fetcher
+                    data = await getAdById(adId);
+                }
                 setAd(data);
             } catch (err) {
                 setError("Failed to fetch ad details.");
@@ -37,7 +49,8 @@ const AdminAdDetailView = () => {
             }
         };
         fetchDetails();
-    }, [adId, getPendingUpdateById]);
+    }, [adId, viewType, getPendingUpdateById, getAdById]); // Effect depends on the ID and type
+
 
 
     const prevSlide = () => {
@@ -78,12 +91,13 @@ const AdminAdDetailView = () => {
     }
     if (error) return <p className="error-message">{error}</p>;
     if (!ad) return <p>لم يتم العثور على الإعلان.</p>;
-
+    
+    const isPending = viewType === 'pending';
     return (
         // --- 4. THE UI STRUCTURE NOW MIRRORS THE MAIN SITE ---
         <div className="ad-detail-container">
             <div className="ad-detail-header">
-                <h1>مراجعة الإعلان: {ad.title}</h1>
+                <h1>{isPending ? 'مراجعة التعديلات' : 'تفاصيل الإعلان'}: {ad.title}</h1>
                 <Link to="/manage-ads" className="back-link-btn">العودة إلى القائمة</Link>
             </div>
 

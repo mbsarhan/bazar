@@ -117,6 +117,17 @@ export const AdminProvider = ({ children }) => {
 
 
 
+
+    /**
+     * Fetches the full public details of any single advertisement.
+     */
+    const getAdById = useCallback(async (adId) => {
+        const response = await api.get(`/advertisements/${adId}`);
+        return response.data.data;
+    }, []);
+
+
+
     const value = {
         pendingUpdates,
         isLoading,
@@ -130,6 +141,7 @@ export const AdminProvider = ({ children }) => {
         getDashboardStats,
         getWeeklyChartData,
         getActiveAds,
+        getAdById,
     };
 
     return (
