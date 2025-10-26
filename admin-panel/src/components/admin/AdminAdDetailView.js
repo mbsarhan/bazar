@@ -1,14 +1,16 @@
 // admin-panel/src/components/admin/AdminAdDetailView.js
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
-    Home, Square, BedDouble, Bath } from 'lucide-react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';    
+import {
+    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
+    Home, Square, BedDouble, Bath
+} from 'lucide-react';
+import 'swiper/css';
 import { useAdmin } from '../../context/AdminContext'; // Use the admin context
-import AdDetailSkeleton from '../AdDetailSkeleton'; 
+import AdDetailSkeleton from '../AdDetailSkeleton';
+import VideoPlayer from '../VideoPlayer';
 import '../../styles/AdDetailPage.css';
-import '../../styles/AdminPages.css'; 
+import '../../styles/AdminPages.css';
 
 const AdminAdDetailView = () => {
     const { adId } = useParams();
@@ -21,6 +23,7 @@ const AdminAdDetailView = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [videoPlayerOptions, setVideoPlayerOptions] = useState(null);
 
     // Fetch the detailed pending update data
     useEffect(() => {
@@ -30,6 +33,20 @@ const AdminAdDetailView = () => {
             try {
                 const data = await getPendingUpdateById(adId);
                 setAd(data);
+                if (data && data.videoUrl && data.videoType) {
+                    setVideoPlayerOptions({
+                        autoplay: false,
+                        controls: true,
+                        responsive: true,
+                        fluid: true,
+                        sources: [{
+                            src: data.videoUrl,
+                            type: data.videoType // Use the type from the backend
+                        }]
+                    });
+                } else {
+                    setVideoPlayerOptions(null); // Ensure it's null if no video
+                }
             } catch (err) {
                 setError("Failed to fetch ad details.");
             } finally {
@@ -49,6 +66,11 @@ const AdminAdDetailView = () => {
         if (!ad) return;
         const newIndex = currentIndex === ad.imageUrls.length - 1 ? 0 : currentIndex + 1;
         setCurrentIndex(newIndex);
+    };
+
+    const handlePlayerReady = (player) => {
+        console.log('Video.js player is ready on the detail page!', player);
+        // Video.js will automatically add the quality selector for HLS streams.
     };
 
 
@@ -74,7 +96,7 @@ const AdminAdDetailView = () => {
     };
 
     if (isLoading) {
-        return <AdDetailSkeleton />; 
+        return <AdDetailSkeleton />;
     }
     if (error) return <p className="error-message">{error}</p>;
     if (!ad) return <p>لم يتم العثور على الإعلان.</p>;
@@ -83,45 +105,63 @@ const AdminAdDetailView = () => {
         // --- 4. THE UI STRUCTURE NOW MIRRORS THE MAIN SITE ---
         <div className="ad-detail-container">
             <div className="ad-detail-header">
-                <h1>مراجعة الإعلان: {ad.title}</h1>
-                <Link to="/manage-ads" className="back-link-btn">العودة إلى القائمة</Link>
+                <h1>{ad.title}</h1>
+                <span className="ad-detail-price">{`${!ad.price ? 'السعر عند التواصل' : `${ad.price} $`}
+                     ${ad.negotiable_check ? '(قابل للتفاوض)' : ''}`}</span>
             </div>
 
             <div className="ad-detail-content">
-                <div className="ad-detail-main-content">
-                    <div className="ad-detail-image-gallery">
-                        <div className="main-image-container">
-                            <img src={ad.imageUrls[currentIndex]} alt={`${ad.title} - ${currentIndex + 1}`} className="main-image"/>
-                            {ad.imageUrls.length > 1 && (
-                                <>
-                                    <button className="gallery-arrow left" onClick={prevSlide}><ChevronLeft size={32} /></button>
-                                    <button className="gallery-arrow right" onClick={nextSlide}><ChevronRight size={32} /></button>
-                                </>
-                            )}
-                        </div>
+                <div className="ad-detail-image-gallery">
+                    {/* Main Image Display */}
+                    <div className="main-image-container">
+                        {currentIndex === -1 && videoPlayerOptions ? (
+                            <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady} />
+                        ) : (
+                            <img
+                                src={ad.imageUrls[currentIndex]}
+                                alt={`${ad.title} - ${currentIndex + 1}`}
+                                className="main-image"
+                            />
+                        )}
                         {ad.imageUrls.length > 1 && (
-                            <Swiper className="thumbnail-swiper" spaceBetween={10} slidesPerView={'auto'} freeMode={true}>
-                                {ad.imageUrls.map((url, index) => (
-                                    <SwiperSlide key={index}>
-                                        <div className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`} onClick={() => setCurrentIndex(index)}>
-                                            <img src={url} alt={`Thumbnail ${index + 1}`} />
-                                        </div>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
+                            <>
+                                <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
+                                <button className="gallery-arrow right" onClick={prevSlide}><ChevronRight size={32} /></button>
+                            </>
                         )}
                     </div>
 
-                    {ad.videoUrl && (
-                        <div className="video-section">
-                            <h3>فيديو الإعلان</h3>
-                            <div className="video-player-wrapper">
-                                <video controls width="100%"><source src={ad.videoUrl} type="video/mp4" /></video>
-                            </div>
+                    {/* Thumbnails Container */}
+                    <div className="thumbnail-container-wrapper">
+                        {/* Video Thumbnails - Left Side (space always reserved) */}
+                        <div className="video-thumbnails">
+                            {videoPlayerOptions && (
+                                <div className={`video-thumbnail ${currentIndex === -1 ? 'active' : ''}`} onClick={() => setCurrentIndex(-1)}>
+                                    <div style={{ width: '100%', height: '100%', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="white"><path d="M8 5v14l11-7z" /></svg>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )}
+
+                        {/* Photo Thumbnails - Right Side */}
+                        {ad.imageUrls.length && (
+                            <div className="thumbnail-scroller">
+                                {ad.imageUrls.map((url, index) => (
+                                    <div
+                                        key={index}
+                                        className={`thumbnail-image ${currentIndex === index ? 'active' : ''}`}
+                                        onClick={() => setCurrentIndex(index)}
+                                    >
+                                        <img src={url} alt={`Thumbnail ${index + 1}`} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-                
+
+                {/* Ad Details Info */}
                 <div className="ad-detail-info">
                     <h3>التفاصيل الأساسية</h3>
                     <div className="info-grid">
@@ -148,11 +188,11 @@ const AdminAdDetailView = () => {
                     </div>
                     <h3>الوصف</h3>
                     <p className="ad-detail-description">{ad.description || 'لا يوجد وصف متاح.'}</p>
-                    
+
                     <div className="admin-actions-box">
                         <h4>الإجراءات الإدارية</h4>
                         <p>يرجى مراجعة محتوى الإعلان بعناية قبل الموافقة عليه.</p>
-                         <div className="actions-cell">
+                        <div className="actions-cell">
                             <button className="action-btn approve" onClick={handleApprove}>موافقة</button>
                             <button className="action-btn reject" onClick={handleReject}>رفض</button>
                         </div>
