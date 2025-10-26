@@ -117,7 +117,10 @@ const ManageAds = () => {
                         {ads.length > 0 ? (
                             ads.map(ad => (
                                 // 3. Add onClick to the table row
-                                <tr key={ad.id} className="clickable-row" onClick={() => navigate(`/admin/view-ad/${ad.id}`)}>
+                                <tr key={ad.id} className="clickable-row" onClick={() => navigate(`/admin/view-ad/${ad.id}`, { 
+                                        // Pass the filter type in the state
+                                        state: { type: statusFilter } 
+                                    })}>
                                     <td>{ad.title}</td>
                                     <td>{ad.user.name}</td>
                                     <td>{ad.type}</td>
