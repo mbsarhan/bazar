@@ -150,6 +150,8 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- ADD THIS ROUTE FOR GETTING THE MAIN AD LIST ---
     Route::get('/advertisements', [AdvertisementController::class, 'adminIndex']);
+    // --- ADD THIS ROUTE FOR DELETING AN ACTIVE AD ---
+    Route::delete('/advertisements/{ad}', [AdvertisementController::class, 'adminDestroy']);
     
     // Route for an admin to approve a pending update
     Route::post('/pending-updates/{pendingUpdate}/approve', [PendingUpdateController::class, 'approve'])

@@ -6,6 +6,7 @@ use App\Models\Advertisement;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request; // <-- 1. IMPORT THE REQUEST CLASS
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage; // <-- IMPORT
 
 class AdvertisementService
 {
@@ -100,5 +101,57 @@ class AdvertisementService
         return $query->with(['owner:id,fname,lname', 'carDetails', 'realEstateDetails'])
             ->latest()
             ->paginate(15);
+    }
+
+
+
+
+
+
+    /**
+     * Permanently delete an advertisement and all its associated media as an admin.
+     */
+    public function deleteAdAsAdmin(Advertisement $ad): bool
+    {
+        return DB::transaction(function () use ($ad) {
+            $owner = $ad->owner;
+
+            // 1. Eager-load all nested relationships needed for file cleanup.
+            $ad->load(['carDetails.ImagesForCar', 'realEstateDetails.ImageForRealestate']);
+
+            // 2. Delete Car Ad Images if they exist
+            if ($ad->carDetails && $ad->carDetails->ImagesForCar) {
+                foreach ($ad->carDetails->ImagesForCar as $image) {
+                    Storage::disk('public')->delete($image->image_url);
+                }
+            }
+
+            // 3. Delete Real Estate Ad Images and Videos if they exist
+            if ($ad->realEstateDetails) {
+                // Delete images
+                foreach ($ad->realEstateDetails->ImageForRealestate as $image) {
+                    Storage::disk('public')->delete($image->image_url);
+                }
+                // Delete video files (originals and HLS folders)
+                if ($ad->realEstateDetails->video_url) {
+                    Storage::disk('public')->delete($ad->realEstateDetails->video_url);
+                }
+                if ($ad->realEstateDetails->hls_url) {
+                    $hlsDirectory = dirname($ad->realEstateDetails->hls_url);
+                    Storage::disk('public')->deleteDirectory($hlsDirectory);
+                }
+            }
+            
+            // 4. Delete the advertisement record from the database.
+            // All related records in other tables will be cascade deleted by the database.
+            $deleted = $ad->delete();
+
+            // 5. Decrement the owner's ad counter.
+            if ($deleted && $owner) {
+                $owner->decrement('ads_num');
+            }
+
+            return $deleted;
+        });
     }
 }

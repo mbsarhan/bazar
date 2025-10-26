@@ -18,7 +18,8 @@ const ManageAds = () => {
         getPendingUpdates, 
         approveUpdate, 
         getActiveAds, // <-- 1. GET THE NEW FUNCTION
-        rejectUpdate 
+        rejectUpdate,
+        deleteActiveAd,
     } = useAdmin(); // 2. GET FUNCTIONS
 
     useEffect(() => {
@@ -71,10 +72,16 @@ const ManageAds = () => {
         }
     };
 
-    const handleDelete = (adId) => {
-        if (window.confirm('هل أنت متأكد أنك تريد حذف هذا الإعلان نهائياً؟')) {
-            console.log(`Deleting ad ${adId}`);
-            setAds(prev => prev.filter(ad => ad.id !== adId));
+    // --- 2. UPDATE THE handleDelete FUNCTION ---
+    const handleDelete = async (adId) => {
+        if (window.confirm('هل أنت متأكد أنك تريد حذف هذا الإعلان نهائياً؟ سيتم حذف جميع ملفاته وبياناته.')) {
+            try {
+                await deleteActiveAd(adId);
+                // On success, filter the ad from the local state for an instant UI update
+                setAds(prev => prev.filter(ad => ad.id !== adId));
+            } catch (err) {
+                alert(err.response?.data?.message || 'Failed to delete the ad.');
+            }
         }
     };
 
