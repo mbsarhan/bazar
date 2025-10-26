@@ -127,6 +127,15 @@ export const AdminProvider = ({ children }) => {
     }, []);
 
 
+    /**
+     * Permanently deletes an active advertisement by its ID.
+     */
+    const deleteActiveAd = useCallback(async (adId) => {
+        const response = await api.delete(`/admin/advertisements/${adId}`);
+        return response.data;
+    }, []);
+
+
 
     const value = {
         pendingUpdates,
@@ -142,6 +151,7 @@ export const AdminProvider = ({ children }) => {
         getWeeklyChartData,
         getActiveAds,
         getAdById,
+        deleteActiveAd,
     };
 
     return (

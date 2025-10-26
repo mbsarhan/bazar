@@ -122,4 +122,25 @@ class AdvertisementController extends Controller
         // Return the data formatted through our new AdminAdListResource
         return AdminAdListResource::collection($ads);
     }
+
+
+
+
+
+    /**
+     * Permanently delete a specified advertisement as an Admin.
+     */
+    public function adminDestroy(Request $request, Advertisement $ad)
+    {
+        // Authorization is already handled by the 'admin' middleware on the route group.
+        // No extra check is needed here unless you have more specific rules.
+
+        $success = $this->advertisementService->deleteAdAsAdmin($ad);
+
+        if ($success) {
+            return response()->json(['message' => 'Advertisement and all its data deleted successfully.']);
+        }
+
+        return response()->json(['message' => 'Failed to delete the advertisement.'], 500);
+    }
 }
