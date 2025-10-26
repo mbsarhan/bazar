@@ -1,5 +1,5 @@
 // src/frontend/App.js
-import React, { useState } from 'react'; // 1. Import useState
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import 'rc-slider/assets/index.css';
@@ -31,7 +31,7 @@ import PublicProfile from './components/PublicProfile';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import DashboardOverview from './components/dashboard/DashboardOverview';
 import MyProfile from './components/dashboard/MyProfile';
-import SecuritySettings from './components/dashboard/SecuritySettings'; // Make sure this is imported
+import SecuritySettings from './components/dashboard/SecuritySettings'; 
 import MyCarAds from './components/dashboard/MyCarAds';
 import MyRealEstateAds from './components/dashboard/MyRealEstateAds';
 import Reviews from './components/dashboard/Reviews';

@@ -1,9 +1,11 @@
 // admin-panel/src/components/admin/AdminAdDetailView.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate , useLocation} from 'react-router-dom';
-import { ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
-    Home, Square, BedDouble, Bath } from 'lucide-react';
-import 'swiper/css';    
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import {
+    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
+    Home, Square, BedDouble, Bath
+} from 'lucide-react';
+import 'swiper/css';
 import { useAdmin } from '../../context/AdminContext'; // Use the admin context
 import AdDetailSkeleton from '../AdDetailSkeleton';
 import VideoPlayer from '../VideoPlayer';
@@ -126,7 +128,11 @@ const AdminAdDetailView = () => {
                     {/* Main Image Display */}
                     <div className="main-image-container">
                         {currentIndex === -1 && videoPlayerOptions ? (
-                            <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady} />
+                            <VideoPlayer
+                                key={ad.videoUrl}
+                                options={videoPlayerOptions}
+                                onReady={handlePlayerReady}
+                            />
                         ) : (
                             <img
                                 src={ad.imageUrls[currentIndex]}
@@ -149,7 +155,7 @@ const AdminAdDetailView = () => {
                             {videoPlayerOptions && (
                                 <div className={`video-thumbnail ${currentIndex === -1 ? 'active' : ''}`} onClick={() => setCurrentIndex(-1)}>
                                     <div style={{ width: '100%', height: '100%', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="white"><path d="M8 5v14l11-7z" /></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z" /></svg>
                                     </div>
                                 </div>
                             )}
@@ -200,14 +206,16 @@ const AdminAdDetailView = () => {
                     <h3>الوصف</h3>
                     <p className="ad-detail-description">{ad.description || 'لا يوجد وصف متاح.'}</p>
 
-                    <div className="admin-actions-box">
-                        <h4>الإجراءات الإدارية</h4>
-                        <p>يرجى مراجعة محتوى الإعلان بعناية قبل الموافقة عليه.</p>
-                        <div className="actions-cell">
-                            <button className="action-btn approve" onClick={handleApprove}>موافقة</button>
-                            <button className="action-btn reject" onClick={handleReject}>رفض</button>
+                    {isPending &&
+                        <div className="admin-actions-box">
+                            <h4>الإجراءات الإدارية</h4>
+                            <p>يرجى مراجعة محتوى الإعلان بعناية قبل الموافقة عليه.</p>
+                            <div className="actions-cell">
+                                <button className="action-btn approve" onClick={handleApprove}>موافقة</button>
+                                <button className="action-btn reject" onClick={handleReject}>رفض</button>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
