@@ -111,11 +111,13 @@ const AdminAdDetailView = () => {
     }
     if (error) return <p className="error-message">{error}</p>;
     if (!ad) return <p>لم يتم العثور على الإعلان.</p>;
+
+    const isPending = viewType === 'pending';
     return (
         // --- 4. THE UI STRUCTURE NOW MIRRORS THE MAIN SITE ---
         <div className="ad-detail-container">
             <div className="ad-detail-header">
-                <h1>مراجعة الإعلان: {ad.title}</h1>
+                <h1>مراجعة الإعلان: {ad.title}</h1><h1>{isPending ? 'مراجعة التعديلات' : 'تفاصيل الإعلان'}: {ad.title}</h1>
                 <Link to="/manage-ads" className="back-link-btn">العودة إلى القائمة</Link>
             </div>
 
