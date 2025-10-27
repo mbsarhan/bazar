@@ -1,6 +1,7 @@
 // src/frontend/components/HomePage.js
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import FeaturedCarousel from './FeaturedCarousel';
 import AdCard from './dashboard/AdCard';
 import AdCardSkeleton from './dashboard/AdCardSkeleton'; // 1. Import the skeleton
 import SearchFilters from './SearchFilters';
@@ -75,6 +76,8 @@ const HomePage = () => {
 
     return (
         <div className="home-page-container">
+            <FeaturedCarousel />
+            
             <SearchFilters
                 activeFilter={activeFilter}
                 onFilterChange={handleFilterChange}
