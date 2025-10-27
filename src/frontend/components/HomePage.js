@@ -11,10 +11,12 @@ import { useLocation } from '../context/LocationContext';
 
 const HomePage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+    const { country } = useLocation();
 
     const activeFilter = searchParams.get('type') || 'cars';
     const sortOrder = searchParams.get('sort') || 'newest-first';
-    const { country } = useLocation();
+
+    const [advancedFilters, setAdvancedFilters] = useState({});
 
     // 2. Add loading state to the homepage
     const [isLoading, setIsLoading] = useState(true);
@@ -32,9 +34,9 @@ const HomePage = () => {
                 const params = {
                     geo_location: country.name,
                     sort_by: sortOrder,
+                    type: activeFilter === 'cars' ? 'car' : 'real_estate',
+                    ...advancedFilters, // Add the advanced filters here
                 };
-                // The activeFilter is now guaranteed to be 'cars' or 'real-estate'
-                params.type = activeFilter === 'cars' ? 'car' : 'real_estate';
 
                 // 2. Pass the filters to the API call.
                 const data = await getPublicAds(params);
@@ -48,7 +50,7 @@ const HomePage = () => {
         };
 
         fetchAds();
-    }, [country, activeFilter, sortOrder, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
+    }, [country, activeFilter, sortOrder, advancedFilters, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
     const handleFilterChange = (filter) => {
         setSearchParams(prevParams => {
@@ -56,20 +58,28 @@ const HomePage = () => {
             return prevParams;
         }, { replace: true });
     };
-    
+
     // This handler receives the new filter from the child and updates the state.
     const handleSortChange = (sort) => {
-         setSearchParams(prevParams => {
+        setSearchParams(prevParams => {
             prevParams.set('sort', sort);
             return prevParams;
         }, { replace: true });
     };
 
+    const handleSearchApply = (appliedFilters) => {
+        console.log("Applying advanced filters:", appliedFilters);
+        setAdvancedFilters(appliedFilters);
+        // You could also add these to the URL if you want them to be persistent
+    };
+
     return (
         <div className="home-page-container">
-            <SearchFilters 
+            <SearchFilters
                 activeFilter={activeFilter}
-                onFilterChange={handleFilterChange} 
+                onFilterChange={handleFilterChange}
+                onSearchApply={handleSearchApply}
+                currentFilters={advancedFilters}
             />
             <div className="list-header">
                 <h1>أحدث الإعلانات</h1>
