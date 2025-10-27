@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useLocation } from '../context/LocationContext';
+import { useLocation, countries } from '../context/LocationContext';
 import '../styles/Header.css';
 import { Globe } from 'lucide-react';
 
@@ -37,12 +37,17 @@ const Header = () => {
                 <div className="header-actions">
                     <div className="country-selector">
                         <Globe size={20} />
-                        <select 
-                            value={country.code} 
+                        <select
+                            value={country.code}
                             onChange={(e) => setCountry(e.target.value)}
                         >
-                            <option value="SY">Syria</option>
-                            <option value="SA">Saudi Arabia</option>
+                            {Object.values(countries).map((countryOption) => (
+                                <option key={countryOption.code} value={countryOption.code}>
+                                    {/* --- THIS IS THE FIX --- */}
+                                    {/* Display the Arabic name to the user */}
+                                    {countryOption.displayName}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <button onClick={handleAddAdClick} className="add-ad-btn">

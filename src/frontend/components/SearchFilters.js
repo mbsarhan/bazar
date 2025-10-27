@@ -108,12 +108,10 @@ const RealEstateFilters = ({ filters, onFilterChange }) => {
 };
 
 // --- Main SearchFilters Component ---
-const SearchFilters = ({ onFilterChange }) => {
+const SearchFilters = ({ activeFilter, onFilterChange }) => {
     // 1. New state: 'all' is the default
-    const [activeFilter, setActiveFilter] = useState('all');
 
     const handleFilterClick = (filter) => {
-        setActiveFilter(filter);
         onFilterChange(filter); // Notify the parent component (HomePage) of the change
     };
 
@@ -132,13 +130,6 @@ const SearchFilters = ({ onFilterChange }) => {
 
             {/* --- 2. The NEW Icon Filter Bar --- */}
             <div className="icon-filter-bar">
-                <button 
-                    className={`icon-filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-                    onClick={() => handleFilterClick('all')}
-                >
-                    <LayoutGrid size={20} />
-                    <span>الكل</span>
-                </button>
                 <button 
                     className={`icon-filter-btn ${activeFilter === 'cars' ? 'active' : ''}`}
                     onClick={() => handleFilterClick('cars')}

@@ -12,7 +12,7 @@ import { useLocation } from '../context/LocationContext';
 const HomePage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const activeFilter = searchParams.get('type') || 'all';
+    const activeFilter = searchParams.get('type') || 'cars';
     const sortOrder = searchParams.get('sort') || 'newest-first';
     const { country } = useLocation();
 
@@ -29,19 +29,15 @@ const HomePage = () => {
             setError(null);
             try {
                 // 1. Build the filters object based on the current activeFilter.
-                const filters = {};
-                if (activeFilter !== 'all') {
-                    // Map 'cars' to 'car' and 'real-estate' to 'real_estate' for the API
-                    const apiType = activeFilter === 'cars' ? 'car' : 'real_estate';
-                    filters.type = apiType;
-                }
-                filters.geo_location = country.name;
-
-                // --- 1. ADD THE SORT ORDER TO THE FILTERS OBJECT ---
-                filters.sort_by = sortOrder;
+                const params = {
+                    geo_location: country.name,
+                    sort_by: sortOrder,
+                };
+                // The activeFilter is now guaranteed to be 'cars' or 'real-estate'
+                params.type = activeFilter === 'cars' ? 'car' : 'real_estate';
 
                 // 2. Pass the filters to the API call.
-                const data = await getPublicAds(filters);
+                const data = await getPublicAds(params);
                 setAds(data);
             } catch (err) {
                 console.error("Failed to fetch public ads:", err);
@@ -52,13 +48,13 @@ const HomePage = () => {
         };
 
         fetchAds();
-    }, [country, activeFilter,sortOrder, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
+    }, [country, activeFilter, sortOrder, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
     const handleFilterChange = (filter) => {
         setSearchParams(prevParams => {
             prevParams.set('type', filter);
             return prevParams;
-        });
+        }, { replace: true });
     };
     
     // This handler receives the new filter from the child and updates the state.
@@ -66,12 +62,15 @@ const HomePage = () => {
          setSearchParams(prevParams => {
             prevParams.set('sort', sort);
             return prevParams;
-        });
+        }, { replace: true });
     };
 
     return (
         <div className="home-page-container">
-            <SearchFilters onFilterChange={handleFilterChange} />
+            <SearchFilters 
+                activeFilter={activeFilter}
+                onFilterChange={handleFilterChange} 
+            />
             <div className="list-header">
                 <h1>أحدث الإعلانات</h1>
                 <div className="sort-dropdown-wrapper">

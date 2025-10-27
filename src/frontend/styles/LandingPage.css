@@ -1,0 +1,76 @@
+/* src/frontend/styles/LandingPage.css */
+.landing-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--color-bg-page);
+    text-align: center;
+}
+
+.landing-header {
+    width: 100%;
+    padding: 20px 0;
+    position: absolute;
+    top: 0;
+}
+
+.landing-logo {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-accent-primary);
+    margin: 0;
+}
+
+.landing-content {
+    color: var(--color-text-dark);
+}
+.landing-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.landing-country-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 40px;
+}
+.landing-country-selector svg { color: #666; }
+.landing-country-selector select {
+    background: none; border: none; outline: none;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text-dark);
+}
+
+.landing-choices-wrapper {
+    display: flex;
+    gap: 30px;
+}
+
+.landing-choice-card {
+    background-color: var(--color-bg-card);
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.landing-choice-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent-primary);
+}
+.landing-choice-card svg { color: var(--color-accent-primary); margin-bottom: 15px; }
+.landing-choice-card h3 { margin: 0; font-size: 1.3rem; }
