@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation, countries } from '../context/LocationContext';
 import { Car, Home, Globe } from 'lucide-react';
 import '../styles/LandingPage.css'; // New dedicated CSS file
+import '../styles/forms.css';
 
 const LandingPage = () => {
     const navigate = useNavigate();
@@ -17,11 +18,11 @@ const LandingPage = () => {
     return (
         <div className="landing-page-container">
             <div className="landing-header">
-                <h1 className="landing-logo">بازار</h1>
+                <h1 className="landing-logo">ديّلها</h1>
             </div>
 
-            <div className="landing-content">
-                <h2>ماذا تريد أن تعلن عنه؟</h2>
+            <div className="form-container choice-container">
+                <h2>ديّلها معنا</h2>
 
                 {/* --- The New Country Selector --- */}
                 <div className="landing-country-selector">

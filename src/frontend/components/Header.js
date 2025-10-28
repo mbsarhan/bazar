@@ -1,6 +1,6 @@
 // src/frontend/components/Header.js (Reverted to simple, consistent version)
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation as useReactRouterLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocation, countries } from '../context/LocationContext';
 import '../styles/Header.css';
@@ -10,6 +10,25 @@ const Header = () => {
     const { user } = useAuth();
     const { country, setCountry } = useLocation();
     const navigate = useNavigate();
+    const reactRouterLocation = useReactRouterLocation();
+
+    const [lastFilterType, setLastFilterType] = useState(() => {
+        // On initial load, try to get it from localStorage, default to 'cars'
+        return localStorage.getItem('lastFilterType') || 'cars';
+    });
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(reactRouterLocation.search);
+        const currentType = searchParams.get('type');
+        
+        // If the URL has a type (e.g., '/ads?type=real-estate'), save it.
+        if (currentType === 'cars' || currentType === 'real-estate') {
+            localStorage.setItem('lastFilterType', currentType);
+            setLastFilterType(currentType);
+        }
+    }, [reactRouterLocation.search]);
+
+    const homeLink = `/ads?type=${lastFilterType}`;
 
     const handleAddAdClick = () => {
         if (user) {
@@ -20,19 +39,18 @@ const Header = () => {
     };
 
     const handleLogoClick = () => {
-        // This function ensures clicking the logo on the homepage scrolls to top
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        // We still keep this to scroll to top if already on an ads page
+        if (window.location.pathname.startsWith('/ads')) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     return (
         // The header no longer has any conditional classes
         <header className="main-header">
             <div className="header-content">
-                <Link to="/" className="logo" onClick={handleLogoClick}>
-                    بازار
+                <Link to={homeLink} className="logo" onClick={handleLogoClick}>
+                    ديّلها
                 </Link>
                 <div className="header-actions">
                     <div className="country-selector">
