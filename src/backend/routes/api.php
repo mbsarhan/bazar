@@ -124,7 +124,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     //Search and filter
-    Route::get('/advertisement/search', [AdvertisementSearchController::class, 'search']);
+    Route::get('/advertisements/search', [AdvertisementSearchController::class, 'search']);
 
 
     //Video

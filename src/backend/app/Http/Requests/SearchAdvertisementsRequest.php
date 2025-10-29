@@ -23,8 +23,8 @@ class SearchAdvertisementsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', Rule::in(['car', 'realestate'])],
-            'q' => ['required', 'string', 'min:2', 'max:100'],
+            'type' => ['nullable', 'string', Rule::in(['car', 'realestate'])],
+            'q' => ['nullable', 'string', 'min:2', 'max:100'],
 
             // Common Optional Filters
             'min_price' => ['nullable', 'numeric', 'min:0'],
