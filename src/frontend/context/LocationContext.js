@@ -3,8 +3,18 @@ import React, { createContext, useState, useContext, useMemo } from 'react';
 
 // Define our supported countries and their properties
 export const countries = {
-    SY: { code: 'SY', name: 'Syria', currency: 'USD' }, // Keeping USD for now
-    SA: { code: 'SA', name: 'Saudi Arabia', currency: 'SAR' },
+    SY: { 
+        code: 'SY', 
+        name: 'Syria', // This value will be sent to the backend
+        displayName: 'الجمهورية العربية السورية', // This text will be shown to the user
+        currency: 'USD' 
+    },
+    SA: { 
+        code: 'SA', 
+        name: 'Saudi Arabia', // This value will be sent to the backend
+        displayName: 'المملكة العربية السعودية', // This text will be shown to the user
+        currency: 'SAR' 
+    },
 };
 
 const LocationContext = createContext(null);

@@ -117,6 +117,26 @@ export const AdminProvider = ({ children }) => {
 
 
 
+
+    /**
+     * Fetches the full public details of any single advertisement.
+     */
+    const getAdById = useCallback(async (adId) => {
+        const response = await api.get(`/advertisements/${adId}`);
+        return response.data.data;
+    }, []);
+
+
+    /**
+     * Permanently deletes an active advertisement by its ID.
+     */
+    const deleteActiveAd = useCallback(async (adId) => {
+        const response = await api.delete(`/admin/advertisements/${adId}`);
+        return response.data;
+    }, []);
+
+
+
     const value = {
         pendingUpdates,
         isLoading,
@@ -130,6 +150,8 @@ export const AdminProvider = ({ children }) => {
         getDashboardStats,
         getWeeklyChartData,
         getActiveAds,
+        getAdById,
+        deleteActiveAd,
     };
 
     return (

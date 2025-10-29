@@ -1,6 +1,7 @@
 // src/frontend/components/HomePage.js
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import FeaturedCarousel from './FeaturedCarousel';
 import AdCard from './dashboard/AdCard';
 import AdCardSkeleton from './dashboard/AdCardSkeleton'; // 1. Import the skeleton
 import SearchFilters from './SearchFilters';
@@ -11,10 +12,12 @@ import { useLocation } from '../context/LocationContext';
 
 const HomePage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-
-    const activeFilter = searchParams.get('type') || 'all';
-    const sortOrder = searchParams.get('sort') || 'newest-first';
     const { country } = useLocation();
+
+    const activeFilter = searchParams.get('type') || 'cars';
+    const sortOrder = searchParams.get('sort') || 'newest-first';
+
+    const [advancedFilters, setAdvancedFilters] = useState({});
 
     // 2. Add loading state to the homepage
     const [isLoading, setIsLoading] = useState(true);
@@ -29,19 +32,15 @@ const HomePage = () => {
             setError(null);
             try {
                 // 1. Build the filters object based on the current activeFilter.
-                const filters = {};
-                if (activeFilter !== 'all') {
-                    // Map 'cars' to 'car' and 'real-estate' to 'real_estate' for the API
-                    const apiType = activeFilter === 'cars' ? 'car' : 'real_estate';
-                    filters.type = apiType;
-                }
-                filters.geo_location = country.name;
-
-                // --- 1. ADD THE SORT ORDER TO THE FILTERS OBJECT ---
-                filters.sort_by = sortOrder;
+                const params = {
+                    geo_location: country.name,
+                    sort_by: sortOrder,
+                    type: activeFilter === 'cars' ? 'car' : 'real_estate',
+                    ...advancedFilters, // Add the advanced filters here
+                };
 
                 // 2. Pass the filters to the API call.
-                const data = await getPublicAds(filters);
+                const data = await getPublicAds(params);
                 setAds(data);
             } catch (err) {
                 console.error("Failed to fetch public ads:", err);
@@ -52,26 +51,39 @@ const HomePage = () => {
         };
 
         fetchAds();
-    }, [country, activeFilter,sortOrder, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
+    }, [country, activeFilter, sortOrder, advancedFilters, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
     const handleFilterChange = (filter) => {
         setSearchParams(prevParams => {
             prevParams.set('type', filter);
             return prevParams;
-        });
+        }, { replace: true });
     };
-    
+
     // This handler receives the new filter from the child and updates the state.
     const handleSortChange = (sort) => {
-         setSearchParams(prevParams => {
+        setSearchParams(prevParams => {
             prevParams.set('sort', sort);
             return prevParams;
-        });
+        }, { replace: true });
+    };
+
+    const handleSearchApply = (appliedFilters) => {
+        console.log("Applying advanced filters:", appliedFilters);
+        setAdvancedFilters(appliedFilters);
+        // You could also add these to the URL if you want them to be persistent
     };
 
     return (
         <div className="home-page-container">
-            <SearchFilters onFilterChange={handleFilterChange} />
+            <FeaturedCarousel />
+            
+            <SearchFilters
+                activeFilter={activeFilter}
+                onFilterChange={handleFilterChange}
+                onSearchApply={handleSearchApply}
+                currentFilters={advancedFilters}
+            />
             <div className="list-header">
                 <h1>أحدث الإعلانات</h1>
                 <div className="sort-dropdown-wrapper">

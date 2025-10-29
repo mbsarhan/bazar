@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
 import '../styles/AdDetailPage.css';
 import {
-    GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
+    ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
     Home, Square, BedDouble, Bath
 } from 'lucide-react';
 
@@ -40,7 +40,7 @@ const AdDetailPage = () => {
                 console.log("Received videoType:", data.videoType);
                 // --- END LOG ---
                 setAd(data);
-                 if (data && data.videoUrl && data.videoType) {
+                if (data && data.videoUrl && data.videoType) {
                     setVideoPlayerOptions({
                         autoplay: false,
                         controls: true,
@@ -135,13 +135,19 @@ const AdDetailPage = () => {
                     {/* Main Image Display */}
                     <div className="main-image-container">
                         {currentIndex === -1 && videoPlayerOptions ? (
-                        <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady} />
+                            <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady} />
                         ) : (
                             <img
                                 src={ad.imageUrls[currentIndex]}
                                 alt={`${ad.title} - ${currentIndex + 1}`}
                                 className="main-image"
                             />
+                        )}
+                        {ad.imageUrls.length > 1 && (
+                            <>
+                                <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
+                                <button className="gallery-arrow right" onClick={prevSlide}><ChevronRight size={32} /></button>
+                            </>
                         )}
                     </div>
 
@@ -151,8 +157,8 @@ const AdDetailPage = () => {
                         <div className="video-thumbnails">
                             {videoPlayerOptions && (
                                 <div className={`video-thumbnail ${currentIndex === -1 ? 'active' : ''}`} onClick={() => setCurrentIndex(-1)}>
-                                    <div style={{width: '100%', height: '100%', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                                    <div style={{ width: '100%', height: '100%', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="white"><path d="M8 5v14l11-7z" /></svg>
                                     </div>
                                 </div>
                             )}

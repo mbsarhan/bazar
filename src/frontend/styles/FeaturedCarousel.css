@@ -1,0 +1,73 @@
+/* src/frontend/styles/FeaturedCarousel.css */
+
+.featured-carousel-container {
+    width: 100%;
+    max-width: 1200px; /* Match the homepage container */
+    margin: 40px auto 0 auto; /* Margin top, but not bottom */
+    height: 450px; /* A large, prominent height */
+}
+
+.myFeaturedSwiper {
+    width: 100%;
+    height: 100%;
+    border-radius: 18px; /* Match the search container's rounding */
+}
+
+.myFeaturedSwiper .swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.myFeaturedSwiper .swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.slide-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    color: white;
+    padding: 40px 20px 20px 20px;
+    text-align: right;
+}
+
+.slide-caption h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+}
+
+.slide-caption p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* --- THEME OVERRIDE for Swiper Elements --- */
+.myFeaturedSwiper .swiper-pagination-bullet-active {
+    background-color: var(--color-accent-primary);
+}
+
+.myFeaturedSwiper .swiper-button-next,
+.myFeaturedSwiper .swiper-button-prev {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
+.myFeaturedSwiper .swiper-button-next:after,
+.myFeaturedSwiper .swiper-button-prev:after {
+    font-size: 20px;
+    font-weight: 900;
+}

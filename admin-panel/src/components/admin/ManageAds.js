@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import '../../styles/AdminPages.css';
 import { useAdmin } from '../../context/AdminContext'; // 1. IMPORT
+import { Trash2 } from 'lucide-react';
 
 
 const ManageAds = () => {
@@ -17,8 +18,10 @@ const ManageAds = () => {
         getPendingUpdates, 
         approveUpdate, 
         getActiveAds, // <-- 1. GET THE NEW FUNCTION
-        rejectUpdate 
+        rejectUpdate,
+        deleteActiveAd,
     } = useAdmin(); // 2. GET FUNCTIONS
+
     useEffect(() => {
         const fetchAds = async () => {
             setIsLoading(true);
@@ -69,6 +72,19 @@ const ManageAds = () => {
         }
     };
 
+    // --- 2. UPDATE THE handleDelete FUNCTION ---
+    const handleDelete = async (adId) => {
+        if (window.confirm('هل أنت متأكد أنك تريد حذف هذا الإعلان نهائياً؟ سيتم حذف جميع ملفاته وبياناته.')) {
+            try {
+                await deleteActiveAd(adId);
+                // On success, filter the ad from the local state for an instant UI update
+                setAds(prev => prev.filter(ad => ad.id !== adId));
+            } catch (err) {
+                alert(err.response?.data?.message || 'Failed to delete the ad.');
+            }
+        }
+    };
+
     if (isLoading) return <p>جاري تحميل الإعلانات...</p>;
     if (error) return <p className="error-message">{error}</p>;
 
@@ -108,18 +124,25 @@ const ManageAds = () => {
                         {ads.length > 0 ? (
                             ads.map(ad => (
                                 // 3. Add onClick to the table row
-                                <tr key={ad.id} className="clickable-row" onClick={() => navigate(`/admin/view-ad/${ad.id}`)}>
+                                <tr key={ad.id} className="clickable-row" onClick={() => navigate(`/admin/view-ad/${ad.id}`, { 
+                                        // Pass the filter type in the state
+                                        state: { type: statusFilter } 
+                                    })}>
                                     <td>{ad.title}</td>
                                     <td>{ad.user.name}</td>
                                     <td>{ad.type}</td>
                                     <td>{ad.date}</td>
                                     <td className="actions-cell" onClick={handleActionClick}>
-                                        <button className="action-btn approve" onClick={() => handleApprove(ad.id)}>
-                                            موافقة
-                                        </button>
-                                        <button className="action-btn reject" onClick={() => handleReject(ad.id)}>
-                                            رفض
-                                        </button>
+                                        {statusFilter === 'pending' ? (
+                                            <>
+                                                <button className="action-btn approve" onClick={() => handleApprove(ad.id)}>موافقة</button>
+                                                <button className="action-btn reject" onClick={() => handleReject(ad.id)}>رفض</button>
+                                            </>
+                                        ) : (
+                                            <button className="action-btn reject" onClick={() => handleDelete(ad.id)} title="حذف الإعلان نهائياً">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))
