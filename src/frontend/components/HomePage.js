@@ -77,7 +77,7 @@ const HomePage = () => {
     return (
         <div className="home-page-container">
             <FeaturedCarousel />
-            
+
             <SearchFilters
                 activeFilter={activeFilter}
                 onFilterChange={handleFilterChange}
@@ -103,16 +103,26 @@ const HomePage = () => {
 
             <div className="ads-list-container">
                 {isLoading ? (
-                    // 4. If loading, show a grid of 8 skeleton cards
                     Array.from({ length: 8 }).map((_, index) => (
                         <AdCardSkeleton key={index} />
                     ))
                 ) : error ? (
                     <p className="error-message">حدث خطأ أثناء تحميل الإعلانات: {error}</p>
                 ) : ads.length > 0 ? (
-                    ads.map(ad => (
-                        <AdCard key={ad.id} ad={ad} isPublic={true} />
-                    ))
+                    (() => {
+                        // 1. Get the list of IDs from your currently displayed ads.
+                        const filteredAdIds = ads.map(ad => ad.id);
+
+                        // 2. Map over the ads and pass the entire list of IDs to each AdCard.
+                        return ads.map(ad => (
+                            <AdCard
+                                key={ad.id}
+                                ad={ad}
+                                isPublic={true}
+                                adIdList={filteredAdIds} // <-- PASS THE LIST AS A PROP
+                            />
+                        ));
+                    })()
                 ) : (
                     <p>لا توجد إعلانات لعرضها حالياً.</p>
                 )}

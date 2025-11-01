@@ -1,23 +1,28 @@
 // src/frontend/components/AdDetailPage.js
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useAds } from '../context/AdContext'; // 1. Use the context
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'; // 1. Import useLocation
+import { useAds } from '../context/AdContext';
 import { useAuth } from '../context/AuthContext';
 
-import AdDetailSkeleton from './AdDetailSkeleton'; // 2. Import the skeleton
+import AdDetailSkeleton from './AdDetailSkeleton';
 import '../styles/AdDetailPage.css';
 import {
     ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical, Fuel, Wrench,
     Home, Square, BedDouble, Bath
 } from 'lucide-react';
 
-import VideoPlayer from './VideoPlayer'; // <-- EDIT: Import the new reusable component
+import VideoPlayer from './VideoPlayer';
 
 const AdDetailPage = () => {
     const { adId } = useParams();
-    const { getAdById } = useAds(); // 3. Get the fetching function from context
+    const { getAdById, getPublicAds } = useAds();
     const { user } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation(); // 2. Get the location object to access state
 
+    // This state will hold the list of ad IDs for navigation.
+    // It will be populated from the navigation state if available.
+    const [adIdList, setAdIdList] = useState([]);
 
     const [ad, setAd] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,12 +38,7 @@ const AdDetailPage = () => {
             setAd(null);
             try {
                 const data = await getAdById(parseInt(adId, 10));
-                // --- ADD THIS LOG ---
                 console.log("API Response for Ad:", data);
-                // You can be more specific:
-                console.log("Received videoUrl:", data.videoUrl);
-                console.log("Received videoType:", data.videoType);
-                // --- END LOG ---
                 setAd(data);
                 if (data && data.videoUrl && data.videoType) {
                     setVideoPlayerOptions({
@@ -48,11 +48,11 @@ const AdDetailPage = () => {
                         fluid: true,
                         sources: [{
                             src: data.videoUrl,
-                            type: data.videoType // Use the type from the backend
+                            type: data.videoType
                         }]
                     });
                 } else {
-                    setVideoPlayerOptions(null); // Ensure it's null if no video
+                    setVideoPlayerOptions(null);
                 }
             } catch (err) {
                 setError(err.message);
@@ -62,6 +62,27 @@ const AdDetailPage = () => {
         };
         fetchAd();
     }, [adId, getAdById]);
+
+    // 3. This effect now sets the ad list for navigation
+    useEffect(() => {
+        const fetchAndSetAdIds = async () => {
+            // If a list of IDs was passed from the previous page, use it.
+            if (location.state && location.state.filteredAdIds) {
+                setAdIdList(location.state.filteredAdIds);
+            } else {
+                // As a fallback, fetch all public ads and map to their IDs.
+                try {
+                    const publicAds = await getPublicAds();
+                    const ids = publicAds.map(ad => ad.id);
+                    setAdIdList(ids);
+                } catch (err) {
+                    console.error("Error fetching ads for navigation:", err);
+                }
+            }
+        };
+        fetchAndSetAdIds();
+    }, [location.state, getPublicAds]);
+
 
     // Auto-scroll thumbnail into view when currentIndex changes
     useEffect(() => {
@@ -79,7 +100,6 @@ const AdDetailPage = () => {
 
     const handlePlayerReady = (player) => {
         console.log('Video.js player is ready on the detail page!', player);
-        // Video.js will automatically add the quality selector for HLS streams.
     };
 
     const formatNumber = (num) => num ? num.toLocaleString('en-US') : '0';
@@ -97,6 +117,26 @@ const AdDetailPage = () => {
         const newIndex = isLastSlide ? 0 : currentIndex + 1;
         setCurrentIndex(newIndex);
     };
+
+    // 4. Update navigation logic to use the new `adIdList`
+    const currentAdIndexInList = adIdList.findIndex(id => id === Number(adId));
+
+    const handleNextAd = () => {
+        if (currentAdIndexInList < adIdList.length - 1) {
+            const nextAdId = adIdList[currentAdIndexInList + 1];
+            // Pass the state along so the next page also has the context
+            navigate(`/ad/${nextAdId}`, { state: { filteredAdIds: adIdList } });
+        }
+    };
+
+    const handlePrevAd = () => {
+        if (currentAdIndexInList > 0) {
+            const prevAdId = adIdList[currentAdIndexInList - 1];
+            // Pass the state along so the next page also has the context
+            navigate(`/ad/${prevAdId}`, { state: { filteredAdIds: adIdList } });
+        }
+    };
+
 
     if (isLoading) {
         return <AdDetailSkeleton />;
@@ -124,6 +164,18 @@ const AdDetailPage = () => {
 
     return (
         <div className="ad-detail-container">
+            <div className="ad-navigation-buttons">
+                {/* 5. Logic for disabling buttons is now also based on the new list */}
+                <button onClick={handlePrevAd} disabled={currentAdIndexInList <= 0}>
+                    الإعلان السابق →
+                </button>
+                <button onClick={() => navigate('/')} className="home-button">
+                    الصفحة الرئيسية
+                </button>
+                <button onClick={handleNextAd} disabled={currentAdIndexInList >= adIdList.length - 1}>
+                    ← الإعلان التالي
+                </button>
+            </div>
             <div className="ad-detail-header">
                 <h1>{ad.title}</h1>
                 <span className="ad-detail-price">{`${!ad.price ? 'السعر عند التواصل' : `${ad.price} $`}
@@ -145,15 +197,15 @@ const AdDetailPage = () => {
                         )}
                         {ad.imageUrls.length > 1 && (
                             <>
-                                <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
-                                <button className="gallery-arrow right" onClick={prevSlide}><ChevronRight size={32} /></button>
+                                <button className="gallery-arrow left" onClick={prevSlide}><ChevronLeft size={32} /></button>
+                                <button className="gallery-arrow right" onClick={nextSlide}><ChevronRight size={32} /></button>
                             </>
                         )}
                     </div>
 
                     {/* Thumbnails Container */}
                     <div className="thumbnail-container-wrapper">
-                        {/* Video Thumbnails - Left Side (space always reserved) */}
+                        {/* Video Thumbnails */}
                         <div className="video-thumbnails">
                             {videoPlayerOptions && (
                                 <div className={`video-thumbnail ${currentIndex === -1 ? 'active' : ''}`} onClick={() => setCurrentIndex(-1)}>
@@ -164,9 +216,9 @@ const AdDetailPage = () => {
                             )}
                         </div>
 
-                        {/* Photo Thumbnails - Right Side */}
-                        {ad.imageUrls.length && (
-                            <div className="thumbnail-scroller">
+                        {/* Photo Thumbnails */}
+                        {ad.imageUrls.length > 0 && (
+                            <div className="thumbnail-scroller" ref={thumbnailScrollerRef}>
                                 {ad.imageUrls.map((url, index) => (
                                     <div
                                         key={index}

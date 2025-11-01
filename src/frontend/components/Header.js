@@ -20,7 +20,7 @@ const Header = () => {
     useEffect(() => {
         const searchParams = new URLSearchParams(reactRouterLocation.search);
         const currentType = searchParams.get('type');
-        
+
         // If the URL has a type (e.g., '/ads?type=real-estate'), save it.
         if (currentType === 'cars' || currentType === 'real-estate') {
             localStorage.setItem('lastFilterType', currentType);
@@ -31,12 +31,21 @@ const Header = () => {
     const homeLink = `/ads?type=${lastFilterType}`;
 
     const handleAddAdClick = () => {
-        if (user) {
-            navigate('/add-ad');
+        const currentPath = reactRouterLocation.pathname;
+
+        if (currentPath.includes('/dashboard')) {
+            navigate('/', { state: { fromDashboard: true } });
         } else {
-            navigate('/login', { state: { redirectTo: '/add-ad' } });
+            if (user) {
+                navigate('/', { state: { fromAddAd: true } });
+            } else {
+                navigate('/login', {
+                    state: { redirectTo: '/', fromAddAd: true },
+                });
+            }
         }
     };
+
 
     const handleLogoClick = () => {
         // We still keep this to scroll to top if already on an ads page
@@ -61,8 +70,6 @@ const Header = () => {
                         >
                             {Object.values(countries).map((countryOption) => (
                                 <option key={countryOption.code} value={countryOption.code}>
-                                    {/* --- THIS IS THE FIX --- */}
-                                    {/* Display the Arabic name to the user */}
                                     {countryOption.displayName}
                                 </option>
                             ))}
