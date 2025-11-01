@@ -16,6 +16,7 @@ const HomePage = () => {
 
     const activeFilter = searchParams.get('type') || 'cars';
     const sortOrder = searchParams.get('sort') || 'newest-first';
+    const currentQuery = searchParams.get('q') || '';
 
     const [advancedFilters, setAdvancedFilters] = useState({});
 
@@ -23,41 +24,55 @@ const HomePage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [ads, setAds] = useState([]);
     const [error, setError] = useState(null); // Add error state
-    const { getPublicAds } = useAds(); // 2. Get the function from context
+    const { getPublicAds, searchAds } = useAds(); // 2. Get the function from context
 
     // This useEffect hook is now the "engine". It depends on activeFilter.
     useEffect(() => {
         const fetchAds = async () => {
             setIsLoading(true);
             setError(null);
+            const params = {
+                geo_location: country.name,
+                sort_by: sortOrder,
+                type: activeFilter === 'cars' ? 'car' : 'real_estate',
+                ...advancedFilters, // Add the advanced filters here
+            };
             try {
-                // 1. Build the filters object based on the current activeFilter.
-                const params = {
-                    geo_location: country.name,
-                    sort_by: sortOrder,
-                    type: activeFilter === 'cars' ? 'car' : 'real_estate',
-                    ...advancedFilters, // Add the advanced filters here
-                };
+                let data;
+                
 
-                // 2. Pass the filters to the API call.
-                const data = await getPublicAds(params);
-                setAds(data);
+                // --- EDIT: Decide whether to search or list ---
+                if (currentQuery) {
+                    params.q = currentQuery;
+                    data = await searchAds(params);
+                } else {
+                    data = await getPublicAds(params);
+                }
+                setAds(data || []); // Ensure ads is always an array
             } catch (err) {
-                console.error("Failed to fetch public ads:", err);
-                setError(err.message || 'Failed to load advertisements.');
+                let errorMessage = 'Failed to load advertisements.';
+                if (err.response && err.response.status === 422) {
+                    errorMessage = 'Invalid filters provided. Please check your search criteria.';
+                    console.error('Validation Errors:', err.response.data.errors);
+                } else {
+                    errorMessage = err.message || errorMessage;
+                    setError(err.message || 'Failed to load advertisements.');
+                    setAds([]); // Clear ads on error
+                }
+
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchAds();
-    }, [country, activeFilter, sortOrder, advancedFilters, getPublicAds]); // 3. Re-run this effect WHENEVER activeFilter changes.
+    }, [country, activeFilter, sortOrder, advancedFilters, getPublicAds, searchAds,currentQuery]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
     const handleFilterChange = (filter) => {
-        setSearchParams(prevParams => {
-            prevParams.set('type', filter);
-            return prevParams;
-        }, { replace: true });
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('q'); // CRITICAL: Clear the search query when changing tabs
+        newParams.set('type', filter);
+        setSearchParams(newParams);
     };
 
     // This handler receives the new filter from the child and updates the state.
@@ -74,15 +89,24 @@ const HomePage = () => {
         // You could also add these to the URL if you want them to be persistent
     };
 
+    // --- EDIT: This function is called by the SearchFilters component ---
+    const handleSearch = (query) => {
+        const newParams = new URLSearchParams(searchParams); // Start fresh
+        newParams.set('q', query);
+        // You can add other filters here if you want to preserve them during search
+        setSearchParams(newParams);
+    };
+
     return (
         <div className="home-page-container">
             <FeaturedCarousel />
-            
+
             <SearchFilters
                 activeFilter={activeFilter}
                 onFilterChange={handleFilterChange}
                 onSearchApply={handleSearchApply}
                 currentFilters={advancedFilters}
+                onSearch={handleSearch}
             />
             <div className="list-header">
                 <h1>أحدث الإعلانات</h1>

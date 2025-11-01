@@ -20,8 +20,9 @@ class AdvertisementSearchController extends Controller
      */
     public function search(SearchAdvertisementsRequest $request)
     {
-        $results = $this->searchService->search($request->validated());
+        $searchResults = $this->searchService->search($request->validated());
+        $searchResults['data'] = AdvertisementResource::collection(collect($searchResults['data']));
 
-        return response()->json($results);
+        return response()->json($searchResults);
     }
 }

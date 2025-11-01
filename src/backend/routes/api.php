@@ -43,6 +43,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 // Advertisements & SearchFilters
 Route::get('/advertisements', [AdvertisementController::class, 'index']);
+//Search and filter
+    Route::get('/advertisements/search', [AdvertisementSearchController::class, 'search']);
 Route::get('/advertisements/{ad}', [AdvertisementController::class, 'show']);
 
 //Verify Email with Otp
@@ -123,8 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/rate', [UserRatingsController::class, 'store'])->middleware('throttle:5,1');
 
 
-    //Search and filter
-    Route::get('/advertisements/search', [AdvertisementSearchController::class, 'search']);
+    
 
 
     //Video
