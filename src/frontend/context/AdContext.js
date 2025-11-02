@@ -5,7 +5,7 @@ const AdContext = createContext(null);
 const API_URL = 'http://127.0.0.1:8000/api';
 
 export const AdProvider = ({ children }) => {
-    
+
     const createCarAd = async (formData) => {
         const token = localStorage.getItem('authToken');
         if (!token) throw new Error('User not authenticated.');
@@ -80,10 +80,10 @@ export const AdProvider = ({ children }) => {
         return result;
     };
 
-   /**
-     * NEW: Creates a new Real Estate Ad using AXIOS.
-     * @param {FormData} adFormData - The complete form data including files.
-     */
+    /**
+      * NEW: Creates a new Real Estate Ad using AXIOS.
+      * @param {FormData} adFormData - The complete form data including files.
+      */
     const createRealEstateAd = async (adFormData) => {
         // Our api.js client automatically adds the Auth token.
         // For file uploads with FormData, we must tell axios to set the correct multipart header.
@@ -92,7 +92,7 @@ export const AdProvider = ({ children }) => {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        
+
         // Axios automatically provides the data in the .data property
         return response.data;
     };
@@ -126,10 +126,27 @@ export const AdProvider = ({ children }) => {
      * @param {object} filters - e.g., { type: 'car' }
      */
     const getPublicAds = async (filters = {}) => {
-        const response = await api.get('/advertisements', {
-            params: filters // Axios will create the URL: /advertisements?type=car
-        });
-        return response.data.data;
+        try {
+            const response = await api.get('/advertisements', {
+                params: filters // Axios will create the URL: /advertisements?type=car&page=1&limit=24
+            });
+
+            // The API now returns a structured object, not just the data array.
+            // We need to extract both the data and the total pages from it.
+            const responseData = response.data;
+
+            // A standard paginated response from a framework like Laravel looks like this.
+            // Adjust the paths (e.g., `responseData.meta.last_page`) if your API structure is different.
+            return {
+                data: responseData.data, // The array of ads for the current page
+                totalPages: responseData.meta.last_page, // The total number of pages available
+            };
+
+        } catch (error) {
+            console.error("Error in getPublicAds:", error);
+            // Throw a clear error message that the component can catch and display.
+            throw new Error(error.response?.data?.message || "Failed to fetch advertisements.");
+        }
     };
 
     /**
@@ -179,9 +196,9 @@ export const AdProvider = ({ children }) => {
     };
 
 
-     // Add the new function to the provider's value
+    // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView ,updateCarAd ,updateRealEstateAd}}>
+        <AdContext.Provider value={{ createCarAd, getMyCarAds, deleteCarAd, getAdById, createRealEstateAd, getMyRealEstateAds, deleteRealEstateAd, getPublicAds, incrementAdView, updateCarAd, updateRealEstateAd }}>
             {children}
         </AdContext.Provider>
     );

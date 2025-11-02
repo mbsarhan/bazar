@@ -13,7 +13,7 @@ const DeleteIcon = () => <Trash2 size={16} />;
 const ViewIcon = () => <ExternalLink size={16} />;
 
 // 1. Accept `adIdList` as a new prop. This list comes from the parent component.
-const AdCard = ({ ad, isPublic = false, onDelete, adIdList }) => {
+const AdCard = ({ ad, isPublic = false, onDelete, adIdList, returnPath }) => {
 
     const navigate = useNavigate();
     const { incrementAdView } = useAds();
@@ -84,7 +84,10 @@ const AdCard = ({ ad, isPublic = false, onDelete, adIdList }) => {
         
         // 2. When navigating, pass the list of IDs in the `state` object.
         navigate(`/ad/${ad.id}`, { 
-            state: { filteredAdIds: adIdList }
+            state: { 
+                filteredAdIds: adIdList,
+                returnTo: returnPath // <-- ADD THIS
+            }
         });
     } ;
 
@@ -111,8 +114,11 @@ const AdCard = ({ ad, isPublic = false, onDelete, adIdList }) => {
                 to={`/ad/${ad.id}`} 
                 className="ad-card-clickable-area" 
                 onClick={handleShowClick}
-                // 3. Also add the state to the Link for accessibility (e.g., right-click to open in new tab).
-                state={{ filteredAdIds: adIdList }}
+                // 3. Also add it to the Link's state for accessibility
+                state={{ 
+                    filteredAdIds: adIdList,
+                    returnTo: returnPath // <-- AND ADD THIS
+                }}
             >
                 <div className="ad-card-image">
                     <img src={ad.imageUrls[currentIndex]} alt={ad.title} />

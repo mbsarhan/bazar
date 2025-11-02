@@ -162,6 +162,8 @@ const AdDetailPage = () => {
         );
     }
 
+    const returnToPath = location.state?.returnTo || '/';
+
     return (
         <div className="ad-detail-container">
             <div className="ad-navigation-buttons">
@@ -169,7 +171,7 @@ const AdDetailPage = () => {
                 <button onClick={handlePrevAd} disabled={currentAdIndexInList <= 0}>
                     الإعلان السابق →
                 </button>
-                <button onClick={() => navigate('/')} className="home-button">
+                <button onClick={() => navigate(returnToPath)} className="home-button">
                     الصفحة الرئيسية
                 </button>
                 <button onClick={handleNextAd} disabled={currentAdIndexInList >= adIdList.length - 1}>

@@ -18,20 +18,6 @@ class AdvertisementService
         // Start building the query on the Advertisement model
         $query = Advertisement::query();
 
-        // --- 3. THE NEW FILTERING LOGIC ---
-        // Check if a 'type' parameter was passed in the URL (e.g., /api/advertisements?type=car)
-        // if ($request->has('type')) {
-        //     $type = $request->query('type');
-
-        //     if ($type === 'car') {
-        //         // If type is 'car', only include ads that have a carDetails relationship.
-        //         $query->whereHas('carDetails');
-        //     } elseif ($type === 'real_estate') {
-        //         // If type is 'real_estate', only include ads that have a realEstateDetails relationship.
-        //         $query->whereHas('realEstateDetails');
-        //     }
-        // }
-
         if ($request->filled('geo_location')) {
         // Use an exact match '=' instead of 'LIKE' for better performance.
         $query->where('geo_location', $request->query('geo_location'));
@@ -80,7 +66,7 @@ class AdvertisementService
                 'carDetails.ImagesForCar',
                 'realEstateDetails.ImageForRealestate'
             ])
-            ->paginate(100); // It's better to use a smaller page size like 20
+            ->paginate(24); // It's better to use a smaller page size like 20
     }
 
 
