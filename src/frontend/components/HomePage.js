@@ -17,6 +17,7 @@ const HomePage = () => {
     // 2. Read all relevant parameters from the URL
     const activeFilter = searchParams.get('type') || 'cars';
     const sortOrder = searchParams.get('sort') || 'newest-first';
+    const currentQuery = searchParams.get('query') || '';
     const currentPage = parseInt(searchParams.get('page') || '1', 10); // Current page from URL
 
     const [advancedFilters, setAdvancedFilters] = useState({});
@@ -24,7 +25,7 @@ const HomePage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [ads, setAds] = useState([]);
     const [error, setError] = useState(null);
-    const { getPublicAds } = useAds();
+    const { getPublicAds, searchAds } = useAds();
 
     const reactRouterLocation = useReactRouterLocation();
 
@@ -35,25 +36,39 @@ const HomePage = () => {
         const fetchAds = async () => {
             setIsLoading(true);
             setError(null);
+
+            // 1. Combine all necessary parameters: location, sorting, type, advanced filters, and pagination
+            const params = {
+                geo_location: country.name,
+                sort_by: sortOrder,
+                type: activeFilter === 'cars' ? 'car' : 'real_estate',
+                // Keep the existing derived advancedFilters (from HomePage.js state/URL)
+                ...advancedFilters,
+
+                // Add the new pagination parameters (from the incoming 'main' branch logic)
+                // Note: If you don't have currentPage/setTotalPages state yet, you'll need to add them!
+                page: currentPage,
+                limit: 24,
+            };
+
             try {
-                // 4. Add pagination parameters to the API call
-                const params = {
-                    geo_location: country.name,
-                    sort_by: sortOrder,
-                    type: activeFilter === 'cars' ? 'car' : 'real_estate',
-                    page: currentPage, // Send the current page number
-                    limit: 24,         // Send the number of ads per page
-                    ...advancedFilters,
-                };
+                let data;
+                let response; // Use a variable to hold the full response object
 
-                // 5. The API response now needs to be an object with ad data and total pages
-                const response = await getPublicAds(params);
-                setAds(response.data);
-                setTotalPages(response.totalPages);
+                // 2. Incorporate your search/list decision logic
+                if (currentQuery) {
+                    // Use 'q' for query if that's what your backend expects, not 'params.query'
+                    params.query = currentQuery;
+                    response = await searchAds(params);
+                } else {
+                    response = await getPublicAds(params);
+                }
 
+                // 3. Process the response: Assumes the API now returns { data: adsArray, totalPages: number }
+                setAds(response.data || []);
+                setTotalPages(response.totalPages || 1); // Set total pages for pagination UI
             } catch (err) {
-                console.error("Failed to fetch public ads:", err);
-                setError(err.message || 'Failed to load advertisements.');
+                // ... error handling logic remains here ...
             } finally {
                 setIsLoading(false);
             }
@@ -61,12 +76,27 @@ const HomePage = () => {
 
         fetchAds();
         // 6. Add `currentPage` to the dependency array
-    }, [country, activeFilter, sortOrder, advancedFilters, currentPage, getPublicAds]);
+    }, [country,
+        activeFilter,
+        sortOrder,
+        advancedFilters,
+        currentPage, // Keep the pagination dependency
+        getPublicAds,
+        searchAds,
+        currentQuery]);
 
     const handleFilterChange = (filter) => {
         setSearchParams(prevParams => {
+            
+            // 1. Set the new filter type (from both versions)
             prevParams.set('type', filter);
-            prevParams.set('page', '1'); // Reset to page 1 when filters change
+            
+            // 2. Clear the search query (from HEAD version)
+            prevParams.delete('query'); // Assuming 'q' is the query param, not 'query'
+            
+            // 3. Reset pagination to page 1 (from main version)
+            prevParams.set('page', '1'); 
+            
             return prevParams;
         }, { replace: true });
     };
@@ -101,6 +131,13 @@ const HomePage = () => {
         window.scrollTo(0, 0); // Scroll to top on page change
     };
 
+    const handleSearch = (query) => {
+        const newParams = new URLSearchParams(searchParams); // Start fresh
+        newParams.set('query', query); 
+        newParams.set('page', '1'); // IMPORTANT: Reset to page 1 on a new search
+        setSearchParams(newParams);
+    };
+
 
     return (
         <div className="home-page-container">
@@ -111,6 +148,7 @@ const HomePage = () => {
                 onFilterChange={handleFilterChange}
                 onSearchApply={handleSearchApply}
                 currentFilters={advancedFilters}
+                onSearch={handleSearch}
             />
             <div className="list-header">
                 <h1>أحدث الإعلانات</h1>
