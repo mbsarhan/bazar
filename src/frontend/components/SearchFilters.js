@@ -33,10 +33,11 @@ const CarFilters = ({ filters, onFilterChange, provinces }) => {
             </div>
             <div className="filter-item">
                 <label>الحالة</label>
-                <select>
+                <select value={filters.condition || ''} onChange={e => onFilterChange('condition', e.target.value)}>
                     <option value="">الكل</option>
                     <option value="new">جديدة</option>
                     <option value="used">مستعملة</option>
+                    <option value="متضررة">متضررة</option>
                 </select>
             </div>
             <div className="filter-item filter-item-full">

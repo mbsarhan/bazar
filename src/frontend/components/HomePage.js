@@ -39,8 +39,6 @@ const HomePage = () => {
             };
             try {
                 let data;
-                
-
                 // --- EDIT: Decide whether to search or list ---
                 if (currentQuery) {
                     params.q = currentQuery;
@@ -66,7 +64,7 @@ const HomePage = () => {
         };
 
         fetchAds();
-    }, [country, activeFilter, sortOrder, advancedFilters, getPublicAds, searchAds,currentQuery]); // 3. Re-run this effect WHENEVER activeFilter changes.
+    }, [country, activeFilter, sortOrder, advancedFilters, getPublicAds, searchAds, currentQuery]); // 3. Re-run this effect WHENEVER activeFilter changes.
 
     const handleFilterChange = (filter) => {
         const newParams = new URLSearchParams(searchParams);

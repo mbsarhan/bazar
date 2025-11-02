@@ -41,7 +41,7 @@ class AdvertisementSearchService
         // Start with the base Advertisement query and eager load the correct relationships
         $query = Advertisement::query()->with($relationsToLoad);
 
-        // --- THE REST OF THE FUNCTION REMAINS THE SAME ---
+        $query->where('ad_status', 'فعال');
 
         // Join the relevant details table based on the 'type' filter
         if ($filters['type'] === 'car') {
@@ -63,7 +63,7 @@ class AdvertisementSearchService
         // Step 1: Execute the pagination query and get the paginator object.
         $paginator = $query->select('advertisements.*')
                            ->latest()
-                           ->paginate(15)
+                           ->paginate(24)
                            ->withQueryString();
                            
         // Ensure we only select columns from the main 'advertisements' table to avoid conflicts,
@@ -96,8 +96,7 @@ class AdvertisementSearchService
                 $qBuilder->orWhere('car_ads.manufacturer', 'LIKE', "%{$keyword}%")
                          ->orWhere('car_ads.model', 'LIKE', "%{$keyword}%");
             } elseif ($type === 'real_estate') {
-                $qBuilder->orWhere('realestate_ads.detailed_address', 'LIKE', "%{$keyword}%")
-                         ->orwhere('advertisements.title', 'LIKE', "%{$keyword}%");
+                $qBuilder->orWhere('realestate_ads.detailed_address', 'LIKE', "%{$keyword}%");
             }
         });
     }
