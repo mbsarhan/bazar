@@ -53,8 +53,8 @@ class AdvertisementSearchService
 
         // Apply the primary keyword search ('q')
                 // Only apply keyword search if 'q' is present and not empty
-        if (!empty($filters['q'])) {
-            $this->applyKeywordSearch($query, $filters['q'], $type);
+        if (!empty($filters['query'])) {
+            $this->applyKeywordSearch($query, $filters['query'], $type);
         }
         
         // Apply all other optional filters

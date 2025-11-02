@@ -46,7 +46,7 @@ class SearchAdvertisementsRequest extends FormRequest
     {
         return [
             'type' => ['required', 'string', Rule::in(['car', 'real_estate'])],
-            'q' => ['required', 'string', 'min:2', 'max:100'],
+            'query' => ['required', 'string', 'min:2', 'max:100'],
 
             // Common Optional Filters
             'min_price' => ['nullable', 'numeric', 'min:0'],

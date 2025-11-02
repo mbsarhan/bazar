@@ -16,7 +16,7 @@ const HomePage = () => {
 
     const activeFilter = searchParams.get('type') || 'cars';
     const sortOrder = searchParams.get('sort') || 'newest-first';
-    const currentQuery = searchParams.get('q') || '';
+    const currentQuery = searchParams.get('query') || '';
 
     const [advancedFilters, setAdvancedFilters] = useState({});
 
@@ -41,7 +41,7 @@ const HomePage = () => {
                 let data;
                 // --- EDIT: Decide whether to search or list ---
                 if (currentQuery) {
-                    params.q = currentQuery;
+                    params.query = currentQuery;
                     data = await searchAds(params);
                 } else {
                     data = await getPublicAds(params);
@@ -68,7 +68,7 @@ const HomePage = () => {
 
     const handleFilterChange = (filter) => {
         const newParams = new URLSearchParams(searchParams);
-        newParams.delete('q'); // CRITICAL: Clear the search query when changing tabs
+        newParams.delete('query'); // CRITICAL: Clear the search query when changing tabs
         newParams.set('type', filter);
         setSearchParams(newParams);
     };
@@ -90,7 +90,7 @@ const HomePage = () => {
     // --- EDIT: This function is called by the SearchFilters component ---
     const handleSearch = (query) => {
         const newParams = new URLSearchParams(searchParams); // Start fresh
-        newParams.set('q', query);
+        newParams.set('query', query);
         // You can add other filters here if you want to preserve them during search
         setSearchParams(newParams);
     };
