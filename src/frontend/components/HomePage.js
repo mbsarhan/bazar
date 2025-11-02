@@ -7,7 +7,7 @@ import AdCardSkeleton from './dashboard/AdCardSkeleton';
 import SearchFilters from './SearchFilters';
 import '../styles/HomePage.css';
 import { useAds } from '../context/AdContext';
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'; // 1. Import new icons
+import { ChevronDown, ChevronLeft, ChevronRight, MessageCircle, Mail, MessageSquare, Phone } from 'lucide-react';
 import { useLocation } from '../context/LocationContext';
 
 const HomePage = () => {
@@ -166,6 +166,35 @@ const HomePage = () => {
                     </button>
                 </div>
             )}
+
+            <div className="contact-us-section">
+                <div className="contact-us-content">
+                    <div className="contact-us-icon-wrapper">
+                        <MessageCircle size={48} className="contact-icon" />
+                    </div>
+                    <h2>هل لديك أي استفسار؟</h2>
+                    <p>نحن هنا لمساعدتك! تواصل معنا في أي وقت</p>
+                    <div className="contact-buttons">
+                        <a href="mailto:support@diyalha.com" className="contact-btn email-btn">
+                            <Mail size={20} />
+                            <span>البريد الإلكتروني</span>
+                        </a>
+                        <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="contact-btn whatsapp-btn">
+                            <MessageSquare size={20} />
+                            <span>واتساب</span>
+                        </a>
+                        <a href="tel:+1234567890" className="contact-btn phone-btn">
+                            <Phone size={20} />
+                            <span>اتصل بنا</span>
+                        </a>
+                    </div>
+                </div>
+                <div className="contact-decorative-circles">
+                    <div className="circle circle-1"></div>
+                    <div className="circle circle-2"></div>
+                    <div className="circle circle-3"></div>
+                </div>
+            </div>
         </div>
     );
 };
