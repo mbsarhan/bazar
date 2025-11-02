@@ -12,7 +12,8 @@ const EditIcon = () => <Edit size={16} />;
 const DeleteIcon = () => <Trash2 size={16} />;
 const ViewIcon = () => <ExternalLink size={16} />;
 
-const AdCard = ({ ad, isPublic = false, onDelete }) => {
+// 1. Accept `adIdList` as a new prop. This list comes from the parent component.
+const AdCard = ({ ad, isPublic = false, onDelete, adIdList, returnPath }) => {
 
     const navigate = useNavigate();
     const { incrementAdView } = useAds();
@@ -79,23 +80,27 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
     const handleShowClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        // Step 1: Call the API and wait for it to finish.
         incrementAdView(ad.id);
-        navigate(`/ad/${ad.id}`);
+        
+        // 2. When navigating, pass the list of IDs in the `state` object.
+        navigate(`/ad/${ad.id}`, { 
+            state: { 
+                filteredAdIds: adIdList,
+                returnTo: returnPath // <-- ADD THIS
+            }
+        });
     } ;
 
     const handleEditClick = (e) => {
         e.stopPropagation();
         e.preventDefault();
         
-        // Determine the correct edit path based on the ad type
         const editPath = ad.model_year 
             ? `/edit-car/${ad.id}` 
             : `/edit-real-estate/${ad.id}`;
         navigate(editPath);
     };
 
-    // Stop propagation on delete button to prevent navigation
     const handleDeleteClick = (e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -105,7 +110,16 @@ const AdCard = ({ ad, isPublic = false, onDelete }) => {
 
     return (
         <div className="ad-card" onClick={handleShowClick}>
-            <Link to={`/ad/${ad.id}`} className="ad-card-clickable-area" onClick={handleShowClick}>
+            <Link 
+                to={`/ad/${ad.id}`} 
+                className="ad-card-clickable-area" 
+                onClick={handleShowClick}
+                // 3. Also add it to the Link's state for accessibility
+                state={{ 
+                    filteredAdIds: adIdList,
+                    returnTo: returnPath // <-- AND ADD THIS
+                }}
+            >
                 <div className="ad-card-image">
                     <img src={ad.imageUrls[currentIndex]} alt={ad.title} />
                     

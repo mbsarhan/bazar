@@ -1,33 +1,33 @@
 // src/frontend/components/dashboard/DashboardOverview.js
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler,
 } from 'chart.js';
 import { useAuth } from '../../context/AuthContext';
 import { useDashboard } from '../../context/DashboardContext'; // <-- 1. IMPORT
 
-import { ar } from 'date-fns/locale'; 
+import { ar } from 'date-fns/locale';
 import { subDays, format } from 'date-fns';
 
-const cursorFollowPositioner = function(items) {
+const cursorFollowPositioner = function (items) {
     // The event is the last argument
     const event = arguments[arguments.length - 1];
-    
+
     // If there's no event, we can't position, so return false
     if (!items.length || !event) {
         return false;
     }
-    
+
     // Return the x from the first item and the y from the mouse event
     return {
         x: items[0].element.x,
@@ -40,14 +40,14 @@ Tooltip.positioners.cursorFollow = cursorFollowPositioner;
 
 // This is a required step for Chart.js v3+
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
 );
 
 const generate7DayWeeks = () => {
@@ -65,11 +65,11 @@ const generate7DayWeeks = () => {
         // ALWAYS format the start and end dates completely and separately
         const startFormatted = format(startDate, 'd MMMM', { locale: ar }); // e.g., "٣١ أغسطس"
         const endFormatted = format(endDate, 'd MMMM', { locale: ar });   // e.g., "٦ سبتمبر"
-        
+
         // ALWAYS use the pre-reversed, multi-line array format.
         // This is guaranteed to bypass the browser's rendering bug.
         labelArray = [startFormatted, '-', endFormatted];
-        
+
         labels.push(labelArray);
     }
     return labels;
@@ -90,15 +90,20 @@ const generateLast7Days = () => {
 const DashboardOverview = () => {
     const { user } = useAuth();
     const userName = user ? user.fname : "المستخدم";
+    const navigate = useNavigate();
+
+    const handleAddAdClick = () => {
+        navigate('/', { state: { fromDashboard: true } });
+    };
 
     const { getDashboardStats, getDashboardViews } = useDashboard(); // <-- 2. GET THE FUNCTION
-    
+
     // --- 3. CREATE STATE for the statistics data ---
     const [stats, setStats] = useState({
         carStats: { active: 0, pending: 0, sold: 0 },
         realEstateStats: { active: 0, pending: 0, sold: 0 },
     });
-     const [statsLoading, setStatsLoading] = useState(true);
+    const [statsLoading, setStatsLoading] = useState(true);
 
     const [timeRange, setTimeRange] = useState('weeks'); // 'weeks' or 'days'
 
@@ -106,8 +111,8 @@ const DashboardOverview = () => {
     const [viewsLoading, setViewsLoading] = useState(true); // Renamed from isLoading
 
 
-    
-    
+
+
     // --- 4. CREATE A SEPARATE useEffect for fetching statistics ---
     useEffect(() => {
         const fetchStats = async () => {
@@ -125,7 +130,7 @@ const DashboardOverview = () => {
         fetchStats();
     }, [getDashboardStats]);
 
-    
+
 
 
     useEffect(() => {
@@ -143,7 +148,7 @@ const DashboardOverview = () => {
         };
 
         fetchViewData();
-    }, [timeRange,getDashboardViews]); // The dependency array now includes `timeRange`
+    }, [timeRange, getDashboardViews]); // The dependency array now includes `timeRange`
 
     // --- 2. Prepare Chart Data (Mock Data for Views) ---
     const chartOptions = {
@@ -206,13 +211,13 @@ const DashboardOverview = () => {
     const chartData = useMemo(() => {
         // This calculation depends on the 'timeRange' state
         const labels = timeRange === 'weeks' ? generate7DayWeeks() : generateLast7Days();
-        
+
         return {
             labels: labels,
-            datasets: [ {
+            datasets: [{
                 label: 'المشاهدات',
                 // This part of the calculation depends on the 'viewData' state
-                data: viewData, 
+                data: viewData,
                 fill: true,
                 backgroundColor: (context) => {
                     const ctx = context.chart.ctx;
@@ -226,28 +231,34 @@ const DashboardOverview = () => {
                 pointRadius: 4,
                 pointBackgroundColor: '#50C878',
                 tension: 0.4,
-            } ],
+            }],
         };
-    // The dependency array now correctly includes BOTH 'viewData' and 'timeRange'
+        // The dependency array now correctly includes BOTH 'viewData' and 'timeRange'
     }, [viewData, timeRange]);
 
     return (
         <div>
             <div className="content-header">
                 <h1>أهلاً بك، {userName}!</h1>
-                <Link to="/add-ad" className="submit-btn" style={{maxWidth: '200px'}}>+ أضف إعلاناً جديداً</Link>
+                <button
+                    onClick={handleAddAdClick}
+                    className="submit-btn"
+                    style={{ maxWidth: '200px' }}
+                >
+                    + أضف إعلاناً جديداً
+                </button>
             </div>
 
             <div className="stats-header with-toggle">
                 <h2>نظرة عامة على المشاهدات</h2>
                 <div className="view-changer">
-                    <button 
+                    <button
                         className={timeRange === 'weeks' ? 'active' : ''}
                         onClick={() => setTimeRange('weeks')}
                     >
                         آخر 7 أسابيع
                     </button>
-                    <button 
+                    <button
                         className={timeRange === 'days' ? 'active' : ''}
                         onClick={() => setTimeRange('days')}
                     >
@@ -264,7 +275,7 @@ const DashboardOverview = () => {
                     <Line options={chartOptions} data={chartData} />
                 )}
             </div>
-            
+
             {/* --- 4. Car Stat Boxes --- */}
             <h2 className="stats-header">إحصائيات السيارات</h2>
             <div className="stats-container">
@@ -285,15 +296,15 @@ const DashboardOverview = () => {
             {/* --- 5. Real Estate Stat Boxes --- */}
             <h2 className="stats-header">إحصائيات العقارات</h2>
             <div className="stats-container">
-                 <div className="stat-card stat-card-active">
+                <div className="stat-card stat-card-active">
                     <h2>{statsLoading ? '...' : stats.realEstateStats.active}</h2>
                     <p>إعلانات عقارات نشطة</p>
                 </div>
-                 <div className="stat-card stat-card-pending">
+                <div className="stat-card stat-card-pending">
                     <h2>{statsLoading ? '...' : stats.realEstateStats.pending}</h2>
                     <p>إعلانات عقارات قيد المراجعة</p>
                 </div>
-                 <div className="stat-card stat-card-sold">
+                <div className="stat-card stat-card-sold">
                     <h2>{statsLoading ? '...' : stats.realEstateStats.sold}</h2>
                     <p>إعلانات عقارات مباعة أو مؤجرة</p>
                 </div>

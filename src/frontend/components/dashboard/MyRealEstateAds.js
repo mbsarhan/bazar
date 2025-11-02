@@ -2,10 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import AdCard from './AdCard';
 import AdCardSkeleton from './AdCardSkeleton';
-import Modal from './Modal'; // 1. Import your Modal component
+import Modal from './Modal';
 import { useAds } from '../../context/AdContext';
 import '../../styles/StatusFilter.css';
-// We are not using the context for now, so the import can be removed if you wish
 
 const MyRealEstateAds = () => {
     const [ads, setAds] = useState([]);
@@ -14,7 +13,6 @@ const MyRealEstateAds = () => {
     const { getMyRealEstateAds ,deleteRealEstateAd} = useAds();
     const [activeStatus, setActiveStatus] = useState('all');
 
-    // --- 3. Add state for the delete modal ---
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [adToDelete, setAdToDelete] = useState(null);
     const [deleteError, setDeleteError] = useState('');
@@ -35,10 +33,9 @@ const MyRealEstateAds = () => {
         };
 
         fetchAds();
-    }, [getMyRealEstateAds,activeStatus]); // Runs once on mount
+    }, [getMyRealEstateAds,activeStatus]);
 
 
-    // --- 4. Create functions to handle the delete flow ---
     const handleDeleteClick = (ad) => {
         setAdToDelete(ad);
         setDeleteError('');
@@ -50,12 +47,10 @@ const MyRealEstateAds = () => {
 
         try {
             await deleteRealEstateAd(adToDelete.id);
-            // On success, update the UI instantly
             setAds(prevAds => prevAds.filter(ad => ad.id !== adToDelete.id));
             setIsDeleteModalOpen(false);
             setAdToDelete(null);
         } catch (err) {
-            // Display any error from the API inside the modal
             setDeleteError(err.response?.data?.message || 'Failed to delete the ad.');
         }
     };
@@ -79,28 +74,31 @@ const MyRealEstateAds = () => {
 
             <div className="ads-list-container">
                 {isLoading ? (
-                    // If loading, render the skeletons
                     Array.from({ length: 4 }).map((_, index) => (
                         <AdCardSkeleton key={index} />
                     ))
                 ) : error ? (
                     <p className="error-message">خطأ في تحميل الإعلانات: {error}</p>
                 ) : ads.length > 0 ? (
-                    // If not loading and ads exist, render the real ads
-                    ads.map(ad => (
-                        <AdCard 
-                            key={ad.id} 
-                            ad={ad} 
-                            onDelete={() => handleDeleteClick(ad)}
-                            // The onDelete prop is removed for now
-                        />
-                    ))
+                    (() => {
+                        // 1. Get the list of IDs from the currently filtered ads.
+                        const filteredAdIds = ads.map(ad => ad.id);
+
+                        // 2. Map over the ads and pass the ID list to each AdCard.
+                        return ads.map(ad => (
+                            <AdCard 
+                                key={ad.id} 
+                                ad={ad} 
+                                onDelete={() => handleDeleteClick(ad)}
+                                adIdList={filteredAdIds} // <-- PASS THE CONTEXTUAL LIST HERE
+                            />
+                        ));
+                    })()
                 ) : (
-                    // If not loading and no ads exist, render the "no ads" message
                     <p>ليس لديك أي إعلانات عقارات منشورة حالياً.</p>
                 )}
             </div>
-            {/* --- 6. Add the confirmation modal to the JSX --- */}
+
             <Modal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}

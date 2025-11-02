@@ -11,11 +11,11 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
-
   const location = useLocation(); // 3. للوصول إلى المعلومات الممررة
   const auth = useAuth(); // 4. للوصول لدالة login
 
-  const from = location.state?.from || '/dashboard';
+  const redirectTo = location.state?.redirectTo || '/dashboard';
+  const fromAddAd = location.state?.fromAddAd;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,14 +29,10 @@ const Login = () => {
     setIsSubmitting(true);
     try {
       await auth.login({ credential, password });
-      // 7.إذا كانت البيانات صحيحة التوجيه إلى المسار الصحيح
-      navigate(from, { replace: true });
-
+      navigate(redirectTo, { replace: true, state: { fromAddAd } });
     } catch (err) {
-      // إذا كانت البيانات خاطئة أعرض الخطأ
       setError(err.response?.data?.message || err.message || "فشل تسجيل الدخول");
-    }
-    finally {
+    } finally {
       setIsSubmitting(false);
     }
   };

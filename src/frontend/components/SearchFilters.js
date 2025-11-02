@@ -178,7 +178,7 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
                 </div>
                 <button className="filter-btn" onClick={openFilterModal}>
                     <SlidersHorizontal size={20} />
-                    <span>فلاتر</span>
+                    <span>تصفية</span>
                 </button>
                 <button className="search-btn-main" onClick={handleSearch}>بحث</button>
             </div>

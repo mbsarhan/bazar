@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAds } from '../context/AdContext'; // <-- 1. IMPORT THE NEW HOOK
-import { useLocation } from '../context/LocationContext'; // 1. Import location hook
-import { locationData } from '../context/locationData'; // 2. Import location data
+import { useAds } from '../context/AdContext';
+import { useLocation } from '../context/LocationContext';
+import { locationData } from '../context/locationData';
 import { carData } from '../context/carData';
 import '../styles/forms.css';
 import '../styles/AddAdForm.css';
@@ -18,13 +18,12 @@ const UploadIcon = () => (
 
 const AddCarForm = () => {
     const navigate = useNavigate();
-    const { adId } = useParams(); // 2. Get the adId from the URL
-    const isEditMode = Boolean(adId); // 3. Determine if we are in Edit Mode
+    const { adId } = useParams();
+    const isEditMode = Boolean(adId);
 
     const { country } = useLocation();
-    const { createCarAd, getAdById, updateCarAd } = useAds(); // Get functions from context
+    const { createCarAd, getAdById, updateCarAd } = useAds();
 
-    // This state object is now perfect. Do not change it.
     const [formData, setFormData] = useState({
         transaction_type: 'بيع',
         manufacturer: '',
@@ -47,25 +46,21 @@ const AddCarForm = () => {
     const [mandatoryImages, setMandatoryImages] = useState({
         front: null, back: null, side1: null, side2: null,
     });
-    const [extraImages, setExtraImages] = useState([]); // مصفوفة للصور الإضافية
-
-    // --- NEW STATE TO TRACK REMOVED IMAGES ---
+    const [extraImages, setExtraImages] = useState([]);
     const [removedImages, setRemovedImages] = useState([]);
 
 
-    const [errorMessage, setErrorMessage] = useState(''); // لرسالة الخطأ العامة في الأعلى
+    const [errorMessage, setErrorMessage] = useState('');
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isLoading, setIsLoading] = useState(isEditMode); // Start loading if in edit mode
+    const [isLoading, setIsLoading] = useState(isEditMode);
 
     const fileInputRef = useRef(null);
-    const uploadMode = useRef(null); // لتحديد ما إذا كنا نرفع صورة إلزامية أم إضافية
+    const uploadMode = useRef(null);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        // Map frontend names to backend names
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-        // إزالة الخطأ من الحقل عند بدء الكتابة فيه
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: false }));
         }
@@ -76,8 +71,8 @@ const AddCarForm = () => {
         setFormData(prev => ({
             ...prev,
             manufacturer: selectedMakeName,
-            model: '', // Reset model
-            model_year: '' // Reset year
+            model: '',
+            model_year: ''
         }));
 
         const selectedMake = carData.find(make => make.make_name === selectedMakeName);
@@ -86,24 +81,23 @@ const AddCarForm = () => {
         } else {
             setAvailableModels([]);
         }
-        setAvailableYears([]); // Clear years when make changes
+        setAvailableYears([]);
         if (errors.manufacturer) {
             setErrors(prev => ({ ...prev, manufacturer: false }));
         }
     };
 
-    // --- NEW HANDLER FOR MODEL SELECTION ---
     const handleModelChange = (e) => {
         const selectedModelName = e.target.value;
         setFormData(prev => ({
             ...prev,
             model: selectedModelName,
-            model_year: '' // Reset year
+            model_year: ''
         }));
 
         const selectedMake = carData.find(make => make.make_name === formData.manufacturer);
         if (selectedMake && selectedMake.models[selectedModelName]) {
-            const years = [...selectedMake.models[selectedModelName].years].sort((a, b) => b - a); // Sort descending
+            const years = [...selectedMake.models[selectedModelName].years].sort((a, b) => b - a);
             setAvailableYears(years);
         } else {
             setAvailableYears([]);
@@ -114,7 +108,7 @@ const AddCarForm = () => {
     };
 
     const handleUploadClick = (mode, fieldName = null) => {
-        uploadMode.current = { mode, fieldName }; // mode: 'mandatory' or 'extra'
+        uploadMode.current = { mode, fieldName };
         fileInputRef.current.click();
     };
 
@@ -126,7 +120,6 @@ const AddCarForm = () => {
 
         if (mode === 'mandatory') {
             setMandatoryImages(prev => ({ ...prev, [fieldName]: files[0] }));
-            // إزالة الخطأ من حقل الصورة عند رفعها
             if (errors[fieldName]) {
                 setErrors(prev => ({ ...prev, [fieldName]: false }));
             }
@@ -138,7 +131,6 @@ const AddCarForm = () => {
 
     const removeMandatoryImage = (fieldName) => {
         const imageToRemove = mandatoryImages[fieldName];
-        // If the image is a string, it's an existing URL from the backend
         if (typeof imageToRemove === 'string') {
             const filename = imageToRemove.substring(imageToRemove.lastIndexOf('/') + 1);
             setRemovedImages(prev => [...prev, filename]);
@@ -148,7 +140,6 @@ const AddCarForm = () => {
 
     const removeExtraImage = (index) => {
         const imageToRemove = extraImages[index];
-        // If the image is a string, it's an existing URL
         if (typeof imageToRemove === 'string') {
             const filename = imageToRemove.substring(imageToRemove.lastIndexOf('/') + 1);
             setRemovedImages(prev => [...prev, filename]);
@@ -156,8 +147,6 @@ const AddCarForm = () => {
         setExtraImages(prev => prev.filter((_, i) => i !== index));
     };
 
-
-    // --- 4. NEW useEffect to fetch data in Edit Mode ---
     useEffect(() => {
         setFormData(prev => ({
             ...prev,
@@ -167,8 +156,6 @@ const AddCarForm = () => {
             const fetchAdData = async () => {
                 try {
                     const adData = await getAdById(adId);
-
-                    // Pre-populate the form with the fetched data
                     setFormData({
                         transaction_type: adData.transaction_type || 'بيع',
                         manufacturer: adData.manufacturer || '',
@@ -179,12 +166,12 @@ const AddCarForm = () => {
                         model_year: adData.model_year || '',
                         distance_traveled: adData.distance_traveled ?? '',
                         price: adData.price || '',
-                        negotiable_check: adData.negotiable_check === 1, // Convert 1/0 to true/false
-                        governorate: adData.governorate || 'دمشق',
+                        negotiable_check: adData.negotiable_check === 1,
+                        // Note: The key is still 'governorate' in the state
+                        governorate: adData.governorate || locationData[country.code].provinces[0],
                         city: adData.city || '',
                         description: adData.description || '',
                     });
-                    // You would also handle pre-populating images here
 
                     if (adData?.imageUrls) {
                         setMandatoryImages({
@@ -222,7 +209,7 @@ const AddCarForm = () => {
                 }
             }
         }
-    }, [isEditMode, formData.manufacturer, formData.model]); // Re-run when fetched data is ready
+    }, [isEditMode, formData.manufacturer, formData.model]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -230,20 +217,17 @@ const AddCarForm = () => {
         setErrors({});
         const newErrors = {};
 
-        // التحقق من الحقول النصية الإلزامية
         if (!formData.manufacturer) newErrors.manufacturer = true;
         if (!formData.model) newErrors.model = true;
         if (!formData.model_year) newErrors.model_year = true;
         if (!formData.distance_traveled) newErrors.distance_traveled = true;
         if (!formData.city) newErrors.city = true;
 
-        // التحقق من الصور الإلزامية
         if (!mandatoryImages.front) newErrors.front = true;
         if (!mandatoryImages.back) newErrors.back = true;
         if (!mandatoryImages.side1) newErrors.side1 = true;
         if (!mandatoryImages.side2) newErrors.side2 = true;
 
-        // إذا كان هناك أخطاء، قم بتحديث الحالة وإيقاف الإرسال
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             setErrorMessage('يرجى ملء جميع الحقول الإلزامية.');
@@ -253,11 +237,9 @@ const AddCarForm = () => {
 
 
         setIsSubmitting(true);
-        // --- Call the API ---
         try {
             const dataToSubmit = new FormData();
 
-            // Append all form fields
             for (const key in formData) {
                 let value = formData[key];
                 if (key === 'negotiable_check') {
@@ -265,43 +247,34 @@ const AddCarForm = () => {
                 }
 
                 if (typeof value === 'string') {
-                    value = value.trim(); // 🔥 removes invisible spaces
+                    value = value.trim();
                 }
 
                 if (key === 'price' || key === 'distance_traveled' || key === 'model_year') {
-                    value = parseInt(value) || 0; // Use parseFloat and fallback to 0 if invalid
+                    value = parseInt(value) || 0;
                 }
 
                 dataToSubmit.append(key, value);
             }
 
-            // --- THIS IS THE CRITICAL FIX ---
+            Object.keys(mandatoryImages).forEach(key => {
+                const image = mandatoryImages[key];
+                if (image instanceof File) {
+                    dataToSubmit.append(key, image);
+                }
+            });
 
-        // 2. Append ONLY NEWLY UPLOADED mandatory images
-        // A new image will be a 'File' object, an existing one is a 'string' (URL).
-        Object.keys(mandatoryImages).forEach(key => {
-            const image = mandatoryImages[key];
-            if (image instanceof File) {
-                dataToSubmit.append(key, image);
-            }
-        });
+            extraImages.forEach(image => {
+                if (image instanceof File) {
+                    dataToSubmit.append('extra_images[]', image);
+                }
+            });
 
-        // 3. Append ONLY NEWLY UPLOADED extra images
-        extraImages.forEach(image => {
-            if (image instanceof File) {
-                dataToSubmit.append('extra_images[]', image);
-            }
-        });
-
-        // 4. Append the list of REMOVED image filenames (this part is correct)
-        removedImages.forEach(filename => {
-            dataToSubmit.append('removed_images[]', filename);
-        });
+            removedImages.forEach(filename => {
+                dataToSubmit.append('removed_images[]', filename);
+            });
             
-
-
             if (isEditMode) {
-                // For updates with FormData, you must use POST and add a _method field
                 dataToSubmit.append('_method', 'PUT');
                 const result = await updateCarAd(adId, dataToSubmit);
                 
@@ -318,7 +291,7 @@ const AddCarForm = () => {
             }
         } catch (error) {
             setErrorMessage(error.response?.message || error.message || 'فشل إرسال الإعلان.');
-            window.scrollTo(0, 0); // Scroll to top to show the error
+            window.scrollTo(0, 0);
         }
         finally {
             setIsSubmitting(false);
@@ -329,14 +302,20 @@ const AddCarForm = () => {
     const conditions = ['جديدة', 'مستعملة', 'متضررة'];
     const transmissions = ['أوتوماتيك', 'عادي', 'الإثنان معا'];
     const fuelTypes = ['بنزين', 'ديزل', 'كهرباء', 'هايبرد'];
-    const provinces = locationData[country.code].provinces;
     const currencyLabel = locationData[country.code].currency;
+
+    // --- DYNAMIC LOCATION LOGIC ---
+    // 1. Determine the correct label and list based on the country.
+    const isSaudi = country.code === 'SA';
+    const locationLabel = isSaudi ? 'المدينة *' : 'المحافظة *';
+    // The data source is now also dynamic, although it points to the same key 'provinces'.
+    // Ensure your `locationData.js` has cities listed under `provinces` for the 'SA' key.
+    const locationsList = locationData[country.code].provinces;
+
 
     const MandatoryImageUploaderSlot = ({ fieldName, label }) => {
         const image = mandatoryImages[fieldName];
         const hasError = errors[fieldName];
-
-        // Build a safe preview URL
         const previewUrl = image
             ? image instanceof File
                 ? URL.createObjectURL(image)
@@ -346,7 +325,6 @@ const AddCarForm = () => {
         return (
             <div className="image-upload-slot">
                 <label>{label} *</label>
-
                 <div
                     className={`upload-box ${hasError ? 'input-error' : ''}`}
                     onClick={() => !image && handleUploadClick('mandatory', fieldName)}
@@ -376,7 +354,6 @@ const AddCarForm = () => {
         );
     };
 
-
     if (isLoading) {
         return <div className="form-container wide-form"><p>جاري تحميل بيانات الإعلان...</p></div>;
     }
@@ -393,7 +370,10 @@ const AddCarForm = () => {
             )}
 
             <form onSubmit={handleSubmit}>
-                <fieldset>
+                {/* ... other fieldsets ... */}
+
+                {/* --- Fieldsets for Basic Info, Technical Specs --- */}
+                 <fieldset>
                     <legend>المعلومات الأساسية</legend>
                     <div className="form-grid">
                         <div className="form-group">
@@ -409,8 +389,6 @@ const AddCarForm = () => {
                                 {carData.map(make => <option key={make.make_id} value={make.make_name}>{make.make_name}</option>)}
                             </select>
                         </div>
-
-                        {/* --- UPDATED MODEL DROPDOWN --- */}
                         <div className="form-group">
                             <label htmlFor="model">الموديل *</label>
                             <select id="model" name="model" value={formData.model} onChange={handleModelChange} disabled={!formData.manufacturer} className={errors.model ? 'input-error' : ''}>
@@ -418,8 +396,6 @@ const AddCarForm = () => {
                                 {availableModels.map(modelName => <option key={modelName} value={modelName}>{modelName}</option>)}
                             </select>
                         </div>
-
-                        {/* --- UPDATED YEAR DROPDOWN --- */}
                         <div className="form-group">
                             <label htmlFor="model_year">سنة الصنع *</label>
                             <select id="model_year" name="model_year" value={formData.model_year} onChange={handleChange} disabled={!formData.model} className={errors.model_year ? 'input-error' : ''}>
@@ -427,7 +403,6 @@ const AddCarForm = () => {
                                 {availableYears.map(year => <option key={year} value={year}>{year}</option>)}
                             </select>
                         </div>
-
                         <div className="form-group">
                             <label htmlFor="condition">الحالة</label>
                             <select id="condition" name="condition" value={formData.condition} onChange={handleChange}>{conditions.map(c => <option key={c} value={c}>{c}</option>)}</select>
@@ -435,7 +410,6 @@ const AddCarForm = () => {
                     </div>
                 </fieldset>
 
-                {/* --- القسم الثاني: المواصفات الفنية (موجود الآن) --- */}
                 <fieldset>
                     <legend>المواصفات الفنية</legend>
                     <div className="form-grid">
@@ -452,7 +426,6 @@ const AddCarForm = () => {
                             </select>
                         </div>
                     </div>
-                    {/* The distance_traveled input is now in its own full-width group */}
                     <div className="form-group" style={{ marginTop: '20px' }}>
                         <label htmlFor="distance_traveled">المسافة المقطوعة (كم) *</label>
                         <input
@@ -468,7 +441,7 @@ const AddCarForm = () => {
                     </div>
                 </fieldset>
 
-                {/* --- القسم الثالث: السعر والموقع (موجود الآن) --- */}
+                {/* --- Section for Price and Location (NOW DYNAMIC) --- */}
                 <fieldset>
                     <legend>السعر والموقع</legend>
                     <div className="form-grid">
@@ -481,20 +454,22 @@ const AddCarForm = () => {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="governorate">المحافظة *</label>
+                            {/* 2. Use the dynamic label here */}
+                            <label htmlFor="governorate">{locationLabel}</label>
                             <select id="governorate" name="governorate" value={formData.governorate} onChange={handleChange}>
-                                {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+                                {/* 3. Populate options from the dynamic list */}
+                                {locationsList.map(location => <option key={location} value={location}>{location}</option>)}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="city">المدينة / المنطقة *</label>
+                            <label htmlFor="city">الحي / المنطقة *</label>
                             <input type="text" id="city" name="city" value={formData.city} onChange={handleChange} className={errors.city ? 'input-error' : ''} />
                         </div>
                     </div>
                 </fieldset>
 
-                {/* --- القسم الرابع: التفاصيل --- */}
-                <fieldset>
+                {/* ... other fieldsets ... */}
+                 <fieldset>
                     <legend>التفاصيل</legend>
                     <div className="form-group">
                         <label htmlFor="description">وصف كامل للسيارة</label>
@@ -502,7 +477,6 @@ const AddCarForm = () => {
                     </div>
                 </fieldset>
 
-                {/* --- القسم الخامس: الصور الإلزامية (القسم الجديد) --- */}
                 <fieldset>
                     <legend>الصور الإلزامية</legend>
                     <div className="image-grid-container">
@@ -513,19 +487,17 @@ const AddCarForm = () => {
                     </div>
                 </fieldset>
 
-                {/* --- 5. إضافة قسم الصور الإضافية الجديد --- */}
                 <fieldset>
                     <legend>صور إضافية (اختياري)</legend>
                     <div className="image-grid-container">
-                        {/* عرض الصور الإضافية التي تم رفعها */}
                         {extraImages.map((image, index) => (
                             <div key={index} className="upload-box">
                                 <div className="image-preview">
                                     <img
                                         src={
                                             image instanceof File
-                                                ? URL.createObjectURL(image) // for new uploads
-                                                : image                      // for URLs from backend
+                                                ? URL.createObjectURL(image)
+                                                : image
                                         }
                                         alt={`extra ${index + 1}`}
                                     />
@@ -539,9 +511,6 @@ const AddCarForm = () => {
                                 </div>
                             </div>
                         ))}
-
-
-                        {/* زر "أضف صورة" الدائم */}
                         <div className="upload-box" onClick={() => handleUploadClick('extra')}>
                             <div className="upload-placeholder">
                                 <UploadIcon />
@@ -551,14 +520,13 @@ const AddCarForm = () => {
                     </div>
                 </fieldset>
 
-                {/* حقل إدخال الملفات المخفي والمحدث */}
                 <input
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     accept="image/*"
                     style={{ display: 'none' }}
-                    multiple // السماح بتحديد عدة ملفات مرة واحدة للصور الإضافية
+                    multiple
                 />
 
                 <button type="submit" className="submit-btn" disabled={isSubmitting}>

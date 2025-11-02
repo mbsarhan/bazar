@@ -1,6 +1,6 @@
 // src/frontend/components/LandingPage.js
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation as useReactRouterLocation } from 'react-router-dom';
 import { useLocation, countries } from '../context/LocationContext';
 import { Car, Home, Globe } from 'lucide-react';
 import '../styles/LandingPage.css'; // New dedicated CSS file
@@ -9,14 +9,70 @@ import '../styles/forms.css';
 const LandingPage = () => {
     const navigate = useNavigate();
     const { country, setCountry } = useLocation();
+    const reactRouterLocation = useReactRouterLocation();
+
+    const fromDashboard = reactRouterLocation.state?.fromDashboard;
+    const fromAddAd = reactRouterLocation.state?.fromAddAd;
 
     const handleChoice = (type) => {
-        // Navigate to the ads page with the chosen type set in the URL
-        navigate(`/ads?type=${type}`);
+        if (fromDashboard || fromAddAd) {
+            if (type === 'cars') navigate('/add-car');
+            else navigate('/add-real-estate');
+        } else {
+            // Normal landing behavior
+            navigate(`/ads?type=${type}`);
+        }
     };
+
+
+    // Sample data for animated cards
+    const carAds = [
+        { id: 1, title: 'Toyota Camry 2023', price: '25,000' },
+        { id: 2, title: 'BMW X5 2022', price: '45,000' },
+        { id: 3, title: 'Mercedes C-Class', price: '38,000' },
+        { id: 4, title: 'Honda Accord 2024', price: '28,000' },
+        { id: 5, title: 'Audi A4 2023', price: '42,000' },
+    ];
+
+    const realEstateAds = [
+        { id: 1, title: 'شقة 3 غرف', price: '150,000' },
+        { id: 2, title: 'فيلا فاخرة', price: '450,000' },
+        { id: 3, title: 'استوديو حديث', price: '80,000' },
+        { id: 4, title: 'بنتهاوس', price: '320,000' },
+        { id: 5, title: 'شقة عائلية', price: '200,000' },
+    ];
 
     return (
         <div className="landing-page-container">
+            {/* Animated background cards */}
+            <div className="animated-bg">
+                {/* Cars rising on the right */}
+                <div className="animated-column cars-column">
+                    {[...carAds, ...carAds].map((ad, index) => (
+                        <div key={`car-${index}`} className="floating-ad-card car-card">
+                            <Car size={24} />
+                            <div className="ad-info">
+                                <h4>{ad.title}</h4>
+                                <p>${ad.price}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Real estate descending on the left */}
+                <div className="animated-column real-estate-column">
+                    {[...realEstateAds, ...realEstateAds].map((ad, index) => (
+                        <div key={`re-${index}`} className="floating-ad-card re-card">
+                            <Home size={24} />
+                            <div className="ad-info">
+                                <h4>{ad.title}</h4>
+                                <p>${ad.price}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             <div className="landing-header">
                 <h1 className="landing-logo">ديّلها</h1>
             </div>
@@ -24,7 +80,7 @@ const LandingPage = () => {
             <div className="form-container choice-container">
                 <h2>ديّلها معنا</h2>
 
-                {/* --- The New Country Selector --- */}
+                {/* Country Selector */}
                 <div className="landing-country-selector">
                     <Globe size={20} />
                     <select
@@ -33,8 +89,6 @@ const LandingPage = () => {
                     >
                         {Object.values(countries).map((countryOption) => (
                             <option key={countryOption.code} value={countryOption.code}>
-                                {/* --- THIS IS THE FIX --- */}
-                                {/* Display the Arabic name to the user */}
                                 {countryOption.displayName}
                             </option>
                         ))}
