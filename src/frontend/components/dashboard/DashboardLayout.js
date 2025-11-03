@@ -1,11 +1,11 @@
 // src/frontend/components/dashboard/DashboardLayout.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, User, Car, Home, Star, LogOut, PanelLeftClose, PanelRightClose } from 'lucide-react';
+import { LayoutDashboard, User, Car, Home, Star, LogOut, PanelLeftClose, PanelRightClose, Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Modal from './Modal';
-import Tippy from '@tippyjs/react'; // 1. Import Tippy
-import 'tippy.js/dist/tippy.css'; // 2. Import the default tooltip styles
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import '../../styles/Dashboard.css';
 
 const TooltipWrapper = ({ content, children }) => {
@@ -15,7 +15,7 @@ const TooltipWrapper = ({ content, children }) => {
             content={content} 
             placement="left" 
             disabled={!isDashboardCollapsed}
-            theme="bazaar" // <-- ADD THIS LINE
+            theme="bazaar"
         >
             {children}
         </Tippy>
@@ -25,37 +25,82 @@ const TooltipWrapper = ({ content, children }) => {
 const DashboardLayout = () => {
     const navigate = useNavigate();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-    // --- CHANGE 1: Get the 'logout' function from the context ---
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { isDashboardCollapsed, setIsDashboardCollapsed, logout } = useAuth();
 
-    // --- CHANGE 2: Make this function 'async' and call the context's logout ---
-    const handleLogoutConfirm = async () => {
-        try {
-            await logout(); // This now calls our API and clears local storage
-            setIsLogoutModalOpen(false); // Close the modal
-            navigate('/login'); // Redirect the user to the login page
-        } catch (error) {
-            console.error("Logout failed:", error);
-            // Optionally, show an error message to the user
+    // Close mobile menu when screen size changes to desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 768 && isMobileMenuOpen) {
+                setIsMobileMenuOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [isMobileMenuOpen]);
+
+    // Close mobile menu when clicking on a nav link
+    const handleNavLinkClick = () => {
+        if (window.innerWidth <= 768) {
+            setIsMobileMenuOpen(false);
         }
     };
 
-    // The outer div is no longer needed, we return the elements directly
+    const handleLogoutConfirm = async () => {
+        try {
+            await logout();
+            setIsLogoutModalOpen(false);
+            navigate('/login');
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
     return (
         <div>
-            <aside className={`dashboard-sidebar ${isDashboardCollapsed ? 'collapsed' : ''}`}>
+            {/* Mobile menu button */}
+            <button 
+                className="mobile-menu-btn"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{
+                    display: 'none',
+                    position: 'fixed',
+                    top: '75px',
+                    right: '15px',
+                    zIndex: 1000,
+                    background: 'var(--color-bg-card)',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+            >
+                <Menu size={24} />
+            </button>
+
+            {/* Mobile overlay */}
+            <div 
+                className={`mobile-menu-overlay ${isMobileMenuOpen ? 'active' : ''}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            <aside className={`dashboard-sidebar ${isDashboardCollapsed ? 'collapsed' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
                 <div className="sidebar-header">
                     <div></div>
-                    <button className="sidebar-toggle-btn" onClick={() => setIsDashboardCollapsed(!isDashboardCollapsed)}>
+                    <button 
+                        className="sidebar-toggle-btn" 
+                        onClick={() => setIsDashboardCollapsed(!isDashboardCollapsed)}
+                    >
                         {isDashboardCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
                     </button>
                 </div>
                 <nav className="sidebar-nav">
                     <ul>
-                        {/* 4. Wrap each link in the TooltipWrapper */}
                         <li>
                             <TooltipWrapper content="نظرة عامة">
-                                <NavLink to="/dashboard" end>
+                                <NavLink to="/dashboard" end onClick={handleNavLinkClick}>
                                     <LayoutDashboard size={20} />
                                     <span>نظرة عامة</span>
                                 </NavLink>
@@ -63,7 +108,7 @@ const DashboardLayout = () => {
                         </li>
                         <li>
                             <TooltipWrapper content="معلوماتي الشخصية">
-                                <NavLink to="/dashboard/my-profile">
+                                <NavLink to="/dashboard/my-profile" onClick={handleNavLinkClick}>
                                     <User size={20} />
                                     <span>معلوماتي الشخصية</span>
                                 </NavLink>
@@ -71,7 +116,7 @@ const DashboardLayout = () => {
                         </li>
                         <li>
                             <TooltipWrapper content="إعلاناتي للسيارات">
-                                <NavLink to="/dashboard/car-ads">
+                                <NavLink to="/dashboard/car-ads" onClick={handleNavLinkClick}>
                                     <Car size={20} />
                                     <span>إعلاناتي للسيارات</span>
                                 </NavLink>
@@ -79,7 +124,7 @@ const DashboardLayout = () => {
                         </li>
                         <li>
                             <TooltipWrapper content="إعلاناتي للعقارات">
-                                <NavLink to="/dashboard/real-estate-ads">
+                                <NavLink to="/dashboard/real-estate-ads" onClick={handleNavLinkClick}>
                                     <Home size={20} />
                                     <span>إعلاناتي للعقارات</span>
                                 </NavLink>
@@ -87,7 +132,7 @@ const DashboardLayout = () => {
                         </li>
                         <li>
                             <TooltipWrapper content="تقييماتي">
-                                <NavLink to="/dashboard/reviews">
+                                <NavLink to="/dashboard/reviews" onClick={handleNavLinkClick}>
                                     <Star size={20} />
                                     <span>تقييماتي</span>
                                 </NavLink>
@@ -105,7 +150,6 @@ const DashboardLayout = () => {
                 </div>
             </aside>
 
-            {/* The main content area also gets the collapsed class to adjust its margin */}
             <main className={`dashboard-content ${isDashboardCollapsed ? 'collapsed' : ''}`}>
                 <Outlet />
             </main>
@@ -118,6 +162,14 @@ const DashboardLayout = () => {
             >
                 <p>هل أنت متأكد أنك تريد تسجيل الخروج؟</p>
             </Modal>
+
+            <style jsx>{`
+                @media (max-width: 768px) {
+                    .mobile-menu-btn {
+                        display: block !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

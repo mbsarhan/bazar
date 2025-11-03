@@ -15,11 +15,10 @@
     display: flex;
     flex-direction: column;
     padding: 15px;
-    transition: width 0.3s ease-in-out;
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 .dashboard-content {
-    /* The content area has a margin to make space for the sidebar */
     margin-right: 260px; 
     padding: 40px;
     transition: margin-right 0.3s ease-in-out; 
@@ -90,9 +89,9 @@
     margin-bottom: 8px;
     transition: all 0.2s ease-in-out;
     overflow: hidden;
-    width: 100%; /* Ensure the element takes full width */
-    box-sizing: border-box; /* Include padding in the width calculation */
-    justify-content: flex-start; /* Align content to the start (right in RTL) */
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: flex-start;
 }
 
 .sidebar-nav a {
@@ -111,7 +110,7 @@
 
 .logout-btn { 
     background-color: transparent; 
-    border: none; /* remove 1px solid transparent */
+    border: none;
     color: #9c2a2a; 
     cursor: pointer; 
 }
@@ -160,7 +159,6 @@
     position: relative;
 }
 
-
 /* ============================================= */
 /* 5. Dashboard Content (Headers, Cards, etc.)   */
 /* ============================================= */
@@ -169,6 +167,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.content-header h1 {
+    font-size: 2rem;
 }
 
 .stats-container {
@@ -231,14 +235,8 @@
     margin: 0 0 10px 0;
     font-size: 1.2rem;
     white-space: nowrap;
-    
-    /* 2. Hide any text that overflows the container's width */
     overflow: hidden;
-    
-    /* 3. Add the "..." ellipsis to the end of the hidden text */
     text-overflow: ellipsis;
-    
-    /* 4. (Optional but good) Set a max-width to be safe */
     max-width: 100%;
 }
 
@@ -402,8 +400,14 @@
     box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.7);
 }
 
+.dot.small {
+    width: 6px;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
 /* ============================================= */
-/* 8. NEW Tippy.js Tooltip Styles                */
+/* 8. Tippy.js Tooltip Styles                    */
 /* ============================================= */
 .tippy-box[data-theme~='bazaar'] {
     background-color: #333;
@@ -417,7 +421,6 @@
 /* ============================================= */
 /* 9. Dashboard Overview Page Styles             */
 /* ============================================= */
-
 .chart-container {
     background-color: var(--color-bg-card);
     padding: 25px;
@@ -436,58 +439,45 @@
     border-bottom: 1px solid var(--color-border-subtle);
 }
 
-/* Stat card colors */
-.stat-card-active h2 {
-    color: #50C878; /* Green */
-}
-.stat-card-pending h2 {
-    color: #f39c12; /* Orange */
-}
-.stat-card-sold h2 {
-    color: #e74c3c; /* Red */
-}
+.stat-card-active h2 { color: #50C878; }
+.stat-card-pending h2 { color: #f39c12; }
+.stat-card-sold h2 { color: #e74c3c; }
 
 /* ============================================= */
-/* 10. Ad Card View Counter Styles                */
+/* 10. Ad Card View Counter Styles               */
 /* ============================================= */
 .ad-card-views {
     position: absolute;
     top: 0;
     left: 0;
-    
-    /* Create the ribbon shape */
     padding: 10px 15px 10px 20px;
-    border-bottom-right-radius: 16px; /* Rounded corner to complete the look */
-    
-    /* The "Frosted Glass" effect */
+    border-bottom-right-radius: 16px;
     background-color: rgba(255, 255, 255, 0.1);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    
-    /* Text and Icon styling */
     color: white;
     font-size: 13px;
     font-weight: 600;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* Add a subtle shadow for readability */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     z-index: 5;
-    
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
 /* ============================================= */
-/* 11. Chart View Changer (Toggle) Styles         */
+/* 11. Chart View Changer (Toggle) Styles        */
 /* ============================================= */
 .stats-header.with-toggle {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .view-changer {
-    /* The position:absolute is removed */
     background-color: var(--color-bg-page);
     border-radius: 8px;
     padding: 4px;
@@ -517,58 +507,279 @@
 /* 12. Chart Skeleton Loader Styles              */
 /* ============================================= */
 .chart-skeleton-loader {
-    /* Make it fill the container */
     width: 100%;
     height: 100%;
-    
-    /* Style it to look like a placeholder */
-    background-color: #f0f0f0; /* A light grey */
-    border-radius: 16px; /* Match the container's border-radius */
-    
-    /* Add the pulsing animation */
+    background-color: #f0f0f0;
+    border-radius: 16px;
     animation: pulse 1.5s infinite ease-in-out;
 }
 
-/* The keyframes for the pulsing animation */
 @keyframes pulse {
-    0% {
-        background-color: #f0f0f0;
-    }
-    50% {
-        background-color: #e0e0e0; /* A slightly darker grey */
-    }
-    100% {
-        background-color: #f0f0f0;
-    }
+    0% { background-color: #f0f0f0; }
+    50% { background-color: #e0e0e0; }
+    100% { background-color: #f0f0f0; }
 }
 
 /* ============================================= */
-/* 13. Dynamic Ad Card Dots Styles                */
+/* RESPONSIVE DESIGN                              */
 /* ============================================= */
-.dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    /* Add a transition for the size change */
-    transition: all 0.2s ease; 
+
+/* Tablet and below (≤992px) */
+@media (max-width: 992px) {
+    .dashboard-content {
+        padding: 30px 20px;
+    }
+
+    .content-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .stats-container {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-card h2 {
+        font-size: 2rem;
+    }
+
+    .chart-container {
+        padding: 20px;
+    }
+
+    .stats-header {
+        font-size: 1.35rem;
+    }
+
+    .ads-list-container {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+    }
 }
 
-.dot.active {
-    background-color: white;
+/* Tablet (≤768px) - Sidebar becomes overlay */
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        transform: translateX(100%);
+        width: 260px;
+        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .dashboard-content {
+        margin-right: 0;
+        padding: 20px 15px;
+    }
+
+    .dashboard-content.collapsed {
+        margin-right: 0;
+    }
+
+    .content-header {
+        margin-bottom: 25px;
+        gap: 15px;
+    }
+
+    .content-header h1 {
+        font-size: 1.5rem;
+        width: 100%;
+    }
+
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 18px;
+    }
+
+    .stat-card h2 {
+        font-size: 1.75rem;
+    }
+
+    .stat-card p {
+        font-size: 0.95rem;
+    }
+
+    .chart-container {
+        padding: 16px;
+        margin-bottom: 30px;
+    }
+
+    .stats-header {
+        font-size: 1.25rem;
+        margin-top: 30px;
+        margin-bottom: 16px;
+    }
+
+    .view-changer button {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .ads-list-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .ad-card-actions .action-btn {
+        font-size: 13px;
+        padding: 10px 8px;
+    }
+
+    .ad-card-actions .action-btn span {
+        display: none;
+    }
+
+    .sidebar-toggle-btn {
+        display: block;
+    }
 }
 
-.dot:hover {
-    background-color: white;
-    box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.7);
+/* Mobile (≤576px) */
+@media (max-width: 576px) {
+    .dashboard-sidebar {
+        width: 280px;
+    }
+
+    .dashboard-content {
+        padding: 15px 10px;
+    }
+
+    .content-header h1 {
+        font-size: 1.35rem;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-card h2 {
+        font-size: 1.5rem;
+    }
+
+    .stat-card p {
+        font-size: 0.9rem;
+    }
+
+    .chart-container {
+        padding: 12px;
+        margin-bottom: 25px;
+    }
+
+    .stats-header {
+        font-size: 1.15rem;
+    }
+
+    .stats-header.with-toggle {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .view-changer {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .view-changer button {
+        flex: 1;
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+
+    .ad-card-image {
+        height: 180px;
+    }
+
+    .ad-card-details {
+        padding: 15px;
+    }
+
+    .ad-card-details h3 {
+        font-size: 1.1rem;
+    }
+
+    .ad-card-price {
+        font-size: 1rem;
+    }
+
+    .spec-item {
+        font-size: 0.8rem;
+    }
+
+    .ad-card-actions .action-btn {
+        padding: 10px 6px;
+    }
+
+    .nav-arrow {
+        width: 28px;
+        height: 28px;
+    }
+
+    .ad-card-views {
+        font-size: 12px;
+        padding: 8px 12px 8px 16px;
+    }
 }
 
-/* --- This is the new style for the smaller dots --- */
-.dot.small {
-    width: 6px;
-    height: 6px;
-    /* Optionally make them slightly more transparent */
-    background-color: rgba(255, 255, 255, 0.4);
+/* Extra small mobile (≤380px) */
+@media (max-width: 380px) {
+    .dashboard-sidebar {
+        width: 100%;
+    }
+
+    .content-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .stat-card h2 {
+        font-size: 1.35rem;
+    }
+
+    .chart-container {
+        padding: 10px;
+    }
+
+    .stats-header {
+        font-size: 1.1rem;
+    }
+
+    .view-changer button {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
+
+    .ad-card-details h3 {
+        font-size: 1rem;
+    }
+
+    .ad-card-price {
+        font-size: 0.95rem;
+    }
+}
+
+/* Mobile Menu Overlay */
+@media (max-width: 768px) {
+    .mobile-menu-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 989;
+    }
+
+    .mobile-menu-overlay.active {
+        display: block;
+    }
 }

@@ -22,11 +22,13 @@
     color: var(--color-text-dark);
     text-decoration: none;
 }
+
 .header-actions {
     display: flex;
     align-items: center;
     gap: 20px;
 }
+
 .add-ad-btn {
     background-color: var(--color-accent-primary);
     color: var(--color-text-dark);
@@ -37,14 +39,18 @@
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
+    white-space: nowrap;
 }
+
 .add-ad-btn:hover {
     background-color: var(--color-accent-hover);
 }
+
 .user-link, .login-link {
     font-weight: 600;
     text-decoration: none;
     color: var(--color-text-dark);
+    white-space: nowrap;
 }
 
 .country-selector {
@@ -59,6 +65,7 @@
 
 .country-selector svg {
     color: #666;
+    flex-shrink: 0;
 }
 
 .country-selector select {
@@ -70,4 +77,100 @@
     font-weight: 600;
     cursor: pointer;
     color: var(--color-text-dark);
+}
+
+/* Tablet and below (Medium devices) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: 12px 20px;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .header-actions {
+        gap: 12px;
+    }
+
+    .add-ad-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .country-selector {
+        padding: 6px 10px;
+    }
+
+    .country-selector select {
+        font-size: 0.85rem;
+    }
+
+    .user-link, .login-link {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 576px) {
+    .main-header {
+        padding: 10px 15px;
+    }
+
+    .logo {
+        font-size: 1.3rem;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .add-ad-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .country-selector {
+        padding: 6px 8px;
+        gap: 4px;
+    }
+
+    .country-selector svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .country-selector select {
+        font-size: 0.8rem;
+        max-width: 80px;
+    }
+
+    .user-link, .login-link {
+        font-size: 0.85rem;
+    }
+}
+
+/* Very small mobile devices */
+@media (max-width: 380px) {
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .header-actions {
+        gap: 6px;
+    }
+
+    .add-ad-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .country-selector select {
+        max-width: 70px;
+        font-size: 0.75rem;
+    }
+
+    .user-link, .login-link {
+        font-size: 0.8rem;
+    }
 }
