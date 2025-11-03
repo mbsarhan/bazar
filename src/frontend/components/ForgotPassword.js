@@ -24,21 +24,21 @@ const ForgotPassword = () => {
 
     setIsSubmitting(true);
     try {
-        const result = await sendResetCode(credential);
-        setMessage(result.message);
-        // --- THIS IS THE KEY CHANGE ---
-            // Navigate to the general verification page, but with a specific type.
-            navigate('/verification', { 
-                state: { 
-                    credential: credential, 
-                    type: 'passwordReset' // Identify the purpose of the verification
-                } 
-            });
+      const result = await sendResetCode(credential);
+      setMessage(result.message);
+      // --- THIS IS THE KEY CHANGE ---
+      // Navigate to the general verification page, but with a specific type.
+      navigate('/verification', {
+        state: {
+          credential: credential,
+          type: 'passwordReset' // Identify the purpose of the verification
+        }
+      });
     } catch (err) {
-        const errorMessage = err.response?.data?.errors?.email?.[0] || err.response?.data?.message || 'فشل إرسال الرمز.';
-        setError(errorMessage);
+      const errorMessage = err.response?.data?.errors?.email?.[0] || err.response?.data?.message || 'فشل إرسال الرمز.';
+      setError(errorMessage);
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -46,7 +46,7 @@ const ForgotPassword = () => {
     <div className="centered-page-container">
       <div className="form-container">
         <h2>استعادة كلمة المرور</h2>
-        <p className="form-subtitle" style={{marginBottom: '25px'}}>أدخل بريدك الإلكتروني أو رقم هاتفك لإرسال رمز التأكيد.</p>
+        <p className="form-subtitle" style={{ marginBottom: '25px' }}>أدخل بريدك الإلكتروني أو رقم هاتفك لإرسال رمز التأكيد.</p>
 
         {error && <div className="error-message">{error}</div>}
         {message && <div className="success-message">{message}</div>}
@@ -62,9 +62,9 @@ const ForgotPassword = () => {
               placeholder="example@mail.com or 09********"
             />
           </div>
-          
-          <button type="submit" className="submit-btn">
-            إرسال
+
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? 'جاري الإرسال...' : 'إرسال'}
           </button>
         </form>
 
