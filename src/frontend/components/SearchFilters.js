@@ -35,8 +35,8 @@ const CarFilters = ({ filters, onFilterChange, provinces }) => {
                 <label>الحالة</label>
                 <select value={filters.condition || ''} onChange={e => onFilterChange('condition', e.target.value)}>
                     <option value="">الكل</option>
-                    <option value="new">جديدة</option>
-                    <option value="used">مستعملة</option>
+                    <option value="جديد">جديدة</option>
+                    <option value="مستعملة">مستعملة</option>
                     <option value="متضررة">متضررة</option>
                 </select>
             </div>
@@ -87,10 +87,10 @@ const RealEstateFilters = ({ filters, onFilterChange, provinces }) => {
             </div>
             <div className="filter-item">
                 <label>نوع العقار</label>
-                <select>
+                <select value={filters.realestate_type || ''} onChange={e => onFilterChange('realestate_type', e.target.value)}>
                     <option value="">الكل</option>
-                    <option value="apartment">شقة</option>
-                    <option value="villa">فيلا</option>
+                    <option value="شقة">شقة</option>
+                    <option value="فيلا">فيلا</option>
                 </select>
             </div>
             <div className="filter-item filter-item-full">
