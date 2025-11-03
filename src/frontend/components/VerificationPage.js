@@ -200,7 +200,7 @@ const VerificationPage = () => {
                 {renderContent()}
 
                 {/* Show the resend button only after a code has been requested */}
-                {(verificationStep === 2 || flow !== 'change_email' && flow !== 'change_phone') && (
+                {(verificationStep === 2 || (flow !== 'change_email' && flow !== 'change_phone')) && (
                     <div className="form-link" style={{marginTop: '25px', borderTop: '1px solid #eee', paddingTop: '20px', alignItems: 'center'}}>
                         {timer > 0 ? (
                             <p className="timer-text">يمكنك إعادة إرسال الرمز بعد: {formatTime(timer)}</p>

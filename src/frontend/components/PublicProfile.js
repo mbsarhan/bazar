@@ -1,9 +1,8 @@
 // src/frontend/components/PublicProfile.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext'; // 1. IMPORT
 import { useAuth } from '../context/AuthContext'; // 2. IMPORT AuthContext
-import { useAds } from '../context/AdContext'; // We'll need a new function here
 import StarRating from './dashboard/StarRating';
 import AdCard from './dashboard/AdCard';
 import '../styles/PublicProfile.css'; // New CSS file

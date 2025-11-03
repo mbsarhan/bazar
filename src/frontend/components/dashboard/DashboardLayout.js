@@ -45,7 +45,7 @@ const DashboardLayout = () => {
         <div>
             <aside className={`dashboard-sidebar ${isDashboardCollapsed ? 'collapsed' : ''}`}>
                 <div className="sidebar-header">
-                    <h3></h3>
+                    <div></div>
                     <button className="sidebar-toggle-btn" onClick={() => setIsDashboardCollapsed(!isDashboardCollapsed)}>
                         {isDashboardCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
                     </button>

@@ -52,7 +52,6 @@ const HomePage = () => {
             };
 
             try {
-                let data;
                 let response; // Use a variable to hold the full response object
 
                 // 2. Incorporate your search/list decision logic
