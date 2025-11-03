@@ -195,10 +195,24 @@ export const AdProvider = ({ children }) => {
         return response.data;
     };
 
+        const searchAds = async (filters = {}) => {
+        try {
+            // This calls your backend route: GET /api/advertisements/search
+            const response = await api.get('/advertisements/search', {
+                params: filters
+            });
+            // Your search service returns the data directly in a 'data' key
+            return response.data;
+        } catch (error) {
+            console.error('Error searching for ads:', error);
+            throw error;
+        }
+    };
+
 
     // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd, getMyCarAds, deleteCarAd, getAdById, createRealEstateAd, getMyRealEstateAds, deleteRealEstateAd, getPublicAds, incrementAdView, updateCarAd, updateRealEstateAd }}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView ,updateCarAd ,updateRealEstateAd,searchAds}}>
             {children}
         </AdContext.Provider>
     );

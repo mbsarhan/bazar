@@ -33,10 +33,11 @@ const CarFilters = ({ filters, onFilterChange, provinces }) => {
             </div>
             <div className="filter-item">
                 <label>الحالة</label>
-                <select>
+                <select value={filters.condition || ''} onChange={e => onFilterChange('condition', e.target.value)}>
                     <option value="">الكل</option>
                     <option value="new">جديدة</option>
                     <option value="used">مستعملة</option>
+                    <option value="متضررة">متضررة</option>
                 </select>
             </div>
             <div className="filter-item filter-item-full">
@@ -116,13 +117,14 @@ const RealEstateFilters = ({ filters, onFilterChange, provinces }) => {
 };
 
 // --- Main SearchFilters Component ---
-const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFilters, provinces }) => {
+const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFilters, provinces, onSearch }) => {
     // 1. New state: 'all' is the default
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tempFilters, setTempFilters] = useState({});
 
     const { country } = useLocation();
     const provincesForCurrentCountry = locationData[country.code].provinces;
+    const [searchQuery, setSearchQuery] = useState('');
 
     const handleFilterClick = (filter) => {
         onFilterChange(filter); // Notify the parent component (HomePage) of the change
@@ -146,6 +148,20 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
         }));
     };
 
+    const handleSearch = () => {
+        // We only search if there's text. We pass BOTH the query and the active type.
+        if (searchQuery.trim()) {
+            onSearch(searchQuery, activeFilter);
+        }
+    };
+
+    // --- EDIT: Add handler for pressing Enter ---
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     useEffect(() => {
         if (isModalOpen) {
             setTempFilters(currentFilters || {});
@@ -158,13 +174,13 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
             <div className="main-search-bar">
                 <div className="search-input-wrapper">
                     <Search className="search-icon" size={24} />
-                    <input type="text" placeholder="ابحث بالاسم، الموديل، أو المنطقة..." />
+                    <input type="text" placeholder="ابحث بالاسم، الموديل، أو المنطقة..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={handleKeyDown} />
                 </div>
                 <button className="filter-btn" onClick={openFilterModal}>
                     <SlidersHorizontal size={20} />
                     <span>تصفية</span>
                 </button>
-                <button className="search-btn-main">بحث</button>
+                <button className="search-btn-main" onClick={handleSearch}>بحث</button>
             </div>
 
             {/* --- 2. The NEW Icon Filter Bar --- */}

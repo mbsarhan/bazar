@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Advertisement;
+use App\Services\Concerns\Filters;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request; // <-- 1. IMPORT THE REQUEST CLASS
 use Illuminate\Support\Facades\DB;
@@ -10,11 +11,18 @@ use Illuminate\Support\Facades\Storage; // <-- IMPORT
 
 class AdvertisementService
 {
+    use Filters;
     /**
      * Get a paginated list of public ads, with optional filtering.
      */
     public function getPublicListing(Request $request): LengthAwarePaginator // <-- 2. ACCEPT THE REQUEST
     {
+        if ($request->has('priceRange') && is_array($request->priceRange) && count($request->priceRange) === 2) {
+            $request->merge([
+                'min_price' => $request->priceRange[0],
+                'max_price' => $request->priceRange[1],
+            ]);
+        }
         // Start building the query on the Advertisement model
         $query = Advertisement::query();
 
@@ -28,10 +36,14 @@ class AdvertisementService
         $type = $request->query('type');
         if ($type === 'car') {
             $query->whereHas('carDetails');
+            // $query->join('car_ads', 'advertisements.id', '=', 'car_ads.ads_id');
         } elseif ($type === 'real_estate') {
             $query->whereHas('realEstateDetails');
+            // $query->join('realestate_ads', 'advertisements.id', '=', 'realestate_ads.ads_id');
         }
     }
+
+    $this->applyOptionalFilters($query, $request->all());
 
         // Always filter for active ads
         $query->where('ad_status', 'فعال');
