@@ -12,3 +12,11 @@ Route::get('/test/video/{advertisement}', [VideoController::class, 'show'])->nam
 Route::post('/upload/video/{advertisement}', [VideoController::class, 'store'])->name('video.store');
 
 Route::get('/upload/video/{advertisement}', [VideoController::class, 'create'])->name('video.create');
+
+
+
+// in routes/web.php
+    Route::get('/chat-test', function () {
+        // Make sure you have at least two users in your 'users' table to test with.
+        return view('chat-test');
+    });
