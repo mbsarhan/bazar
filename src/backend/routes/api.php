@@ -18,6 +18,7 @@ use App\Http\Controllers\RealestateAdsController;
 use App\Http\Controllers\AdvertisementSearchController;
 use App\Http\Controllers\AdvertisementController; // <-- 1. IMPORT
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\ChatController; // <-- IMPORT THE CHAT CONTROLLER
 
 
 
@@ -131,6 +132,15 @@ Route::middleware('auth:sanctum')->group(function () {
     //Video
     Route::post('/advertisements/{advertisement}/video', [VideoUploadController::class, 'store'])
         ->name('api.video.store');
+
+
+
+    // --- CHAT ROUTES ---
+    Route::prefix('chat')->group(function () {
+        Route::get('/conversations', [ChatController::class, 'getConversations']);
+        Route::get('/messages/{recipient}', [ChatController::class, 'getMessages']);
+        Route::post('/messages/{recipient}', [ChatController::class, 'sendMessage']);
+    });
 
 
 
