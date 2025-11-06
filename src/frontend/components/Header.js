@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation as useReactRouterLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocation, countries } from '../context/LocationContext';
-import { Plus, User, LogIn, Menu, X, MapPin } from 'lucide-react';
+import { Plus, User, LogIn, Menu, X, MapPin, MessageSquare } from 'lucide-react';
 import '../styles/Header.css';
 
 const Header = () => {
@@ -14,6 +14,7 @@ const Header = () => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [lastFilterType, setLastFilterType] = useState(() => {
     return localStorage.getItem('lastFilterType') || 'cars';
   });
@@ -26,6 +27,13 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      // You can implement unread count if needed in backend
+      // For now, we'll skip this or you can add an endpoint
+    }
+  }, [user]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(reactRouterLocation.search);
@@ -53,6 +61,15 @@ const Header = () => {
     if (window.location.pathname.startsWith('/ads')) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handleChatClick = () => {
+    if (!user) {
+      navigate('/login', { state: { redirectTo: '/conversations' } });
+    } else {
+      navigate('/conversations');
+    }
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -93,6 +110,14 @@ const Header = () => {
           <button onClick={handleAddAdClick} className="add-ad-button">
             <Plus size={18} />
             <span>أضف إعلاناً</span>
+          </button>
+
+          <button onClick={handleChatClick} className="chat-button">
+            <MessageSquare size={18} />
+            <span>المحادثات</span>
+            {unreadCount > 0 && (
+              <span className="unread-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+            )}
           </button>
 
           {user ? (
@@ -140,6 +165,14 @@ const Header = () => {
         <button onClick={handleAddAdClick} className="mobile-menu-button add-ad">
           <Plus size={20} />
           <span>أضف إعلاناً</span>
+        </button>
+
+        <button onClick={handleChatClick} className="mobile-menu-button chat">
+          <MessageSquare size={20} />
+          <span>المحادثات</span>
+          {unreadCount > 0 && (
+            <span className="mobile-unread-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+          )}
         </button>
 
         {user ? (

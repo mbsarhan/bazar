@@ -37,6 +37,9 @@ import MyCarAds from './components/dashboard/MyCarAds';
 import MyRealEstateAds from './components/dashboard/MyRealEstateAds';
 import Reviews from './components/dashboard/Reviews';
 
+import Conversations from './components/Conversations';
+import Chat from './components/Chat';
+
 
 function App() {
 
@@ -69,6 +72,9 @@ function App() {
                       <Route path="/profile/:userId" element={<PublicProfile />} />
                       <Route path="add-review/:userIdToReview" element={<AddReview />} />
                       <Route path="/add-ad-choice" element={<AdChoicePage />} />
+                      {/* Chat Routes */}
+                      <Route path="/conversations" element={<Conversations />} />
+                      <Route path="/chat/:userId" element={<Chat />} />
 
                       {/* Dashboard Routes */}
                       <Route path="/dashboard" element={<DashboardLayout />}>
