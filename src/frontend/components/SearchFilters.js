@@ -1,16 +1,18 @@
 // src/frontend/components/SearchFilters.js
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal, Search, Car, Home } from 'lucide-react';
+// 1. Import the X icon
+import { SlidersHorizontal, Search, Car, Home, X, RotateCcw } from 'lucide-react';
 import Slider from 'rc-slider';
 import Modal from './dashboard/Modal';
-import { useLocation } from '../context/LocationContext'; // 1. Import the location hook
+import { useLocation } from '../context/LocationContext';
 import { locationData } from '../context/locationData';
 import '../styles/SearchFilters.css';
 
+// ... (The CarFilters and RealEstateFilters components remain exactly the same)
 const formatPrice = (val) => `$${val.toLocaleString('en-US')}`;
 
-// --- Car Filters Component ---
-const CarFilters = ({ filters, onFilterChange, provinces }) => {
+const CarFilters = ({ filters, onFilterChange, provinces, onReset }) => {
+    // ... no changes here
     const MIN = 0;
     const MAX = 300000;
 
@@ -59,12 +61,18 @@ const CarFilters = ({ filters, onFilterChange, provinces }) => {
                     </div>
                 </div>
             </div>
+
+            <div className="filter-item filter-item-full">
+                <button onClick={onReset} className="reset-filters-btn">
+                    <RotateCcw size={16} />
+                    <span>العودة للافتراضي</span>
+                </button>
+            </div>
         </div>
     );
 };
-
-// --- Real Estate Filters Component ---
-const RealEstateFilters = ({ filters, onFilterChange, provinces }) => {
+const RealEstateFilters = ({ filters, onFilterChange, provinces, onReset }) => {
+    // ... no changes here
     const MIN = 0;
     const MAX = 1000000;
 
@@ -112,13 +120,19 @@ const RealEstateFilters = ({ filters, onFilterChange, provinces }) => {
                     </div>
                 </div>
             </div>
+
+            <div className="filter-item filter-item-full">
+                <button onClick={onReset} className="reset-filters-btn">
+                    <RotateCcw size={16} />
+                    <span>العودة للافتراضي</span>
+                </button>
+            </div>
         </div>
     );
 };
 
 // --- Main SearchFilters Component ---
-const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFilters, provinces, onSearch }) => {
-    // 1. New state: 'all' is the default
+const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFilters, onSearch }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tempFilters, setTempFilters] = useState({});
 
@@ -127,7 +141,7 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleFilterClick = (filter) => {
-        onFilterChange(filter); // Notify the parent component (HomePage) of the change
+        onFilterChange(filter);
     };
 
     const openFilterModal = () => {
@@ -136,30 +150,34 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
     };
 
     const handleConfirmFilters = () => {
-        // onSearchApply is a new function we'll add to HomePage
         onSearchApply(tempFilters);
         setIsModalOpen(false);
     };
 
     const handleTempFilterChange = (filterName, value) => {
-        setTempFilters(prev => ({
-            ...prev,
-            [filterName]: value
-        }));
+        setTempFilters(prev => ({ ...prev, [filterName]: value }));
+    };
+
+    const handleResetFilters = () => {
+        setTempFilters({}); // Reset to an empty object
     };
 
     const handleSearch = () => {
-        // We only search if there's text. We pass BOTH the query and the active type.
         if (searchQuery.trim()) {
-            onSearch(searchQuery, activeFilter);
+            onSearch(searchQuery.trim(), activeFilter);
         }
     };
 
-    // --- EDIT: Add handler for pressing Enter ---
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             handleSearch();
         }
+    };
+
+    // 2. Create the new handler to clear the search
+    const handleClearSearch = () => {
+        setSearchQuery(''); // Clear the input field
+        onSearch('', activeFilter); // Tell HomePage to clear the search query in the URL
     };
 
     useEffect(() => {
@@ -170,11 +188,22 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
 
     return (
         <div className="search-container">
-            {/* --- The Big Search Bar (remains the same) --- */}
             <div className="main-search-bar">
                 <div className="search-input-wrapper">
                     <Search className="search-icon" size={24} />
-                    <input type="text" placeholder="ابحث بالاسم، الموديل، أو المنطقة..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={handleKeyDown} />
+                    <input
+                        type="text"
+                        placeholder="ابحث بالاسم، الموديل، أو المنطقة..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                    />
+                    {/* 3. Conditionally render the clear button */}
+                    {searchQuery && (
+                        <button className="clear-search-btn" onClick={handleClearSearch}>
+                            <X size={20} />
+                        </button>
+                    )}
                 </div>
                 <button className="filter-btn" onClick={openFilterModal}>
                     <SlidersHorizontal size={20} />
@@ -183,8 +212,8 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
                 <button className="search-btn-main" onClick={handleSearch}>بحث</button>
             </div>
 
-            {/* --- 2. The NEW Icon Filter Bar --- */}
             <div className="icon-filter-bar">
+                {/* ... The rest of the component remains the same ... */}
                 <button
                     className={`icon-filter-btn ${activeFilter === 'cars' ? 'active' : ''}`}
                     onClick={() => handleFilterClick('cars')}
@@ -211,12 +240,14 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
                             filters={tempFilters}
                             onFilterChange={handleTempFilterChange}
                             provinces={provincesForCurrentCountry}
+                            onReset={handleResetFilters}
                         />
                     ) : (
                         <RealEstateFilters
                             filters={tempFilters}
                             onFilterChange={handleTempFilterChange}
                             provinces={provincesForCurrentCountry}
+                            onReset={handleResetFilters}
                         />
                     )}
                 </Modal>
