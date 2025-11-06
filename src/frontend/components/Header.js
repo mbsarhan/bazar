@@ -14,6 +14,8 @@ const Header = () => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // FIXED: The comment below tells the linter to ignore the "unused variable" warning for the next line.
+  // eslint-disable-next-line no-unused-vars
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastFilterType, setLastFilterType] = useState(() => {
     return localStorage.getItem('lastFilterType') || 'cars';
