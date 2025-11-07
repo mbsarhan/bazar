@@ -3,7 +3,8 @@ import axios from 'axios';
 // 1. Create a new Axios instance with a custom configuration
 const api = axios.create({
     // Set the base URL for all API requests
-    baseURL: 'https://dayyelha.onrender.com',
+    baseURL: 'https://dayyelha.onrender.com/api',
+    withCredentials: true,
     // Set default headers for all requests
     headers: {
         'Content-Type': 'application/json',
