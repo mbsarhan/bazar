@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
+import { Plus } from 'lucide-react'; // Import the Plus icon
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -14,31 +15,26 @@ import {
     Filler,
 } from 'chart.js';
 import { useAuth } from '../../context/AuthContext';
-import { useDashboard } from '../../context/DashboardContext'; // <-- 1. IMPORT
+import { useDashboard } from '../../context/DashboardContext';
 
 import { ar } from 'date-fns/locale';
 import { subDays, format } from 'date-fns';
 
 const cursorFollowPositioner = function (items) {
-    // The event is the last argument
     const event = arguments[arguments.length - 1];
 
-    // If there's no event, we can't position, so return false
     if (!items.length || !event) {
         return false;
     }
 
-    // Return the x from the first item and the y from the mouse event
     return {
         x: items[0].element.x,
         y: event.y
     };
 };
 
-// 2. Register our new positioner with Chart.js
 Tooltip.positioners.cursorFollow = cursorFollowPositioner;
 
-// This is a required step for Chart.js v3+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -58,17 +54,10 @@ const generate7DayWeeks = () => {
         const endDate = subDays(today, i * 7);
         const startDate = subDays(endDate, 6);
 
-        let labelArray;
+        const startFormatted = format(startDate, 'd MMMM', { locale: ar });
+        const endFormatted = format(endDate, 'd MMMM', { locale: ar });
 
-        // --- THE GUARANTEED FIX for ALL labels ---
-
-        // ALWAYS format the start and end dates completely and separately
-        const startFormatted = format(startDate, 'd MMMM', { locale: ar }); // e.g., "٣١ أغسطس"
-        const endFormatted = format(endDate, 'd MMMM', { locale: ar });   // e.g., "٦ سبتمبر"
-
-        // ALWAYS use the pre-reversed, multi-line array format.
-        // This is guaranteed to bypass the browser's rendering bug.
-        labelArray = [startFormatted, '-', endFormatted];
+        const labelArray = [startFormatted, '-', endFormatted];
 
         labels.push(labelArray);
     }
@@ -93,27 +82,22 @@ const DashboardOverview = () => {
     const navigate = useNavigate();
 
     const handleAddAdClick = () => {
-        navigate('/', { state: { fromDashboard: true } });
+        navigate('/add-ad-choice');
     };
 
-    const { getDashboardStats, getDashboardViews } = useDashboard(); // <-- 2. GET THE FUNCTION
+    const { getDashboardStats, getDashboardViews } = useDashboard();
 
-    // --- 3. CREATE STATE for the statistics data ---
     const [stats, setStats] = useState({
         carStats: { active: 0, pending: 0, sold: 0 },
         realEstateStats: { active: 0, pending: 0, sold: 0 },
     });
     const [statsLoading, setStatsLoading] = useState(true);
 
-    const [timeRange, setTimeRange] = useState('weeks'); // 'weeks' or 'days'
+    const [timeRange, setTimeRange] = useState('weeks');
 
     const [viewData, setViewData] = useState([]);
-    const [viewsLoading, setViewsLoading] = useState(true); // Renamed from isLoading
+    const [viewsLoading, setViewsLoading] = useState(true);
 
-
-
-
-    // --- 4. CREATE A SEPARATE useEffect for fetching statistics ---
     useEffect(() => {
         const fetchStats = async () => {
             setStatsLoading(true);
@@ -122,7 +106,6 @@ const DashboardOverview = () => {
                 setStats(data);
             } catch (error) {
                 console.error("Failed to fetch dashboard stats:", error);
-                // Optionally set an error state here to show a message
             } finally {
                 setStatsLoading(false);
             }
@@ -130,14 +113,10 @@ const DashboardOverview = () => {
         fetchStats();
     }, [getDashboardStats]);
 
-
-
-
     useEffect(() => {
         const fetchViewData = async () => {
             setViewsLoading(true);
             try {
-                // Call the API with the current timeRange
                 const data = await getDashboardViews(timeRange);
                 setViewData(data);
             } catch (error) {
@@ -148,15 +127,14 @@ const DashboardOverview = () => {
         };
 
         fetchViewData();
-    }, [timeRange, getDashboardViews]); // The dependency array now includes `timeRange`
+    }, [timeRange, getDashboardViews]);
 
-    // --- 2. Prepare Chart Data (Mock Data for Views) ---
     const chartOptions = {
         responsive: true,
-        maintainAspectRatio: false, // Allows us to control height
+        maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: false, // Hide the legend box
+                display: false,
             },
             title: {
                 display: true,
@@ -184,7 +162,7 @@ const DashboardOverview = () => {
         scales: {
             x: {
                 grid: {
-                    display: false, // Hide vertical grid lines
+                    display: false,
                 },
                 ticks: {
                     font: { family: 'Cairo', size: 12 },
@@ -193,7 +171,7 @@ const DashboardOverview = () => {
             y: {
                 beginAtZero: true,
                 grid: {
-                    borderDash: [5, 5], // Make horizontal grid lines dashed
+                    borderDash: [5, 5],
                     color: '#e0e0e0',
                 },
                 ticks: {
@@ -209,14 +187,12 @@ const DashboardOverview = () => {
     };
 
     const chartData = useMemo(() => {
-        // This calculation depends on the 'timeRange' state
         const labels = timeRange === 'weeks' ? generate7DayWeeks() : generateLast7Days();
 
         return {
             labels: labels,
             datasets: [{
                 label: 'المشاهدات',
-                // This part of the calculation depends on the 'viewData' state
                 data: viewData,
                 fill: true,
                 backgroundColor: (context) => {
@@ -233,7 +209,6 @@ const DashboardOverview = () => {
                 tension: 0.4,
             }],
         };
-        // The dependency array now correctly includes BOTH 'viewData' and 'timeRange'
     }, [viewData, timeRange]);
 
     return (
@@ -242,10 +217,10 @@ const DashboardOverview = () => {
                 <h1>أهلاً بك، {userName}!</h1>
                 <button
                     onClick={handleAddAdClick}
-                    className="submit-btn"
-                    style={{ maxWidth: '200px' }}
+                    className="dashboard-add-ad-btn"
                 >
-                    + أضف إعلاناً جديداً
+                    <Plus size={18} />
+                    <span>أضف إعلاناً جديداً</span>
                 </button>
             </div>
 
@@ -267,7 +242,6 @@ const DashboardOverview = () => {
                 </div>
             </div>
 
-            {/* --- 3. Graph on Top --- */}
             <div className="chart-container" style={{ height: '400px', position: 'relative' }}>
                 {viewsLoading ? (
                     <div className="chart-skeleton-loader"></div>
@@ -276,7 +250,6 @@ const DashboardOverview = () => {
                 )}
             </div>
 
-            {/* --- 4. Car Stat Boxes --- */}
             <h2 className="stats-header">إحصائيات السيارات</h2>
             <div className="stats-container">
                 <div className="stat-card stat-card-active">
@@ -293,7 +266,6 @@ const DashboardOverview = () => {
                 </div>
             </div>
 
-            {/* --- 5. Real Estate Stat Boxes --- */}
             <h2 className="stats-header">إحصائيات العقارات</h2>
             <div className="stats-container">
                 <div className="stat-card stat-card-active">

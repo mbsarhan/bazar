@@ -1,0 +1,22 @@
+/* src/frontend/styles/PublicLayout.css */
+
+.public-layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  
+  /* CHANGE 1: Set a fixed height to the viewport height. */
+  /* This makes our wrapper the main container. */
+  height: 100vh; 
+}
+
+/* 
+  We are targeting the .main-content class that is on
+  the <main> tag inside PublicLayout.js
+*/
+.public-layout-wrapper > .main-content {
+  /* CHANGE 2: Make THIS the element that scrolls, not the whole page. */
+  overflow-y: auto;
+
+  /* CHANGE 3: Make it grow to fill the remaining space. */
+  flex-grow: 1;
+}

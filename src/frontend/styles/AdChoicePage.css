@@ -1,0 +1,201 @@
+/* AdChoicePage.css */
+
+.ad-choice-page-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-page);
+    padding: 20px;
+}
+
+.ad-choice-content {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ad-choice-content h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--color-text-dark);
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.ad-choice-content > p {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    color: var(--color-text-dark);
+    opacity: 0.7;
+    margin-bottom: 40px;
+}
+
+.ad-choice-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.ad-choice-card {
+    background: var(--color-bg-card);
+    border: 2px solid var(--color-border-subtle);
+    border-radius: 20px;
+    padding: 40px 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ad-choice-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-accent-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.ad-choice-card:hover::before {
+    opacity: 1;
+}
+
+.ad-choice-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 12px 32px rgba(144, 238, 144, 0.3);
+}
+
+.ad-choice-card:active {
+    transform: translateY(-4px);
+}
+
+.card-icon {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    background: var(--color-accent-primary);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.ad-choice-card:hover .card-icon {
+    background: var(--color-bg-card);
+    transform: scale(1.1);
+}
+
+.card-icon svg {
+    color: var(--color-text-dark);
+}
+
+.ad-choice-card h2 {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--color-text-dark);
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.ad-choice-card p {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--color-text-dark);
+    opacity: 0.7;
+    margin: 0;
+}
+
+.back-btn {
+    padding: 14px 40px;
+    background: var(--color-bg-card);
+    color: var(--color-text-dark);
+    border: 2px solid var(--color-border-subtle);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(144, 238, 144, 0.25);
+}
+
+.back-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ad-choice-page-container {
+        padding: 16px;
+    }
+
+    .ad-choice-cards {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .ad-choice-card {
+        padding: 32px 20px;
+    }
+
+    .card-icon {
+        width: 100px;
+        height: 100px;
+    }
+
+    .card-icon svg {
+        width: 64px;
+        height: 64px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ad-choice-content > p {
+        margin-bottom: 32px;
+    }
+
+    .ad-choice-cards {
+        margin-bottom: 32px;
+    }
+
+    .ad-choice-card {
+        padding: 28px 16px;
+    }
+
+    .card-icon {
+        width: 90px;
+        height: 90px;
+    }
+
+    .card-icon svg {
+        width: 56px;
+        height: 56px;
+    }
+}

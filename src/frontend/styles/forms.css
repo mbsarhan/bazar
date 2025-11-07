@@ -8,6 +8,11 @@
     --color-accent-hover: #78d878;   /* نسخة أغمق قليلاً للتأثير عند المرور */
     --color-text-dark: #33363b;     /* Dark Slate Gray */
     --color-border-subtle: #DDDDDD; /* Light Gray for borders */
+
+    --breakpoint-sm: 576px;  /* Small devices (landscape phones) */
+    --breakpoint-md: 768px;  /* Medium devices (tablets) */
+    --breakpoint-lg: 992px;  /* Large devices (desktops) */
+    --breakpoint-xl: 1200px; /* Extra large devices (large desktops) */
 }
 
 /* 2. استيراد الخط وتحضير الإعدادات العامة */
