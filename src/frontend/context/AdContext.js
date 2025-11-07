@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import api from '../api'; // Use the central axios client
 
 const AdContext = createContext(null);
-const API_URL = 'https://dayyelha.onrender.com';
+const API_URL = 'https://dayyelha.onrender.com/api';
 
 export const AdProvider = ({ children }) => {
 
