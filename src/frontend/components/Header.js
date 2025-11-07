@@ -11,9 +11,11 @@ const Header = () => {
   const { country, setCountry } = useLocation();
   const navigate = useNavigate();
   const reactRouterLocation = useReactRouterLocation();
-  
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // FIXED: The comment below tells the linter to ignore the "unused variable" warning for the next line.
+  // eslint-disable-next-line no-unused-vars
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastFilterType, setLastFilterType] = useState(() => {
     return localStorage.getItem('lastFilterType') || 'cars';
@@ -47,15 +49,12 @@ const Header = () => {
   const homeLink = `/ads?type=${lastFilterType}`;
 
   const handleAddAdClick = () => {
-    const currentPath = reactRouterLocation.pathname;
-    if (currentPath.includes('/dashboard')) {
-      navigate('/', { state: { fromDashboard: true } });
+    if (user) {
+      // User is logged in, go to ad choice page
+      navigate('/add-ad-choice');
     } else {
-      if (user) {
-        navigate('/', { state: { fromAddAd: true } });
-      } else {
-        navigate('/login', { state: { redirectTo: '/', fromAddAd: true } });
-      }
+      // User not logged in, redirect to login then to ad choice page
+      navigate('/login', { state: { redirectTo: '/add-ad-choice' } });
     }
     setIsMobileMenuOpen(false);
   };
@@ -82,9 +81,9 @@ const Header = () => {
         <Link to={homeLink} className="logo-section" onClick={handleLogoClick}>
           <div className="logo-icon">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="14" fill="currentColor" opacity="0.1"/>
-              <path d="M16 8L20 12L16 16L12 12L16 8Z" fill="currentColor"/>
-              <path d="M16 16L20 20L16 24L12 20L16 16Z" fill="currentColor" opacity="0.7"/>
+              <circle cx="16" cy="16" r="14" fill="currentColor" opacity="0.1" />
+              <path d="M16 8L20 12L16 16L12 12L16 8Z" fill="currentColor" />
+              <path d="M16 16L20 20L16 24L12 20L16 16Z" fill="currentColor" opacity="0.7" />
             </svg>
           </div>
           <div className="logo-text">
@@ -137,7 +136,7 @@ const Header = () => {
         </nav>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="mobile-menu-toggle"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
@@ -179,8 +178,8 @@ const Header = () => {
         </button>
 
         {user ? (
-          <Link 
-            to="/dashboard" 
+          <Link
+            to="/dashboard"
             className="mobile-menu-button user"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -188,8 +187,8 @@ const Header = () => {
             <span>{user.fname}</span>
           </Link>
         ) : (
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="mobile-menu-button login"
             onClick={() => setIsMobileMenuOpen(false)}
           >

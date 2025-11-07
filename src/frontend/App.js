@@ -26,6 +26,7 @@ import AddRealEstateForm from './components/AddRealEstateForm';
 import AddReview from './components/AddReview';
 import PublicProfile from './components/PublicProfile';
 import PublicLayout from './components/PublicLayout';
+import AdChoicePage from './components/AdChoicePage';
 
 // --- Import Dashboard Layout and its pages ---
 import DashboardLayout from './components/dashboard/DashboardLayout';
@@ -70,6 +71,7 @@ function App() {
                       <Route path="edit-real-estate/:adId" element={<AddRealEstateForm />} />
                       <Route path="/profile/:userId" element={<PublicProfile />} />
                       <Route path="add-review/:userIdToReview" element={<AddReview />} />
+                      <Route path="/add-ad-choice" element={<AdChoicePage />} />
                       {/* Chat Routes */}
                       <Route path="/conversations" element={<Conversations />} />
                       <Route path="/chat/:userId" element={<Chat />} />

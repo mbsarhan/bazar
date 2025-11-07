@@ -86,16 +86,16 @@ const HomePage = () => {
 
     const handleFilterChange = (filter) => {
         setSearchParams(prevParams => {
-            
+
             // 1. Set the new filter type (from both versions)
             prevParams.set('type', filter);
-            
+
             // 2. Clear the search query (from HEAD version)
             prevParams.delete('query'); // Assuming 'q' is the query param, not 'query'
-            
+
             // 3. Reset pagination to page 1 (from main version)
-            prevParams.set('page', '1'); 
-            
+            prevParams.set('page', '1');
+
             return prevParams;
         }, { replace: true });
     };
@@ -132,7 +132,11 @@ const HomePage = () => {
 
     const handleSearch = (query) => {
         const newParams = new URLSearchParams(searchParams); // Start fresh
-        newParams.set('query', query); 
+        if (query) {
+            newParams.set('query', query);
+        } else {
+            newParams.delete('query'); // If the query is empty, remove the parameter from the URL
+        }
         newParams.set('page', '1'); // IMPORTANT: Reset to page 1 on a new search
         setSearchParams(newParams);
     };

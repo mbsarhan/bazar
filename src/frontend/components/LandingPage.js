@@ -1,29 +1,30 @@
 // src/frontend/components/LandingPage.js
-import React from 'react';
-import { useNavigate, useLocation as useReactRouterLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLocation, countries } from '../context/LocationContext';
 import { Car, Home, Globe } from 'lucide-react';
-import '../styles/LandingPage.css'; // New dedicated CSS file
+import '../styles/LandingPage.css';
 import '../styles/forms.css';
 
 const LandingPage = () => {
     const navigate = useNavigate();
     const { country, setCountry } = useLocation();
-    const reactRouterLocation = useReactRouterLocation();
 
-    const fromDashboard = reactRouterLocation.state?.fromDashboard;
-    const fromAddAd = reactRouterLocation.state?.fromAddAd;
+    // Check if user has visited before
+    useEffect(() => {
+        const hasVisited = sessionStorage.getItem('hasVisitedBefore');
+        if (hasVisited) {
+            // Redirect to home page if already visited
+            navigate('/ads?type=cars', { replace: true });
+        } else {
+            // Mark as visited
+            sessionStorage.setItem('hasVisitedBefore', 'true');
+        }
+    }, [navigate]);
 
     const handleChoice = (type) => {
-        if (fromDashboard || fromAddAd) {
-            if (type === 'cars') navigate('/add-car');
-            else navigate('/add-real-estate');
-        } else {
-            // Normal landing behavior
-            navigate(`/ads?type=${type}`);
-        }
+        navigate(`/ads?type=${type}`);
     };
-
 
     // Sample data for animated cards
     const carAds = [

@@ -24,38 +24,45 @@ const Chat = () => {
       navigate('/login');
       return;
     }
+
+    // --- START: FIX ---
+    // The loadMockData function is now defined INSIDE the useEffect hook.
+    const loadMockData = () => {
+      // Find the user
+      const foundUser = mockUsers.find(u => u.id === parseInt(userId));
+      if (foundUser) {
+        setOtherUser(foundUser);
+      }
+      
+      // Load messages for this user
+      const userMessages = mockMessages[parseInt(userId)] || [];
+      setMessages(userMessages);
+      setLoading(false);
+      
+      // Mark messages as read (mock)
+      const updatedMessages = userMessages.map(msg => {
+        if (msg.receiver_id === 999 && !msg.read_at) {
+          return { ...msg, read_at: new Date().toISOString() };
+        }
+        return msg;
+      });
+      setMessages(updatedMessages);
+    };
+    // --- END: FIX ---
     
     // Simulate loading delay
     setTimeout(() => {
       loadMockData();
     }, 300);
+
+  // The dependency array no longer needs loadMockData, so the warning is gone.
   }, [userId, user, navigate]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const loadMockData = () => {
-    // Find the user
-    const foundUser = mockUsers.find(u => u.id === parseInt(userId));
-    if (foundUser) {
-      setOtherUser(foundUser);
-    }
-    
-    // Load messages for this user
-    const userMessages = mockMessages[parseInt(userId)] || [];
-    setMessages(userMessages);
-    setLoading(false);
-    
-    // Mark messages as read (mock)
-    const updatedMessages = userMessages.map(msg => {
-      if (msg.receiver_id === 999 && !msg.read_at) {
-        return { ...msg, read_at: new Date().toISOString() };
-      }
-      return msg;
-    });
-    setMessages(updatedMessages);
-  };
+  // The original loadMockData function is removed from here.
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -66,20 +73,17 @@ const Chat = () => {
     const messageContent = newMessage.trim();
     setNewMessage('');
     
-    // Create new message
     const newMsg = {
       id: Date.now(),
       body: messageContent,
-      sender_id: 999, // Mock current user ID
+      sender_id: 999,
       receiver_id: parseInt(userId),
       created_at: new Date().toISOString(),
       read_at: null
     };
     
-    // Add to messages
     setMessages(prev => [...prev, newMsg]);
     
-    // Simulate sending delay
     setTimeout(() => {
       setSending(false);
       inputRef.current?.focus();

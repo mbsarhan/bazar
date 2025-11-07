@@ -1,5 +1,7 @@
 /* src/styles/Modal.css */
 
+/* --- Base Styles (Desktop First) --- */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -10,8 +12,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* لضمان أنه فوق كل شيء */
+    z-index: 1000;
     animation: fadeIn 0.3s ease-in-out;
+    padding: 15px; /* General padding for smaller viewports */
 }
 
 .modal-content {
@@ -22,6 +25,7 @@
     width: 100%;
     max-width: 450px;
     animation: slideIn 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
 }
 
 .modal-header {
@@ -55,9 +59,10 @@
 
 .modal-footer {
     display: flex;
-    justify-content: flex-end; /* الأزرار على اليسار (لأن الواجهة عربية) */
+    justify-content: flex-end;
     gap: 15px;
     margin-top: 25px;
+    transition: all 0.3s ease-in-out;
 }
 
 .modal-btn {
@@ -80,14 +85,14 @@
 }
 
 .modal-btn-confirm {
-    background-color: #e74c3c; /* لون أحمر للتأكيد على الإجراء الخطير */
+    background-color: #e74c3c;
     color: white;
 }
 .modal-btn-confirm:hover {
     background-color: #c0392b;
 }
 
-/* تأثيرات حركية بسيطة */
+/* --- Animations --- */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -95,4 +100,78 @@
 @keyframes slideIn {
     from { transform: translateY(-30px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+}
+
+
+/* --- Responsive Adjustments --- */
+
+/* For Tablets and smaller devices (≤ 992px) */
+@media (max-width: 992px) {
+    .modal-content {
+        padding: 20px; /* Slightly reduce padding */
+    }
+
+    .modal-header h3 {
+        font-size: 1.25rem; /* Slightly smaller title */
+    }
+}
+
+/* For Tablets (≤ 768px) - This is where the major change happens */
+@media (max-width: 768px) {
+    /* Stack the buttons vertically for easier tapping */
+    .modal-footer {
+        flex-direction: column;
+        gap: 10px; /* Adjust gap for vertical layout */
+    }
+
+    /* Make buttons full-width */
+    .modal-btn {
+        width: 100%;
+        padding: 12px 20px; /* Increase vertical padding for better touch targets */
+    }
+    
+    .modal-body {
+        font-size: 0.95rem; /* Slightly smaller body text */
+    }
+}
+
+/* For Mobile devices (≤ 576px) */
+@media (max-width: 576px) {
+    .modal-content {
+        padding: 20px 15px; /* Further reduce horizontal padding */
+    }
+
+    .modal-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        font-size: 0.9rem;
+    }
+}
+
+/* For Extra small mobile devices (≤ 380px) */
+@media (max-width: 380px) {
+    .modal-overlay {
+        padding: 0; /* Remove padding to let the modal use the full screen */
+    }
+
+    .modal-content {
+        /* Make the modal take the full height and width */
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        border-radius: 0; /* Remove border radius for a full-screen feel */
+        padding: 20px 15px;
+        
+        /* This ensures the content can scroll if it's too long */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-body {
+        /* Allow the body to grow and scroll if needed */
+        flex-grow: 1; 
+        overflow-y: auto;
+    }
 }
