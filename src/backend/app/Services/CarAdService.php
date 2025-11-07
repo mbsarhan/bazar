@@ -57,7 +57,7 @@ class CarAdService
                 if (isset($data[$key])) {
                     $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
                     foreach ($files as $file) {
-                        $path = $file->store('pending/images/cars', 'public');
+                        $path = $file->store('pending/images/cars');
                         $pendingMedia['new'][] = $path;
                     }
                 }
@@ -121,7 +121,7 @@ class CarAdService
         // Process mandatory images
         foreach ($imagesToUpload as $imageFile) {
             if ($imageFile) {
-                $path = $imageFile->store('images/cars', 'public');
+                $path = $imageFile->store('images/cars');
                 CarAdImage::create([
                     'car_ad_id' => $carAd->id,
                     'image_url' => $path,
@@ -132,7 +132,7 @@ class CarAdService
         // Process extra images if they exist
         if (!empty($data['extra_images'])) {
             foreach ($data['extra_images'] as $imageFile) {
-                $path = $imageFile->store('images/cars', 'public');
+                $path = $imageFile->store('images/cars');
                 CarAdImage::create([
                     'car_ad_id' => $carAd->id,
                     'image_url' => $path,
@@ -200,7 +200,7 @@ class CarAdService
 
                 if ($ad->carDetails && $ad->carDetails->ImagesForCar) {
                     foreach ($ad->carDetails->ImagesForCar as $image) {
-                        Storage::disk('public')->delete($image->image_url);
+                        Storage::delete($image->image_url);
                     }
                 }
 
@@ -240,7 +240,7 @@ class CarAdService
                     $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
                     foreach ($files as $file) {
                         // Store in a pending path and save the path
-                        $path = $file->store('pending/images/cars', 'public');
+                        $path = $file->store('pending/images/cars');
                         $pendingMedia['new'][] = $path;
                     }
                 }
@@ -360,11 +360,11 @@ class CarAdService
                 $oldImage = $existingMandatoryImages->get($index);
 
                 // Store the new image
-                $path = $data[$slot]->store('images/cars', 'public');
+                $path = $data[$slot]->store('images/cars');
 
                 if ($oldImage) {
                     // If an old image existed, delete it from storage and update the DB record
-                    Storage::disk('public')->delete($oldImage->image_url);
+                    Storage::delete($oldImage->image_url);
                     $oldImage->update(['image_url' => $path]);
                 } else {
                     // If no old image existed for this slot, create a new DB record
@@ -385,7 +385,7 @@ class CarAdService
                 ->get();
                 
             foreach ($imagesToDelete as $image) {
-                Storage::disk('public')->delete($image->image_url);
+                Storage::delete($image->image_url);
                 $image->delete();
             }
         }
@@ -394,7 +394,7 @@ class CarAdService
         // --- 3. HANDLE NEW EXTRA IMAGES ---
         if (!empty($data['extra_images'])) {
             foreach ($data['extra_images'] as $imageFile) {
-                $path = $imageFile->store('images/cars', 'public');
+                $path = $imageFile->store('images/cars');
                 CarAdImage::create([
                     'car_ad_id' => $carAdId,
                     'image_url' => $path,

@@ -13,7 +13,8 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK', 'cloudinary'),
+    'cloud' => env('FILESYSTEM_CLOUD', 'cloudinary'),
 
     /*
     |--------------------------------------------------------------------------
@@ -38,6 +39,7 @@ return [
             'report' => false,
         ],
 
+        
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -47,6 +49,10 @@ return [
             'report' => false,
         ],
 
+        'cloudinary' => [
+            'driver' => 'cloudinary',
+        ],
+        
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

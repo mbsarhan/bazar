@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class AdvertisementResource extends JsonResource
 {
@@ -72,12 +73,9 @@ class AdvertisementResource extends JsonResource
 
 
                 // --- THE CORRECTED IMAGE URL GENERATION ---
-                'imageUrls'         => $this->whenLoaded('carDetails', function () use ($baseUrl) {
-                    return $this->carDetails->ImagesForCar->map(function ($image) use ($baseUrl) {
-                        // Manually construct the full, absolute URL.
-                        // $image->image_url is 'images/cars/your-file.jpg'
-                        return "{$baseUrl}/storage/{$image->image_url}";
-                    });
+                 'imageUrls' => $this->carDetails->ImagesForCar->map(function ($image) {
+                    // Use the official method to get a public URL for an image
+                    return Cloudinary::getImageUrl($image->image_url);
                 }),
             ];
             return array_merge($baseData, $carData);
@@ -88,17 +86,17 @@ class AdvertisementResource extends JsonResource
             $realEstateImages = $this->realEstateDetails->ImageForRealestate;
             $videoUrl = null;
             if ($this->realEstateDetails->hls_url) {
-                // $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->hls_url}";
-
                 // --- THIS IS THE KEY CHANGE ---
                 // Instead of a direct storage link, we generate a URL to our streaming route.
-                $videoUrl = route('video.stream', ['path' => $this->realEstateDetails->hls_url]);
+                // $videoUrl = route('video.stream', ['path' => $this->realEstateDetails->hls_url]);
+                $videoUrl = $this->realEstateDetails->hls_url;
             } 
             // Priority 2: Fall back to the original video URL if HLS isn't ready.
             elseif ($this->realEstateDetails->video_url) {
                 // $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->video_url}";
 
-                $videoUrl = route('video.stream', ['path' => $this->realEstateDetails->video_url]);
+                // $videoUrl = route('video.stream', ['path' => $this->realEstateDetails->video_url]);
+                $videoUrl = Cloudinary::getVideoUrl($this->realEstateDetails->video_url);
             }
             $realEstateData = [
                 'governorate'           => $this->governorate,
