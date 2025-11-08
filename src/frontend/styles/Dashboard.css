@@ -1,4 +1,4 @@
-/* src/frontend/styles/Dashboard.css */
+/* src/frontend/styles/Dashboard.css - Complete File */
 
 /* ============================================= */
 /* 1. Main Dashboard Layout                      */
@@ -202,7 +202,7 @@
 }
 
 /* ============================================= */
-/* 6. Ad List & Ad Card Styles                   */
+/* 6. Ad List & Ad Card Styles (Classic)         */
 /* ============================================= */
 .ads-list-container {
     display: grid;
@@ -224,6 +224,14 @@
 .ad-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.ad-card-clickable-area {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .ad-card-details {
@@ -317,68 +325,104 @@
 .action-btn.edit-btn { color: #f39c12; }
 .action-btn.delete-btn { color: #e74c3c; }
 
-.ad-card-clickable-area {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
 /* ============================================= */
-/* 7. Image Carousel in Ad Card                  */
+/* 7. Image Section with Modern Features         */
 /* ============================================= */
 .ad-card-image {
     position: relative;
     height: 200px;
+    overflow: hidden;
 }
 
 .ad-card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Image zoom on hover */
+.ad-card:hover .ad-card-image img {
+    transform: scale(1.08);
+}
+
+/* Views Counter - Modern Glassmorphism */
+.ad-card-views {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--color-text-dark);
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ad-card-views svg {
+    color: var(--color-accent-primary);
+}
+
+/* Navigation Arrows - Modern Style */
 .nav-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.7);
-    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #333;
+    color: var(--color-text-dark);
     z-index: 10;
     opacity: 0;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.nav-arrow.left { left: 10px; }
-.nav-arrow.right { right: 10px; }
+.nav-arrow.left { left: 12px; }
+.nav-arrow.right { right: 12px; }
 
 .ad-card:hover .nav-arrow {
     opacity: 1;
 }
 
 .nav-arrow:hover {
-    background-color: white;
-    box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
+    background: var(--color-accent-primary);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(144, 238, 144, 0.4);
 }
 
+.nav-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Animated Pagination Dots */
 .pagination-dots {
     position: absolute;
-    bottom: 10px;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 6px;
     z-index: 10;
     direction: ltr;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
 }
 
 .dot {
@@ -386,24 +430,25 @@
     height: 8px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .dot.active {
     background-color: white;
+    width: 24px;
+    border-radius: 4px;
 }
 
 .dot:hover {
-    background-color: white;
-    box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
 }
 
 .dot.small {
     width: 6px;
     height: 6px;
-    background-color: rgba(255, 255, 255, 0.4);
+    opacity: 0.7;
 }
 
 /* ============================================= */
@@ -444,30 +489,7 @@
 .stat-card-sold h2 { color: #e74c3c; }
 
 /* ============================================= */
-/* 10. Ad Card View Counter Styles               */
-/* ============================================= */
-.ad-card-views {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 10px 15px 10px 20px;
-    border-bottom-right-radius: 16px;
-    background-color: rgba(255, 255, 255, 0.1);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* ============================================= */
-/* 11. Chart View Changer (Toggle) Styles        */
+/* 10. Chart View Changer (Toggle) Styles        */
 /* ============================================= */
 .stats-header.with-toggle {
     display: flex;
@@ -504,7 +526,7 @@
 }
 
 /* ============================================= */
-/* 12. Chart Skeleton Loader Styles              */
+/* 11. Chart Skeleton Loader Styles              */
 /* ============================================= */
 .chart-skeleton-loader {
     width: 100%;
@@ -521,10 +543,45 @@
 }
 
 /* ============================================= */
+/* 12. Dashboard Add Ad Button                   */
+/* ============================================= */
+.dashboard-add-ad-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--color-accent-primary);
+    color: var(--color-text-dark);
+    border: 2px solid var(--color-accent-primary);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    max-width: fit-content;
+}
+
+.dashboard-add-ad-btn:hover {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(144, 238, 144, 0.3);
+}
+
+.dashboard-add-ad-btn:active {
+    transform: translateY(0);
+}
+
+.dashboard-add-ad-btn svg {
+    flex-shrink: 0;
+}
+
+/* ============================================= */
 /* RESPONSIVE DESIGN                              */
 /* ============================================= */
 
-/* Tablet and below (≤992px) */
+/* Large Desktop (≤992px) */
 @media (max-width: 992px) {
     .dashboard-content {
         padding: 30px 20px;
@@ -639,6 +696,31 @@
         display: none;
     }
 
+    .nav-arrow {
+        width: 36px;
+        height: 36px;
+    }
+
+    .ad-card-status {
+        font-size: 11px;
+        padding: 5px 12px;
+    }
+
+    .ad-card-views {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .dashboard-add-ad-btn {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+
+    .dashboard-add-ad-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
     .sidebar-toggle-btn {
         display: block;
     }
@@ -720,13 +802,56 @@
     }
 
     .nav-arrow {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .nav-arrow.left { left: 8px; }
+    .nav-arrow.right { right: 8px; }
+
+    .ad-card-status {
+        top: 10px;
+        right: 10px;
+        font-size: 10px;
+        padding: 4px 10px;
     }
 
     .ad-card-views {
-        font-size: 12px;
-        padding: 8px 12px 8px 16px;
+        top: 10px;
+        left: 10px;
+        font-size: 11px;
+        padding: 6px 10px;
+        gap: 4px;
+    }
+
+    .pagination-dots {
+        bottom: 10px;
+        padding: 4px 10px;
+        gap: 5px;
+    }
+
+    .dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .dot.active {
+        width: 20px;
+    }
+
+    .dot.small {
+        width: 5px;
+        height: 5px;
+    }
+
+    .dashboard-add-ad-btn span {
+        display: none;
+    }
+
+    .dashboard-add-ad-btn {
+        padding: 10px 16px;
+        min-width: 44px;
+        justify-content: center;
     }
 }
 
@@ -781,63 +906,5 @@
 
     .mobile-menu-overlay.active {
         display: block;
-    }
-}
-
-/* Dashboard Add Ad Button - Matching Header Style */
-.dashboard-add-ad-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: var(--color-accent-primary);
-    color: var(--color-text-dark);
-    border: 2px solid var(--color-accent-primary);
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    max-width: fit-content;
-}
-
-.dashboard-add-ad-btn:hover {
-    background: var(--color-accent-hover);
-    border-color: var(--color-accent-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(144, 238, 144, 0.3);
-}
-
-.dashboard-add-ad-btn:active {
-    transform: translateY(0);
-}
-
-.dashboard-add-ad-btn svg {
-    flex-shrink: 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .dashboard-add-ad-btn {
-        padding: 10px 20px;
-        font-size: 15px;
-    }
-
-    .dashboard-add-ad-btn svg {
-        width: 16px;
-        height: 16px;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-add-ad-btn span {
-        display: none; /* Hide text on very small screens */
-    }
-
-    .dashboard-add-ad-btn {
-        padding: 10px 16px;
-        min-width: 44px;
-        justify-content: center;
     }
 }

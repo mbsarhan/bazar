@@ -199,8 +199,8 @@ const AdDetailPage = () => {
                         )}
                         {ad.imageUrls.length > 1 && (
                             <>
-                                <button className="gallery-arrow left" onClick={prevSlide}><ChevronLeft size={32} /></button>
-                                <button className="gallery-arrow right" onClick={nextSlide}><ChevronRight size={32} /></button>
+                                <button className="gallery-arrow left" onClick={nextSlide}><ChevronLeft size={32} /></button>
+                                <button className="gallery-arrow right" onClick={prevSlide}><ChevronRight size={32} /></button>
                             </>
                         )}
                     </div>

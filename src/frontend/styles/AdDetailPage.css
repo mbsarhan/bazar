@@ -88,26 +88,44 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.7);
-    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px); /* For the glassy effect */
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    width: 48px;
+    width: 48px;  /* Slightly larger for a main gallery */
     height: 48px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #333;
+    color: var(--color-text-dark);
     z-index: 10;
     opacity: 0;
-    transition: all 0.2s ease-in-out; 
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-.gallery-arrow.left { left: 15px; }
-.gallery-arrow.right { right: 15px; }
-.main-image-container:hover .gallery-arrow { opacity: 1; }
+
+.gallery-arrow.left { 
+    left: 15px; 
+}
+.gallery-arrow.right { 
+    right: 15px; 
+}
+
+/* Show arrows on hover of the container */
+.main-image-container:hover .gallery-arrow {
+    opacity: 1;
+}
+
+/* Hover effect for the arrows themselves */
 .gallery-arrow:hover {
-    background-color: white;
-    box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.7);
+    background: var(--color-accent-primary);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(144, 238, 144, 0.4);
+}
+
+.gallery-arrow:active {
+    transform: translateY(-50%) scale(0.95);
 }
 
 /* --- Thumbnail Container Wrapper --- */
