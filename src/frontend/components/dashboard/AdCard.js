@@ -130,11 +130,11 @@ const AdCard = ({ ad, isPublic = false, onDelete, adIdList, returnPath }) => {
 
                     {ad.imageUrls.length > 1 && (
                         <>
-                            <button className="nav-arrow left" onClick={prevSlide}><ChevronLeft size={24} /></button>
-                            <button className="nav-arrow right" onClick={nextSlide}><ChevronRight size={24} /></button>
+                            <button className="nav-arrow left" onClick={nextSlide}><ChevronLeft size={24} /></button>
+                            <button className="nav-arrow right" onClick={prevSlide}><ChevronRight size={24} /></button>
                             
                             <div className="pagination-dots">
-                                {getVisibleDots().map((dotInfo) => (
+                                {getVisibleDots().reverse().map((dotInfo) => (
                                     <div
                                         key={dotInfo.index}
                                         className={`dot ${currentIndex === dotInfo.index ? 'active' : ''} ${dotInfo.size === 'small' ? 'small' : ''}`}
