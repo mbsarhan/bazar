@@ -22,20 +22,20 @@ const AdChoicePage = () => {
                 <p>ما الذي تريد إضافته؟</p>
 
                 <div className="ad-choice-cards">
-                    <div className="ad-choice-card" onClick={() => handleChoice('cars')}>
-                        <div className="card-icon">
-                            <Car size={80} />
-                        </div>
-                        <h2>سيارة</h2>
-                        <p>أضف إعلان لبيع سيارتك</p>
-                    </div>
-
                     <div className="ad-choice-card" onClick={() => handleChoice('real-estate')}>
                         <div className="card-icon">
                             <Home size={80} />
                         </div>
                         <h2>عقار</h2>
                         <p>أضف إعلان لعقارك</p>
+                    </div>
+                    
+                    <div className="ad-choice-card" onClick={() => handleChoice('cars')}>
+                        <div className="card-icon">
+                            <Car size={80} />
+                        </div>
+                        <h2>سيارة</h2>
+                        <p>أضف إعلان لبيع سيارتك</p>
                     </div>
                 </div>
 

@@ -215,13 +215,6 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
             <div className="icon-filter-bar">
                 {/* ... The rest of the component remains the same ... */}
                 <button
-                    className={`icon-filter-btn ${activeFilter === 'cars' ? 'active' : ''}`}
-                    onClick={() => handleFilterClick('cars')}
-                >
-                    <Car size={20} />
-                    <span>سيارات</span>
-                </button>
-                <button
                     className={`icon-filter-btn ${activeFilter === 'real-estate' ? 'active' : ''}`}
                     onClick={() => handleFilterClick('real-estate')}
                 >
@@ -229,6 +222,14 @@ const SearchFilters = ({ activeFilter, onFilterChange, onSearchApply, currentFil
                     <span>عقارات</span>
                 </button>
 
+                <button
+                    className={`icon-filter-btn ${activeFilter === 'cars' ? 'active' : ''}`}
+                    onClick={() => handleFilterClick('cars')}
+                >
+                    <Car size={20} />
+                    <span>سيارات</span>
+                </button>
+                
                 <Modal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
