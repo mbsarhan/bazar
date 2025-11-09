@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'cloud' => env('FILESYSTEM_CLOUD', 'cloudinary'),
+    'cloud' => env('FILESYSTEM_CLOUD', 'cloudinaryq'),
     'default' => env('FILESYSTEM_DISK', 'cloudinary'),
 
     /*
