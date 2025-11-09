@@ -112,9 +112,15 @@ class AdvertisementResource extends JsonResource
                 'cladding_condition'    => $this->realEstateDetails->cladding_condition,
                 'negotiable_check'      => $this->realEstateDetails->negotiable_check,
                 
-                'imageUrls' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
-                    return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");
+                // 'imageUrls' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
+                //     return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");
+                // }),
+
+                'imageUrls' => $this->carDetails->ImagesForCar->map(function ($image) {
+                    // Use the official method to get a public URL for an image
+                    return Cloudinary::getImageUrl($image->image_url);
                 }),
+                
                 'videoUrl' => $videoUrl,
                 'videoType' => $this->realEstateDetails->video_type,
             ];

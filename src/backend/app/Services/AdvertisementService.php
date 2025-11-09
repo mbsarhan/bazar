@@ -4,10 +4,11 @@ namespace App\Services;
 
 use App\Models\Advertisement;
 use App\Services\Concerns\Filters;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Request; // <-- 1. IMPORT THE REQUEST CLASS
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage; // <-- IMPORT
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request; // <-- 1. IMPORT THE REQUEST CLASS
 
 class AdvertisementService
 {
@@ -120,7 +121,7 @@ class AdvertisementService
             // 2. Delete Car Ad Images if they exist
             if ($ad->carDetails && $ad->carDetails->ImagesForCar) {
                 foreach ($ad->carDetails->ImagesForCar as $image) {
-                    Storage::disk('public')->delete($image->image_url);
+                    Storage::delete($image->image_url);
                 }
             }
 
@@ -128,15 +129,23 @@ class AdvertisementService
             if ($ad->realEstateDetails) {
                 // Delete images
                 foreach ($ad->realEstateDetails->ImageForRealestate as $image) {
-                    Storage::disk('public')->delete($image->image_url);
+                    Storage::delete($image->image_url);
                 }
+                if (config('filesystems.default') === 'cloudinary') {
+                // For Cloudinary, we destroy the asset using its public_id
+                if ($ad->realEstateDetails->video_url) {
+                    Cloudinary::destroy($ad->realEstateDetails->video_url, ['resource_type' => 'video']);
+                }
+                // The HLS files are just transformations of the original, so deleting
+                // the original asset is usually enough.
+            }
                 // Delete video files (originals and HLS folders)
                 if ($ad->realEstateDetails->video_url) {
-                    Storage::disk('public')->delete($ad->realEstateDetails->video_url);
+                    Storage::delete($ad->realEstateDetails->video_url);
                 }
                 if ($ad->realEstateDetails->hls_url) {
                     $hlsDirectory = dirname($ad->realEstateDetails->hls_url);
-                    Storage::disk('public')->deleteDirectory($hlsDirectory);
+                    Storage::deleteDirectory($hlsDirectory);
                 }
             }
             
