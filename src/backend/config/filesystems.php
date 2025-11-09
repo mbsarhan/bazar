@@ -13,8 +13,8 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'cloud'),
-    'cloud' => env('FILESYSTEM_CLOUD', 'cloud'),
+    'default' => env('FILESYSTEM_DISK', 'cloudinary'),
+    'cloud' => env('FILESYSTEM_CLOUD', 'cloudinary'),
 
     /*
     |--------------------------------------------------------------------------
@@ -49,8 +49,8 @@ return [
             'report' => false,
         ],
 
-        'cloud' => [
-            'driver' => 'cloud',
+        'cloudinary' => [
+            'driver' => 'cloudinary',
             'cloudinary_url' => env('CLOUDINARY_URL'),
         ],
         
