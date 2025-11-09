@@ -49,7 +49,7 @@ return [
             'report' => false,
         ],
 
-        'cloudinary' => [
+        'cloud' => [
             'driver' => 'cloudinary',
             'cloudinary_url' => env('CLOUDINARY_URL'),
         ],
