@@ -51,6 +51,7 @@ return [
 
         'cloudinary' => [
             'driver' => 'cloudinary',
+            'cloudinary_url' => env('CLOUDINARY_URL'),
         ],
         
         's3' => [
