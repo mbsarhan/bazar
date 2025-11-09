@@ -114,8 +114,7 @@ class AdvertisementResource extends JsonResource
                 
                 // 'imageUrls' => $this->whenLoaded('realEstateDetails', function () use ($baseUrl) {
                 //     return $this->realEstateDetails->ImageForRealestate->map(fn($image) => "{$baseUrl}/storage/{$image->image_url}");
-                // }),
-
+                // }),   
                 'imageUrls' => $this->realEstateDetails->ImageForRealestate->map(function ($image) {
                     // Use the official method to get a public URL for an image
                     return Cloudinary::getImageUrl($image->image_url);
