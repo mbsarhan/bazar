@@ -50,7 +50,7 @@ return [
         ],
 
         'cloud' => [
-            'driver' => 'cloudinary',
+            'driver' => 'cloud',
             'cloudinary_url' => env('CLOUDINARY_URL'),
         ],
         
