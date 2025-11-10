@@ -1,90 +1,128 @@
 // src/frontend/pages/Chat.js
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation  } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Send, ArrowLeft, User as UserIcon, MoreVertical } from 'lucide-react';
-import { mockUsers, mockMessages } from './mockChatData';
+import api from '../api'; // <-- IMPORT YOUR CUSTOM AXIOS INSTANCE
+import Echo from 'laravel-echo'; // <-- IMPORT ECHO
+import Pusher from 'pusher-js'; // <-- IMPORT PUSHER
 import '../styles/Chat.css';
 
+window.Pusher = Pusher; // Make Pusher globally available for Echo
+
 const Chat = () => {
-  const { userId } = useParams();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [otherUser, setOtherUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
-  const messagesEndRef = useRef(null);
-  const messagesContainerRef = useRef(null);
-  const inputRef = useRef(null);
+    const { userId } = useParams();
+    const { user: loggedInUser } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation(); // To get state passed from Conversations page
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [otherUser, setOtherUser] = useState(location.state?.otherUser || null);
+    const [loading, setLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    // <-- FIX: Declare all necessary refs at the top of the component.
+    const messagesContainerRef = useRef(null);
     
-    // Simulate loading delay
-    setTimeout(() => {
-      loadMockData();
-    }, 300);
-  }, [userId, user, navigate]);
+    const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // --- 1. DATA FETCHING FROM REAL API ---
+    useEffect(() => {
+        if (!loggedInUser) {
+            navigate('/login');
+            return;
+        }
 
-  const loadMockData = () => {
-    // Find the user
-    const foundUser = mockUsers.find(u => u.id === parseInt(userId));
-    if (foundUser) {
-      setOtherUser(foundUser);
-    }
-    
-    // Load messages for this user
-    const userMessages = mockMessages[parseInt(userId)] || [];
-    setMessages(userMessages);
-    setLoading(false);
-    
-    // Mark messages as read (mock)
-    const updatedMessages = userMessages.map(msg => {
-      if (msg.receiver_id === 999 && !msg.read_at) {
-        return { ...msg, read_at: new Date().toISOString() };
-      }
-      return msg;
-    });
-    setMessages(updatedMessages);
-  };
+        const fetchMessages = async () => {
+            try {
+                const response = await api.get(`/chat/messages/${userId}/${loggedInUser.id}`);
+                setMessages(response.data);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    
-    if (!newMessage.trim() || sending) return;
-    
-    setSending(true);
-    const messageContent = newMessage.trim();
-    setNewMessage('');
-    
-    // Create new message
-    const newMsg = {
-      id: Date.now(),
-      body: messageContent,
-      sender_id: 999, // Mock current user ID
-      receiver_id: parseInt(userId),
-      created_at: new Date().toISOString(),
-      read_at: null
+        fetchMessages();
+    }, [userId, loggedInUser, navigate]);
+
+    // --- 2. REAL-TIME LISTENER SETUP WITH ECHO ---
+    useEffect(() => {
+        // Don't subscribe until we have the logged-in user's info
+        if (!loggedInUser) return;
+
+        // Initialize Echo
+        const echo = new Echo({
+            broadcaster: 'reverb',
+            key: 'dm0akxfkvqz9xaqmkaek', // Use your Vite env variables
+            wsHost: '127.0.0.1',
+            wsPort: 8080,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
+        });
+
+        // Subscribe to the PRIVATE channel for the logged-in user
+        const channel = `chat.${loggedInUser.id}`;
+        echo.channel(channel)
+            .listen('.new-message', (event) => {
+                console.log('Real-time message received:', event);
+
+                // Add the new message to the chat ONLY if it's from the person we're currently chatting with
+                if (event.sender_id == userId) {
+                    setMessages(prevMessages => [...prevMessages, event]);
+                }
+            });
+        
+        console.log(`Subscribed to private channel: ${channel}`);
+
+        // Clean up the subscription when the component unmounts
+        return () => {
+            console.log(`Leaving channel: ${channel}`);
+            echo.leave(channel);
+        };
+
+    }, [loggedInUser, userId]); // Re-subscribe if the logged-in user or chat partner changes
+
+    // --- 3. SEND MESSAGE TO REAL API ---
+    const sendMessage = async (e) => {
+        e.preventDefault();
+        if (!newMessage.trim() || sending) return;
+
+        setSending(true);
+        const messageContent = newMessage.trim();
+
+        // Optimistic UI update: show the message immediately
+        const optimisticMessage = {
+            id: `temp-${Date.now()}`,
+            body: messageContent,
+            sender_id: loggedInUser.id,
+            receiver_id: parseInt(userId),
+            created_at: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, optimisticMessage]);
+        setNewMessage('');
+
+        try {
+            const response = await api.post(`/chat/messages/${userId}`, {
+                body: messageContent,
+                sender_id: loggedInUser.id, // <-- add this line
+            });
+            
+            // Replace the temporary message with the real one from the server
+            setMessages(prev => prev.map(msg => 
+                msg.id === optimisticMessage.id ? response.data : msg
+            ));
+        } catch (error) {
+            console.error("Error sending message:", error);
+            // Optionally remove the optimistic message on failure
+            setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+        } finally {
+            setSending(false);
+            inputRef.current?.focus();
+        }
     };
-    
-    // Add to messages
-    setMessages(prev => [...prev, newMsg]);
-    
-    // Simulate sending delay
-    setTimeout(() => {
-      setSending(false);
-      inputRef.current?.focus();
-    }, 500);
-  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
