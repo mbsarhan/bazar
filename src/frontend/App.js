@@ -10,9 +10,9 @@ import { AdProvider } from './context/AdContext'; // <-- IMPORT
 import { DashboardProvider } from './context/DashboardContext'; // <-- IMPORT
 import { UserProvider } from './context/UserContext'; // <-- IMPORT
 import { PasswordResetProvider } from './context/PasswordResetContext'; // <-- IMPORT
-import ScrollToTop from './components/ScrollToTop';
 
 // --- Import pages and layouts ---
+import ScrollToTop from './components/ScrollToTop';
 import HomePage from './components/HomePage';
 import AdDetailPage from './components/AdDetailPage';
 import Login from './components/Login';
@@ -27,6 +27,7 @@ import AddReview from './components/AddReview';
 import PublicProfile from './components/PublicProfile';
 import PublicLayout from './components/PublicLayout';
 import AdChoicePage from './components/AdChoicePage';
+import ReportUser from './components/ReportUser';
 
 // --- Import Dashboard Layout and its pages ---
 import DashboardLayout from './components/dashboard/DashboardLayout';
@@ -72,6 +73,7 @@ function App() {
                       <Route path="/profile/:userId" element={<PublicProfile />} />
                       <Route path="add-review/:userIdToReview" element={<AddReview />} />
                       <Route path="/add-ad-choice" element={<AdChoicePage />} />
+                      <Route path="/report-user/:userId" element={<ReportUser />} />
                       {/* Chat Routes */}
                       <Route path="/conversations" element={<Conversations />} />
                       <Route path="/chat/:userId" element={<Chat />} />

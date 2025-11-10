@@ -134,7 +134,7 @@ const AdCard = ({ ad, isPublic = false, onDelete, adIdList, returnPath }) => {
                             <button className="nav-arrow right" onClick={prevSlide}><ChevronRight size={24} /></button>
                             
                             <div className="pagination-dots">
-                                {getVisibleDots().reverse().map((dotInfo) => (
+                                {getVisibleDots().map((dotInfo) => (
                                     <div
                                         key={dotInfo.index}
                                         className={`dot ${currentIndex === dotInfo.index ? 'active' : ''} ${dotInfo.size === 'small' ? 'small' : ''}`}

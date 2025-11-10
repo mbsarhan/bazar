@@ -294,36 +294,64 @@
 
 .ad-card-actions {
     display: flex;
+    gap: 8px;
+    padding: 16px;
+    background: var(--color-bg-page);
     border-top: 1px solid var(--color-border-subtle);
 }
 
 .ad-card-actions .action-btn {
     flex: 1;
-    padding: 12px;
-    background-color: transparent;
-    border: none;
-    border-left: 1px solid var(--color-border-subtle);
+    padding: 12px 16px;
+    background: var(--color-bg-card);
+    border: 2px solid var(--color-border-subtle);
+    border-radius: 12px;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    transition: background-color 0.2s ease-in-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Cairo', sans-serif;
 }
 
-.ad-card-actions .action-btn:last-child {
-    border-left: none;
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.ad-card-actions .action-btn:hover {
-    background-color: var(--color-bg-page);
+.action-btn:active {
+    transform: translateY(0);
 }
 
-.action-btn.view-btn { color: #3498db; }
-.action-btn.edit-btn { color: #f39c12; }
-.action-btn.delete-btn { color: #e74c3c; }
+.action-btn.view-btn { 
+    color: #3498db;
+    border-color: #3498db;
+}
+.action-btn.view-btn:hover {
+    background: #3498db;
+    color: white;
+}
+
+.action-btn.edit-btn { 
+    color: #f39c12;
+    border-color: #f39c12;
+}
+.action-btn.edit-btn:hover {
+    background: #f39c12;
+    color: white;
+}
+
+.action-btn.delete-btn { 
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+.action-btn.delete-btn:hover {
+    background: #e74c3c;
+    color: white;
+}
 
 /* ============================================= */
 /* 7. Image Section with Modern Features         */
@@ -418,7 +446,6 @@
     display: flex;
     gap: 6px;
     z-index: 10;
-    direction: ltr;
     padding: 6px 12px;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(8px);
@@ -687,13 +714,22 @@
         gap: 12px;
     }
 
-    .ad-card-actions .action-btn {
-        font-size: 13px;
-        padding: 10px 8px;
+    .ad-card-actions {
+        padding: 12px;
+        gap: 6px;
     }
 
-    .ad-card-actions .action-btn span {
+    .action-btn {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .action-btn span {
         display: none;
+    }
+
+    .action-btn svg {
+        margin: 0;
     }
 
     .nav-arrow {
@@ -797,8 +833,14 @@
         font-size: 0.8rem;
     }
 
-    .ad-card-actions .action-btn {
-        padding: 10px 6px;
+    .ad-card-actions {
+        padding: 10px;
+        gap: 6px;
+    }
+
+    .action-btn {
+        padding: 10px;
+        border-radius: 10px;
     }
 
     .nav-arrow {
