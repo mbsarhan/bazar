@@ -2,17 +2,18 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Models\User;
-use App\Models\Advertisement;
 use App\Models\CarAds;
 use App\Models\CarAdImage;
+use Illuminate\Support\Str;
+use App\Models\Advertisement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage; // 1. IMPORT
 use Illuminate\Http\Request; // <-- 1. IMPOR
 use App\Models\PendingAdvertisement; // <-- IMPORT
-use Exception;
+use Illuminate\Support\Facades\Storage; // 1. IMPORT
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class CarAdService
 {
@@ -57,8 +58,10 @@ class CarAdService
                 if (isset($data[$key])) {
                     $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
                     foreach ($files as $file) {
-                        $path = $file->store('pending/images/cars');
-                        $pendingMedia['new'][] = $path;
+                        $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                        'folder' => 'pending/images/cars'
+                ]);
+                        $pendingMedia['new'][] = $uploaded['public_id'];
                     }
                 }
             }
@@ -121,10 +124,12 @@ class CarAdService
         // Process mandatory images
         foreach ($imagesToUpload as $imageFile) {
             if ($imageFile) {
-                $path = $imageFile->store('images/cars');
+                $uploadedFile = Cloudinary::uploadApi()->upload($imageFile->getRealPath(), [
+                        'folder' => "images/cars/{$carAd->id}"
+                    ]);
                 CarAdImage::create([
                     'car_ad_id' => $carAd->id,
-                    'image_url' => $path,
+                    'image_url' => $uploadedFile['public_id'], // Save the public_id
                 ]);
             }
         }
@@ -132,10 +137,12 @@ class CarAdService
         // Process extra images if they exist
         if (!empty($data['extra_images'])) {
             foreach ($data['extra_images'] as $imageFile) {
-                $path = $imageFile->store('images/cars');
+               $uploadedFile = Cloudinary::uploadApi()->upload($imageFile->getRealPath(), [
+                        'folder' => "images/cars/{$carAd->id}"
+                    ]);
                 CarAdImage::create([
                     'car_ad_id' => $carAd->id,
-                    'image_url' => $path,
+                    'image_url' => $uploadedFile['public_id'], // Save the public_id
                 ]);
             }
         }
@@ -200,7 +207,13 @@ class CarAdService
 
                 if ($ad->carDetails && $ad->carDetails->ImagesForCar) {
                     foreach ($ad->carDetails->ImagesForCar as $image) {
-                        Storage::delete($image->image_url);
+                    try {
+                        // Delete the image from Cloudinary
+                        Cloudinary::uploadApi()->destroy($image->image_url); // image_url now stores public_id
+                    } catch (Exception $e) {
+                        // Log error but continue
+                        \Log::error("Failed to delete Cloudinary image: {$image->image_url}", ['error' => $e->getMessage()]);
+                        }
                     }
                 }
 
@@ -240,8 +253,10 @@ class CarAdService
                     $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
                     foreach ($files as $file) {
                         // Store in a pending path and save the path
-                        $path = $file->store('pending/images/cars');
-                        $pendingMedia['new'][] = $path;
+                        $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                        'folder' => 'pending/images/cars'
+                    ]);
+                        $pendingMedia['new'][] = $uploaded['public_id'];
                     }
                 }
             }
@@ -359,20 +374,32 @@ class CarAdService
                 // Find the old image for this slot, if it exists
                 $oldImage = $existingMandatoryImages->get($index);
 
-                // Store the new image
-                $path = $data[$slot]->store('images/cars');
+                try {
+                    // Upload new image to Cloudinary
+                    $uploaded = Cloudinary::upload($data[$slot]->getRealPath(), [
+                        'folder' => 'images/cars',
+                    ]);
+                    $publicId = $uploaded->getPublicId();
 
-                if ($oldImage) {
-                    // If an old image existed, delete it from storage and update the DB record
-                    Storage::delete($oldImage->image_url);
-                    $oldImage->update(['image_url' => $path]);
-                } else {
-                    // If no old image existed for this slot, create a new DB record
-                    CarAdImage::create([
-                        'car_ad_id' => $carAdId,
-                        'image_url' => $path,
+                    if ($oldImage) {
+                        // Delete the old image from Cloudinary
+                        Cloudinary::uploadApi()->destroy($oldImage->image_url);
+
+                        // Update DB record with new public_id
+                        $oldImage->update(['image_url' => $publicId]);
+                    } else {
+                        // Create a new DB record with Cloudinary public_id
+                        CarAdImage::create([
+                            'car_ad_id' => $carAdId,
+                            'image_url' => $publicId,
+                        ]);
+                    }
+                } catch (Exception $e) {
+                    \Log::error("Failed to upload or delete Cloudinary image for slot {$slot}", [
+                        'error' => $e->getMessage()
                     ]);
                 }
+            
             }
         }
 
@@ -385,8 +412,14 @@ class CarAdService
                 ->get();
                 
             foreach ($imagesToDelete as $image) {
-                Storage::delete($image->image_url);
-                $image->delete();
+                try{
+                    Cloudinary::uploadApi()->destroy($image->image_url);
+                    $image->delete();
+                }catch(Exception $e){
+                    \Log::error("Failed to delete Cloudinary image {$image->image_url}", [
+                    'error' => $e->getMessage()
+            ]);
+                }
             }
         }
         
@@ -394,11 +427,23 @@ class CarAdService
         // --- 3. HANDLE NEW EXTRA IMAGES ---
         if (!empty($data['extra_images'])) {
             foreach ($data['extra_images'] as $imageFile) {
-                $path = $imageFile->store('images/cars');
-                CarAdImage::create([
-                    'car_ad_id' => $carAdId,
-                    'image_url' => $path,
-                ]);
+                try{
+                    $uploaded = Cloudinary::upload($imageFile->getRealPath(), [
+                        'folder' => 'images/cars',
+                    ]);
+                     // Get the public_id
+                    $publicId = $uploaded->getPublicId();
+
+                    CarAdImage::create([
+                        'car_ad_id' => $carAdId,
+                        'image_url' => $publicId, // store the Cloudinary public_id
+                    ]);
+
+                }catch(Exception $e){
+                     \Log::error("Failed to upload extra image to Cloudinary", [
+                     'error' => $e->getMessage(),
+                    ]);
+                }
             }
         }
     }   

@@ -75,7 +75,7 @@ class AdvertisementResource extends JsonResource
                 // --- THE CORRECTED IMAGE URL GENERATION ---
                  'imageUrls' => $this->carDetails->ImagesForCar->map(function ($image) {
                     // Use the official method to get a public URL for an image
-                    return Cloudinary::getImageUrl($image->image_url);
+                    return Cloudinary::image($image->image_url)->toUrl();
                 }),
             ];
             return array_merge($baseData, $carData);
@@ -96,7 +96,7 @@ class AdvertisementResource extends JsonResource
                 // $videoUrl = "{$baseUrl}/storage/{$this->realEstateDetails->video_url}";
 
                 // $videoUrl = route('video.stream', ['path' => $this->realEstateDetails->video_url]);
-                $videoUrl = Cloudinary::getVideoUrl($this->realEstateDetails->video_url);
+                Cloudinary::video($this->realEstateDetails->video_url)->toUrl();
             }
             $realEstateData = [
                 'governorate'           => $this->governorate,
@@ -117,7 +117,7 @@ class AdvertisementResource extends JsonResource
                 // }),   
                 'imageUrls' => $this->realEstateDetails->ImageForRealestate->map(function ($image) {
                     // Use the official method to get a public URL for an image
-                    return Cloudinary::getImageUrl($image->image_url);
+                    return Cloudinary::image($image->image_url)->toUrl();
                 }),
                 
                 'videoUrl' => $videoUrl,

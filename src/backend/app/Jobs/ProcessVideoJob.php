@@ -41,31 +41,41 @@ class ProcessVideoJob implements ShouldQueue
 
     public function handle(): void
     {
-        // $this->videoPath is the "public_id" of the original video on Cloudinary,
-        // e.g., 'videos/real-estate/originals/xyz'
+         try {
+            // 1️⃣ Create an HLS version using Cloudinary’s explicit API
+            $response = Cloudinary::uploadApi()->explicit($this->videoPath, [
+                'resource_type' => 'video',
+                'type' => 'upload',
+                'eager' => [
+                    [
+                        'format' => 'm3u8',
+                        'streaming_profile' => 'full_hd'
+                    ]
+                ],
+                'eager_async' => false,
+            ]);
 
-        // 1. Define the HLS transformation for Cloudinary
-        $transformation = [
-            ['quality' => 'auto', 'width' => 1920, 'height' => 1080, 'bitrate' => '5m'],
-            ['quality' => 'auto', 'width' => 1280, 'height' => 720, 'bitrate' => '2.5m'],
-            ['quality' => 'auto', 'width' => 640, 'height' => 360, 'bitrate' => '800k'],
-        ];
+            $hlsUrl = $response['eager'][0]['secure_url'] ?? null;
 
-        // 2. Get the final HLS URL from Cloudinary. This does NOT re-upload, it just builds the URL.
-        // You were correct to use getVideoUrl()
-        $hlsUrl = Cloudinary::getVideoUrl($this->videoPath, [
-            'resource_type' => 'video',
-            'transformation' => $transformation,
-        ]);
+            if ($hlsUrl) {
+                RealestateAds::where('ads_id', $this->adId)->update([
+                    'hls_url' => $hlsUrl,
+                    'video_type' => 'application/x-mpegURL',
+                ]);
+            }
 
-        // 3. Update the database with the final HLS URL.
-        RealestateAds::where('ads_id', $this->adId)->update([
-            'hls_url' => $hlsUrl,
-            'video_type' => 'application/x-mpegURL',
-        ]);
+            // (Optional) Delete original to save storage
+            Cloudinary::uploadApi()->destroy($this->videoPath, [
+                'resource_type' => 'video',
+            ]);
 
-        // 4. Delete the original, unprocessed video from Cloudinary to save space.
-        Cloudinary::destroy($this->videoPath, ['resource_type' => 'video']);
+        } catch (Throwable $e) {
+            Log::error('Cloudinary HLS processing failed for ad ID ' . $this->adId, [
+                'video_public_id' => $this->videoPath,
+                'error' => $e->getMessage(),
+            ]);
+            $this->failed($e);
+        }
     }
 
     /**
@@ -73,12 +83,17 @@ class ProcessVideoJob implements ShouldQueue
      */
    public function failed(?Throwable $exception): void
     {
-        // If the job fails, delete the original video that was uploaded
-        Cloudinary::destroy($this->videoPath, ['resource_type' => 'video']);
+         try {
+            Cloudinary::uploadApi()->destroy($this->videoPath, [
+                'resource_type' => 'video',
+            ]);
+        } catch (\Exception $e) {
+            // no-op
+        }
 
-        Log::error('Cloudinary video processing failed for ad ID: ' . $this->adId, [
-            'video_public_id' => $this->videoPath,
-            'error' => $exception->getMessage(),
+        Log::error('Cloudinary video job failed completely', [
+            'adId' => $this->adId,
+            'error' => $exception?->getMessage(),
         ]);
     }
 }

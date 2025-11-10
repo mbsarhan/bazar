@@ -11,9 +11,10 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request; // <-- 1. IMPOR
 use App\Models\PendingAdvertisement; // <-- 1. IMPORT
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RealestateAdsService{
    
@@ -84,13 +85,24 @@ class RealestateAdsService{
                 $videoMimeType = null;
                 if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
                     $videoFile = $data['video'];
-                    // Store the original video file. Its path is now ready for instant playback.
-                    $originalVideoPath = $data['video']->store('videos/real-estate/originals');
-                    $videoMimeType = $videoFile->getMimeType();
-                    
-                    // Dispatch the background job to transcode this video.
-                    // We pass the original path and the main Advertisement ID.
-                    ProcessVideoJob::dispatch($originalVideoPath, $advertisement->id);
+                    try{
+                        // Upload the original video to Cloudinary
+                        $uploaded = Cloudinary::uploadApi()->upload($videoFile->getRealPath(), [
+                            'folder' => 'videos/real-estate/originals',
+                            'resource_type' => 'video',
+                        ]);
+                        
+                        $videoMimeType = $videoFile->getMimeType();
+
+                        // Store the original video file. Its path is now ready for instant playback.
+                        // $originalVideoPath = $data['video']->store('videos/real-estate/originals');
+                        
+                        // Dispatch the background job to transcode this video.
+                        // We pass the original path and the main Advertisement ID.
+                        ProcessVideoJob::dispatch($originalVideoPath, $advertisement->id);
+                    }catch(Exception $e){
+                        
+                    }
                 }
 
                 $realestateAd = RealestateAds::create([
@@ -119,15 +131,22 @@ class RealestateAdsService{
                 if (isset($data[$key])) {
                     $files = is_array($data[$key]) ? $data[$key] : [$data[$key]];
                     foreach ($files as $file) {
-                        $path = $file->store('pending/images/real-estate');
-                        $pendingMedia['new'][] = $path;
+                        $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                        'folder' => 'pending/images/real-estate'
+                    ]);
+                        // $path = $file->store('pending/images/real-estate');
+                        $pendingMedia['new'][] = $uploaded['public_id'];
                     }
                 }
             }
 
             if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
-                $path = $data['video']->store('pending/videos/real-estate');
-                $pendingMedia['new_video'] = $path; // Store separately for clarity
+                $uploaded = Cloudinary::uploadApi()->upload($videoFile->getRealPath(), [
+                            'folder' => 'pending/videos/real-estate',
+                            'resource_type' => 'video',
+                ]);
+                // $path = $data['video']->store('pending/videos/real-estate');
+                $pendingMedia['new_video'] = $uploaded['public_id']; // Store separately for clarity
             }
 
 
@@ -185,10 +204,12 @@ class RealestateAdsService{
     private function uploadImages(RealestateAds $realestateAd, array $images): void
     {
         foreach ($images as $imageFile) {
-            $path = $imageFile->store('images/real-estate');
+            $uploaded = Cloudinary::uploadApi()->upload($imageFile->getRealPath(), [
+            'folder' => "images/real-estate/{$realestateAd->id}"
+        ]);
             RealestateImage::create([
                 'realestate_ad_id' => $realestateAd->id,
-                'image_url' => $path,
+                'image_url' => $uploaded['public_id'], // Save public ID for later URL generation
             ]);
         }
     }
@@ -197,21 +218,43 @@ class RealestateAdsService{
      protected function uploadVideo(Advertisement $advertisement, UploadedFile $video_file): string
     {
         try {
-            $fileName = uniqid('ad_video_') . '.' . $video_file->getClientOriginalExtension();
+            // $fileName = uniqid('ad_video_') . '.' . $video_file->getClientOriginalExtension();
             // Store the video in a specific directory (e.g., 'realestate_ads/{ad_id}/videos')
-            $path = $video_file->storeAs("videos/real-estate", $fileName);
+            // $path = $video_file->storeAs("videos/real-estate", $fileName);
+            //     if (!$path) {
+            //         throw new Exception("Failed to store video file.");
+            //     }
+            //     return $path;
+            // } catch (Exception $e) {
+            //     Log::error('Failed to upload video for ad', [
+            //         'advertisement_id' => $advertisement->id,
+            //         'error'            => $e->getMessage(),
+            //         'trace'            => $e->getTraceAsString(),
+            //     ]);
+            //     throw $e; // Re-throw to ensure transaction rollback
+            $result = Cloudinary::uploadApi()->upload(
+                $video_file->getRealPath(),
+                [
+                    'resource_type' => 'video',
+                    'folder' => 'videos/real-estate/originals',
+                    'public_id' => uniqid('ad_video_'), // optional unique name
+                ]
+            );
+            $publicId = $result['public_id'];
+            $videoMimeType = $video_file->getMimeType();
+            $advertisement->realEstateDetails->update([
+                'video_url' => $publicId,
+                'video_type' => $videoMimeType,
+             ]);
+            return $publicId;
 
-            if (!$path) {
-                throw new Exception("Failed to store video file.");
-            }
-            return $path;
-        } catch (Exception $e) {
+        }catch(Exception $e){
             Log::error('Failed to upload video for ad', [
                 'advertisement_id' => $advertisement->id,
-                'error'            => $e->getMessage(),
-                'trace'            => $e->getTraceAsString(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
-            throw $e; // Re-throw to ensure transaction rollback
+            throw $e;
         }
     }
 
@@ -231,7 +274,8 @@ class RealestateAdsService{
 
                 if ($ad->realEstateDetails && $ad->realEstateDetails->ImageForRealestate) {
                     foreach ($ad->realEstateDetails->ImageForRealestate as $image) {
-                        Storage::delete($image->image_url);
+                        // Storage::delete($image->image_url);
+                        Cloudinary::uploadApi()->destroy($image->image_url);
                     }
                 }
 
@@ -239,7 +283,8 @@ class RealestateAdsService{
                 // بما أن video_url هو حقل مباشر على RealestateAds، فإننا نتحقق منه ونحذفه
                 if ($ad->realEstateDetails && $ad->realEstateDetails->video_url) {
                     // $ad->realEstateDetails هو نموذج RealestateAds
-                    Storage::delete($ad->realEstateDetails->video_url); 
+                    // Storage::delete($ad->realEstateDetails->video_url); 
+                    Cloudinary::uploadApi()->destroy($ad->realEstateDetails->video_url);
                 }
 
                 // 4. Delete the advertisement record from the database.
@@ -284,13 +329,19 @@ class RealestateAdsService{
 
             if (!empty($data['images'])) {
                 foreach ($data['images'] as $file) {
-                    $path = $file->store('pending/images/real-estate');
-                    $pendingMedia['new'][] = $path;
+                    // $path = $file->store('pending/images/real-estate');
+                    $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                        'folder' => 'pending/images/real-estate'
+                    ]);
+                    $pendingMedia['new'][] = $uploaded['public_id'];
                 }
             }
             if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
-                $path = $data['video']->store('pending/videos/real-estate');
-                $pendingMedia['new_video'] = $path; // Store separately for clarity
+                // $path = $data['video']->store('pending/videos/real-estate');
+                 $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                        'folder' => 'pending/videos/real-estate'
+                ]);
+                $pendingMedia['new_video'] = $uploaded['public_id']; // Store separately for clarity
             }
 
             // 4. Add the final required fields to our data array
@@ -368,13 +419,15 @@ class RealestateAdsService{
                 ->get();
 
             foreach ($imagesToDelete as $image) {
-                Storage::delete($image->image_url);
+                // Storage::delete($image->image_url);
+                Cloudinary::uploadApi()->destroy($image->image_url);
                 $image->delete();
             }
 
             // Delete removed video (if its filename is in the array)
             if ($realEstateAd->video_url && in_array(basename($realEstateAd->video_url), $data['removed_media'])) {
-                Storage::delete($realEstateAd->video_url);
+                // Storage::delete($realEstateAd->video_url);
+                Cloudinary::uploadApi()->destroy($realEstateAd->video_url);
                 $realEstateAd->video_url = null;
                 $realEstateAd->save();
             }
@@ -383,10 +436,13 @@ class RealestateAdsService{
         // --- 2. Add New Images ---
         if (!empty($data['images'])) {
             foreach ($data['images'] as $imageFile) {
-                $path = $imageFile->store('images/real-estate');
+                // $path = $imageFile->store('images/real-estate');
+                 $uploaded = Cloudinary::uploadApi()->upload($imageFile->getRealPath(), [
+                        'folder' => 'pending/videos/real-estate'
+                ]);
                 RealestateImage::create([
                     'realestate_ad_id' => $realEstateAd->id,
-                    'image_url' => $path,
+                    'image_url' => $uploaded['public_id'],
                 ]);
             }
         }
@@ -395,11 +451,17 @@ class RealestateAdsService{
         if (isset($data['video']) && $data['video'] instanceof UploadedFile) {
             // Delete the old video if it exists
             if ($realEstateAd->video_url) {
-                Storage::delete($realEstateAd->video_url);
+                // Storage::delete($realEstateAd->video_url);
+                Cloudinary::uploadApi()->destroy($realEstateAd->video_url,['resource_type' => 'video',]);
             }
             // Store the new one and update the record
-            $videoPath = $data['video']->store('videos/real-estate');
-            $realEstateAd->video_url = $videoPath;
+            // $videoPath = $data['video']->store('videos/real-estate');
+             $uploaded = Cloudinary::uploadApi()->upload($data['video']->getRealPath(), [
+                'resource_type' => 'video',
+                'folder' => 'videos/real-estate/originals',
+                'public_id' => uniqid('ad_video_'),
+             ]);
+            $realEstateAd->video_url = $uploaded['public_id'];
             $realEstateAd->save();
         }
     }
