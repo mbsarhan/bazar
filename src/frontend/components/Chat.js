@@ -244,7 +244,7 @@ const Chat = () => {
                   <div
                     key={message.id || index}
                     className={`message ${
-                      message.sender_id === 999 ? 'sent' : 'received'
+                      message.sender_id === loggedInUser.id ? 'sent' : 'received'
                     }`}
                   >
                     <div className="message-bubble">
