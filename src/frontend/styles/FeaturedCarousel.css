@@ -55,25 +55,61 @@
 }
 
 /* --- THEME OVERRIDE for Swiper Elements --- */
-.myFeaturedSwiper .swiper-pagination-bullet-active {
-    background-color: var(--color-accent-primary);
+
+/* --- 1. Modern Pagination Dots --- */
+.myFeaturedSwiper .swiper-pagination-bullet {
+    background: var(--color-accent-primary);
+    opacity: 1;
+    transition: all 0.3s ease;
+    width: 8px;
+    height: 8px;
 }
 
+
+.myFeaturedSwiper .swiper-pagination-bullet-active {
+    background-color: var(--color-accent-primary);
+    width: 24px;
+    border-radius: 4px;
+}
+
+.myFeaturedSwiper .swiper-pagination-bullet:hover{
+    background-color: var(--color-accent-hover);
+    transform: scale(1.2);
+}
+
+
+/* --- 2. Modern Navigation Arrows --- */
 .myFeaturedSwiper .swiper-button-next,
 .myFeaturedSwiper .swiper-button-prev {
-    color: white;
-    background-color: rgba(0, 0, 0, 0.3);
+    /* Base Styling */
+    color: var(--color-text-dark);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    /* Sizing */
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    transition: background-color 0.3s ease;
+    
+    /* Transitions */
+    transition: all 0.3s ease;
 }
 
 .myFeaturedSwiper .swiper-button-next:hover,
 .myFeaturedSwiper .swiper-button-prev:hover {
-    background-color: rgba(0, 0, 0, 0.5);
+    background: var(--color-accent-primary);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(144, 238, 144, 0.4);
 }
 
+.myFeaturedSwiper .swiper-button-next:active,
+.myFeaturedSwiper .swiper-button-prev:active {
+    transform: scale(0.95);
+}
+
+/* Customizing the arrow icon size */
 .myFeaturedSwiper .swiper-button-next:after,
 .myFeaturedSwiper .swiper-button-prev:after {
     font-size: 20px;
@@ -105,13 +141,14 @@
 
     .myFeaturedSwiper .swiper-button-next,
     .myFeaturedSwiper .swiper-button-prev {
-        width: 36px;
-        height: 36px;
+        /* Adjust size for smaller screens */
+        width: 40px;
+        height: 40px;
     }
 
     .myFeaturedSwiper .swiper-button-next:after,
     .myFeaturedSwiper .swiper-button-prev:after {
-        font-size: 16px;
+        font-size: 18px;
     }
 }
 
@@ -137,13 +174,18 @@
         font-size: 0.9rem;
     }
 
+    /* Hide arrows on mobile for a cleaner look and more screen space */
     .myFeaturedSwiper .swiper-button-next,
     .myFeaturedSwiper .swiper-button-prev {
-        display: none; /* Hide arrows on mobile for simplicity */
+        display: none; 
     }
 
     .myFeaturedSwiper .swiper-pagination-bullet {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
+    }
+    
+    .myFeaturedSwiper .swiper-pagination-bullet-active {
+        width: 20px;
     }
 }
