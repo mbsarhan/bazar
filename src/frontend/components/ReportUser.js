@@ -180,7 +180,7 @@ const ReportUser = () => {
                         </button>
                         <button
                             type="submit"
-                            className="report-btn"
+                            className="submit-report-btn"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? 'جاري الإرسال...' : 'إرسال البلاغ'}

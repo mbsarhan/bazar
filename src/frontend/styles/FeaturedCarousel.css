@@ -58,18 +58,25 @@
 
 /* --- 1. Modern Pagination Dots --- */
 .myFeaturedSwiper .swiper-pagination-bullet {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--color-accent-primary);
     opacity: 1;
     transition: all 0.3s ease;
     width: 8px;
     height: 8px;
 }
 
+
 .myFeaturedSwiper .swiper-pagination-bullet-active {
-    background-color: white;
+    background-color: var(--color-accent-primary);
     width: 24px;
     border-radius: 4px;
 }
+
+.myFeaturedSwiper .swiper-pagination-bullet:hover{
+    background-color: var(--color-accent-hover);
+    transform: scale(1.2);
+}
+
 
 /* --- 2. Modern Navigation Arrows --- */
 .myFeaturedSwiper .swiper-button-next,

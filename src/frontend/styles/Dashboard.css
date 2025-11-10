@@ -456,19 +456,19 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--color-accent-primary);
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .dot.active {
-    background-color: white;
+    background-color: var(--color-accent-primary);
     width: 24px;
     border-radius: 4px;
 }
 
 .dot:hover {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: var(--color-accent-hover);
     transform: scale(1.2);
 }
 

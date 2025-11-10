@@ -211,13 +211,13 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.report-btn {
+.submit-report-btn {
     background: #e74c3c;
     border-color: #e74c3c;
     color: white;
 }
 
-.report-btn:hover:not(:disabled) {
+.submit-report-btn:hover:not(:disabled) {
     background: #c0392b;
     border-color: #c0392b;
     transform: translateY(-2px);
