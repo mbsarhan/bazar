@@ -1,10 +1,14 @@
 // src/frontend/pages/Chat.js
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation  } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Send, ArrowLeft, User as UserIcon, MoreVertical } from 'lucide-react';
-import { mockUsers, mockMessages } from './mockChatData';
+import api from '../api'; // <-- IMPORT YOUR CUSTOM AXIOS INSTANCE
+import Echo from 'laravel-echo'; // <-- IMPORT ECHO
+import Pusher from 'pusher-js'; // <-- IMPORT PUSHER
 import '../styles/Chat.css';
+
+window.Pusher = Pusher; // Make Pusher globally available for Echo
 
 const Chat = () => {
     const { userId } = useParams();
@@ -240,7 +244,7 @@ const Chat = () => {
                   <div
                     key={message.id || index}
                     className={`message ${
-                      message.sender_id === 999 ? 'sent' : 'received'
+                      message.sender_id === loggedInUser.id ? 'sent' : 'received'
                     }`}
                   >
                     <div className="message-bubble">
@@ -281,4 +285,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;at;
+export default Chat;
