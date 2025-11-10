@@ -3,19 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { MessageSquare, Search, ChevronLeft, User as UserIcon } from 'lucide-react';
+import { MessageSquare, Clock, Search, ChevronLeft, User as UserIcon } from 'lucide-react';
 import api from '../api';
 import '../styles/Conversations.css';
 
 const Conversations = () => {
-    const { user } = useAuth();
+    const { user: loggedInUser } = useAuth(); // Renamed for clarity
     const navigate = useNavigate();
     const [conversations, setConversations] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!user) {
+        if (!loggedInUser) {
             navigate('/login');
             return;
         }
@@ -32,16 +32,39 @@ const Conversations = () => {
         };
 
         fetchConversations();
-    }, [user, navigate]);
+    }, [loggedInUser, navigate]);
 
     const handleConversationClick = (otherUser) => {
         navigate(`/chat/${otherUser.id}`, { state: { otherUser } });
     };
 
     const filteredConversations = conversations.filter(conv => {
-        const fullName = `${conv.fname || ''} ${conv.lname || ''}`.toLowerCase();
+        const fullName = `${conv.user.fname || ''} ${conv.user.lname || ''}`.toLowerCase();
         return fullName.includes(searchTerm.toLowerCase());
     });
+
+
+    const formatTime = (timestamp) => {
+        if (!timestamp) return '';
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        if (days === 0) {
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            if (hours === 0) {
+                const minutes = Math.floor(diff / (1000 * 60));
+                if (minutes < 1) return 'الآن';
+                return `منذ ${minutes} دقيقة`;
+            }
+            return `منذ ${hours} ساعة`;
+        } else if (days === 1) {
+            return 'أمس';
+        } else {
+            return date.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' });
+        }
+    };
 
     // <-- FIX: The loading state JSX was missing. It is now restored.
     if (loading) {
@@ -87,22 +110,42 @@ const Conversations = () => {
                             <p>ابدأ محادثة جديدة من خلال التواصل مع أصحاب الإعلانات</p>
                         </div>
                     ) : (
+                        // --- THIS IS THE UPDATED MAPPING LOGIC ---
                         filteredConversations.map((conv) => (
                             <div
-                                key={conv.id}
-                                className="conversation-item"
-                                onClick={() => handleConversationClick(conv)}
+                                key={conv.user.id}
+                                className={`conversation-item ${conv.unread_count > 0 ? 'unread' : ''}`}
+                                onClick={() => handleConversationClick(conv.user)}
                             >
                                 <div className="conversation-avatar">
+                                    {/* Replace with conv.user.profilePicture if you add it */}
                                     <div className="avatar-placeholder">
                                         <UserIcon size={24} />
                                     </div>
+                                    {conv.unread_count > 0 && (
+                                        <span className="unread-indicator">
+                                            {conv.unread_count > 99 ? '99+' : conv.unread_count}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="conversation-content">
                                     <div className="conversation-header-info">
-                                        <h3>{`${conv.fname || ''} ${conv.lname || ''}`}</h3>
+                                        <h3>{`${conv.user.fname || ''} ${conv.user.lname || ''}`}</h3>
+                                        {conv.last_message && (
+                                            <span className="conversation-time">
+                                                <Clock size={14} />
+                                                {formatTime(conv.last_message.created_at)}
+                                            </span>
+                                        )}
                                     </div>
-                                    <p className="last-message">Click to view chat history</p>
+                                    {conv.last_message && (
+                                        <p className="last-message">
+                                            {/* Check if the logged-in user sent the last message */}
+                                            {conv.last_message.sender_id === loggedInUser.id ? 'أنت: ' : ''}
+                                            {conv.last_message.body}
+                                        </p>
+                                    )}
+                                    {/* We can add ad reference back later if needed */}
                                 </div>
                             </div>
                         ))

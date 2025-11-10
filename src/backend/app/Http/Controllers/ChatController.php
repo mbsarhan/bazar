@@ -6,24 +6,66 @@ use App\Models\User;
 use App\Models\Message;
 use App\Events\MessageSent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // <-- Make sure DB Facade is imported
 
 class ChatController extends Controller
 {
-    // Fetches a list of users the authenticated user has had conversations with (still needs auth)
+    // --- THIS IS THE NEW, ENHANCED VERSION ---
     public function getConversations(Request $request)
-    {
-        $user = $request->user();
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        $senderIds = Message::where('receiver_id', $user->id)->pluck('sender_id');
-        $receiverIds = Message::where('sender_id', $user->id)->pluck('receiver_id');
-        $userIds = $senderIds->merge($receiverIds)->unique();
-        $conversations = User::whereIn('id', $userIds)->get(['id', 'fname', 'lname']);
-
-        return response()->json($conversations);
+{
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
+    $userId = $user->id;
+
+    // 1. Get the ID of the last message for each conversation
+    $latestMessages = DB::table('messages')
+        ->select(DB::raw('MAX(id) as last_message_id'))
+        // Only consider messages where the current user is either the sender or receiver
+        ->where(function ($query) use ($userId) {
+            $query->where('sender_id', $userId)
+                  ->orWhere('receiver_id', $userId);
+        })
+        // --- THIS IS THE FIX ---
+        // Explicitly exclude any messages where the sender and receiver are the same person.
+        ->where('sender_id', '!=', DB::raw('receiver_id'))
+        // --- END OF FIX ---
+        ->groupBy(DB::raw("LEAST(sender_id, receiver_id), GREATEST(sender_id, receiver_id)"));
+
+    // The rest of the function remains exactly the same...
+    
+    // 2. Get the full message details for those last messages
+    $conversations = Message::whereIn('id', $latestMessages)
+        ->with(['sender', 'receiver'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    // 3. Get all unread message counts
+    $unreadCounts = Message::select('sender_id', DB::raw('count(id) as count'))
+        ->where('receiver_id', $userId)
+        ->whereNull('read_at')
+        ->groupBy('sender_id')
+        ->get()
+        ->keyBy('sender_id');
+
+    // 4. Format the final response
+    $response = $conversations->map(function ($message) use ($userId, $unreadCounts) {
+        $otherUser = $message->sender_id == $userId ? $message->receiver : $message->sender;
+
+        return [
+            'user' => [
+                'id' => $otherUser->id,
+                'fname' => $otherUser->fname,
+                'lname' => $otherUser->lname,
+            ],
+            'last_message' => $message,
+            'unread_count' => $unreadCounts->get($otherUser->id)->count ?? 0,
+        ];
+    });
+
+    return response()->json($response);
+}
 
     // ✅ Public route: Fetch messages between two users
     public function getMessages($senderId, $recipientId)
