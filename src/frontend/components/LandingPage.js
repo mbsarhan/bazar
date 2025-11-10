@@ -97,13 +97,13 @@ const LandingPage = () => {
                 </div>
 
                 <div className="landing-choices-wrapper">
-                    <div className="landing-choice-card" onClick={() => handleChoice('cars')}>
-                        <Car size={64} />
-                        <h3>سيارة</h3>
-                    </div>
                     <div className="landing-choice-card" onClick={() => handleChoice('real-estate')}>
                         <Home size={64} />
                         <h3>عقار</h3>
+                    </div>
+                    <div className="landing-choice-card" onClick={() => handleChoice('cars')}>
+                        <Car size={64} />
+                        <h3>سيارة</h3>
                     </div>
                 </div>
             </div>
