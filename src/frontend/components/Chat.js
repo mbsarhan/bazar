@@ -56,9 +56,9 @@ const Chat = () => {
         // Initialize Echo
         const echo = new Echo({
             broadcaster: 'reverb',
-            key: 'nockga9cigp4h1fejwms', // Use your Vite env variables
-            wsHost: '127.0.0.1',
-            wsPort: 8080,
+            key: 'rjd1p6mdpoowjxbenvzg', 
+            wsHost: '127.0.0.1',       
+            wsPort: 8080,                
             forceTLS: false,
             enabledTransports: ['ws', 'wss'],
         });
