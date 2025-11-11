@@ -147,6 +147,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
+    Route::post('/users/{user}/report', [App\Http\Controllers\UserReportController::class, 'store'])
+    ->name('users.report');
+
+
+
 });
 
 

@@ -53,6 +53,7 @@ const ReportUser = () => {
         }));
     };
 
+    // --- THIS FUNCTION NOW CALLS THE REAL API ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -61,8 +62,8 @@ const ReportUser = () => {
             return;
         }
 
-        if (!formData.description.trim()) {
-            setError('الرجاء كتابة تفاصيل البلاغ');
+        if (formData.description.trim().length < 20) { // Add a length check
+            setError('الرجاء كتابة تفاصيل أطول (20 حرف على الأقل)');
             return;
         }
 
@@ -70,12 +71,17 @@ const ReportUser = () => {
         setError(null);
 
         try {
+            // This now calls the REAL function from UserContext.js
             await reportUser(userId, formData);
             setSuccess(true);
+            
+            // --- CHANGE: Redirect faster after success ---
             setTimeout(() => {
                 navigate(`/profile/${userId}`);
-            }, 2000);
+            }, 1500); // Reduced delay to 1.5 seconds
+
         } catch (err) {
+            // The backend sends a specific error for duplicates, which will be shown here.
             setError(err.response?.data?.message || 'فشل في إرسال البلاغ. حاول مرة أخرى.');
         } finally {
             setIsSubmitting(false);
