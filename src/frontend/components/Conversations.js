@@ -46,55 +46,55 @@ const Conversations = () => {
                 }
             };
             fetchConversations();
+            // --- Setup real-time updates ---
+            const echo = new Echo({
+                broadcaster: 'reverb',
+                key: 'ccgv9x8aeypbok8hfyor',
+                wsHost: '127.0.0.1',
+                wsPort: 8080,
+                forceTLS: false,
+                enabledTransports: ['ws', 'wss'],
+            });
+    
+            const channel = `chat.${loggedInUser.id}`;
+            echo.channel(channel).listen('.new-message', (event) => {
+                setConversations(prev => {
+                    const updated = [...prev];
+                    const index = updated.findIndex(conv => conv.user.id === event.sender_id);
+    
+                    const newLastMessage = {
+                        body: event.body,
+                        sender_id: event.sender_id,
+                        created_at: event.created_at,
+                    };
+    
+                    if (index !== -1) {
+                        // Update existing conversation
+                        const conv = { ...updated[index] };
+                        conv.last_message = newLastMessage;
+                        conv.unread_count = (conv.unread_count || 0) + 1;
+    
+                        // Move to top
+                        updated.splice(index, 1);
+                        updated.unshift(conv);
+                    } else {
+                        // New conversation
+                        updated.unshift({
+                            user: event.sender,
+                            last_message: newLastMessage,
+                            unread_count: 1,
+                        });
+                    }
+    
+                    return updated;
+                });
+            });
+    
+            return () => {
+                echo.leave(channel);
+            };
         }
 
-        // --- Setup real-time updates ---
-        const echo = new Echo({
-            broadcaster: 'reverb',
-            key: 'ccgv9x8aeypbok8hfyor',
-            wsHost: '127.0.0.1',
-            wsPort: 8080,
-            forceTLS: false,
-            enabledTransports: ['ws', 'wss'],
-        });
-
-        const channel = `chat.${loggedInUser.id}`;
-        echo.channel(channel).listen('.new-message', (event) => {
-            setConversations(prev => {
-                const updated = [...prev];
-                const index = updated.findIndex(conv => conv.user.id === event.sender_id);
-
-                const newLastMessage = {
-                    body: event.body,
-                    sender_id: event.sender_id,
-                    created_at: event.created_at,
-                };
-
-                if (index !== -1) {
-                    // Update existing conversation
-                    const conv = { ...updated[index] };
-                    conv.last_message = newLastMessage;
-                    conv.unread_count = (conv.unread_count || 0) + 1;
-
-                    // Move to top
-                    updated.splice(index, 1);
-                    updated.unshift(conv);
-                } else {
-                    // New conversation
-                    updated.unshift({
-                        user: event.sender,
-                        last_message: newLastMessage,
-                        unread_count: 1,
-                    });
-                }
-
-                return updated;
-            });
-        });
-
-        return () => {
-            echo.leave(channel);
-        };
     }, [loggedInUser]); // This effect now only depends on loggedInUser
 
     const filteredConversations = conversations.filter(conv => {
