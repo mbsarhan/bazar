@@ -1,57 +1,46 @@
+// src/frontend/context/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../api'; // <-- 1. IMPORT OUR NEW AXIOS CLIENT
-
-// The URL of your Laravel API backend
+import api from '../api';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    // We will get the user object from the API, so it starts as null
     const [user, setUser] = useState(null);
-    // The token is the key to knowing if the user is logged in
     const [token, setToken] = useState(localStorage.getItem('authToken'));
-    // --- Your existing UI state is preserved here ---
+    // --- 1. NEW: Add a loading state, initially true ---
+    const [isLoading, setIsLoading] = useState(true);
     const [isDashboardCollapsed, setIsDashboardCollapsed] = useState(false);
 
-    // This hook runs when the app loads. It checks if there's a token
-    // and uses it to fetch the user's data, keeping them logged in.
     useEffect(() => {
-        if (token) {
-            const fetchUserData = async () => {
+        const fetchUserData = async () => {
+            if (token) {
                 try {
-                    // Use the axios client. The token is added automatically!
                     const response = await api.get('/user');
                     setUser(response.data);
-
                 } catch (error) {
-                    console.error("Auto-login failed:", error);
+                    console.error("Auto-login failed, removing token:", error);
+                    // If the token is invalid, clear it out
+                    setToken(null);
+                    localStorage.removeItem('authToken');
                 }
-            };
-            fetchUserData();
-        }
-    }, [token]); // This hook re-runs only if the token changes
+            }
+            // --- 2. CRITICAL: Set loading to false AFTER the check is complete ---
+            setIsLoading(false);
+        };
 
-    /**
-     * This is the NEW login function that calls the API.
-     * It will be called from your Login.js component.
-     */
+        fetchUserData();
+    }, [token]); // This hook still runs when the token changes
+
     const login = async (credentials) => {
         const loginPayload = { credential: credentials.credential, password: credentials.password };
-        // Use axios. The base URL is already set.
         const response = await api.post('/login', loginPayload);
         setUser(response.data.user);
         setToken(response.data.access_token);
         localStorage.setItem('authToken', response.data.access_token);
     };
 
-    /**
-     * The NEW logout function.
-     * It calls the API to invalidate the token on the server,
-     * then cleans up the client-side state.
-     */
     const logout = async () => {
         try {
-            // Use axios. The token is added automatically!
             await api.post('/logout');
         } catch (error) {
             console.error("API logout failed, but logging out locally anyway.", error);
@@ -62,109 +51,61 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // --- 2. ADD THE NEW FUNCTIONS FOR PASSWORD MANAGEMENT ---
-
-    /**
-     * Verifies the user's current password.
-     */
+    // ... (All your other functions like verifyPassword, updateProfile, etc., remain exactly the same)
     const verifyPassword = async (password) => {
-        // The token is added automatically by the interceptor.
         const response = await api.post('/user/verify-password', { password });
-        return response.data; // Return the success message
-    };
-
-    /**
-     * Updates the user's password.
-     */
-    const updatePassword = async (passwordData) => {
-        // passwordData will be { password, password_confirmation }
-        const response = await api.post('/user/password', passwordData);
-        return response.data; // Return the success message
-    };
-
-
-    /**
-     * NEW: Updates the user's profile name.
-     * @param {object} profileData - { fname, lname }
-     */
-    const updateProfile = async (profileData) => {
-        // The axios client automatically adds the token.
-        // We use api.put to match the PUT route we created.
-        const response = await api.put('/user/profile', profileData);
-
-        // --- CRITICAL STEP ---
-        // On success, the API returns the full updated user object.
-        // We update our central 'user' state with this new object.
-        // This will automatically refresh the user's name everywhere in the app.
-        setUser(response.data);
-
-        // Return the response so the component knows it was successful.
         return response.data;
     };
-
-
-    /**
-     * Step 1 of email change: Request a verification code to be sent to the new email.
-     */
+    const updatePassword = async (passwordData) => {
+        const response = await api.post('/user/password', passwordData);
+        return response.data;
+    };
+    const updateProfile = async (profileData) => {
+        const response = await api.put('/user/profile', profileData);
+        setUser(response.data);
+        return response.data;
+    };
     const requestEmailChange = async (newEmail) => {
         const response = await api.post('/user/email/request-change', { email: newEmail });
-        return response.data; // e.g., { message: '...' }
+        return response.data;
     };
-
-    /**
-     * Step 2 of email change: Verify the code and finalize the update.
-     */
     const verifyEmailChange = async (code) => {
         const response = await api.post('/user/email/verify-change', { code });
-        
-        // --- CRITICAL STEP ---
-        // After a successful email change, we must refresh the user data
-        // to update the email displayed everywhere in the app.
         const userResponse = await api.get('/user');
-        setUser(userResponse.data); // Update the central user state
-
-        return response.data; // Return the success message from the verify endpoint
+        setUser(userResponse.data);
+        return response.data;
     };
-
-
-
     const verifyAccountOtp = async (email, code) => {
         const response = await api.post('/email/verify-otp', { email, code });
         return response.data;
     };
-    
     const resendAccountOtp = async (email) => {
         const response = await api.post('/email/verify-otp/resend', { email });
         return response.data;
     };
 
-    // Make sure the rest of your file (like the 'value' object and return statement) is correct.
-// The 'value' object should look like this:
-const value = {
-    user,
-    token,
-    verifyAccountOtp,
-    resendAccountOtp,
-    login,
-    logout, // The new async logout function
-    verifyPassword, // <-- 3. EXPOSE THE NEW FUNCTIONS
-    updatePassword, // <-- ADD THIS
-    updateProfile,
-    requestEmailChange,
-    verifyEmailChange,
-    isDashboardCollapsed,
-    setIsDashboardCollapsed
-};
+
+    const value = {
+        user,
+        token,
+        // --- 3. NEW: Expose the loading state to the rest of the app ---
+        isLoading,
+        verifyAccountOtp,
+        resendAccountOtp,
+        login,
+        logout,
+        verifyPassword,
+        updatePassword,
+        updateProfile,
+        requestEmailChange,
+        verifyEmailChange,
+        isDashboardCollapsed,
+        setIsDashboardCollapsed
+    };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// This hook remains the same
 export const useAuth = () => {
     return useContext(AuthContext);
 };
-
-
-
-
-///sadasdasdasdasdsadasd
