@@ -51,7 +51,7 @@ const Conversations = () => {
         // --- Setup real-time updates ---
         const echo = new Echo({
             broadcaster: 'reverb',
-            key: 'rjd1p6mdpoowjxbenvzg',
+            key: 'ccgv9x8aeypbok8hfyor',
             wsHost: '127.0.0.1',
             wsPort: 8080,
             forceTLS: false,
