@@ -43,8 +43,8 @@ trait Filters
             if (!empty($filters['gear'])) {
             $query->where('car_ads.gear', $filters['gear']);
             }
-            if (!empty($filters['fule_type'])) {
-            $query->where('car_ads.fule_type', $filters['fule_type']);
+            if (!empty($filters['fuel_type'])) {
+            $query->where('car_ads.fuel_type', $filters['fuel_type']);
             }
             if (!empty($filters['min_distance_traveled'])) {
             $query->where('car_ads.distance_traveled', '>=', $filters['min_distance_traveled']);
