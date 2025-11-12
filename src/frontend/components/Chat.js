@@ -29,6 +29,17 @@ const Chat = () => {
     // --- 1. NEW REF for the first unread message ---
     const firstUnreadRef = useRef(null);
 
+
+    // --- Mark all as read ---
+const markMessagesAsRead = async () => {
+  try {
+    await api.post(`/chat/read/${userId}`);
+    console.log('Marked messages as read');
+  } catch (error) {
+    console.error('Error marking messages as read:', error);
+  }
+};
+
     useEffect(() => {
         if (!loggedInUser) {
             navigate('/login');
@@ -48,6 +59,7 @@ const Chat = () => {
         };
 
         fetchMessages();
+        markMessagesAsRead() ;
     }, [userId, loggedInUser, navigate]);
 
     // --- 2. MODIFIED useEffect for smart scrolling ---
@@ -85,7 +97,7 @@ const Chat = () => {
         if (!loggedInUser) return;
         const echo = new Echo({
             broadcaster: 'reverb',
-            key: 'ccgv9x8aeypbok8hfyor',
+            key: 'rjd1p6mdpoowjxbenvzg',
             wsHost: '127.0.0.1',
             wsPort: 8080,
             forceTLS: false,

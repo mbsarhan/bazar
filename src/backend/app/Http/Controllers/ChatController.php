@@ -115,4 +115,22 @@ class ChatController extends Controller
 
         return response()->json($message, 201);
     }
+
+
+
+    public function markAsRead(Request $request, $senderId)
+{
+    $user = $request->user();
+
+    // Mark all messages sent by $senderId to the current user as read
+    $updated = \App\Models\Message::where('sender_id', $senderId)
+        ->where('receiver_id', $user->id)
+        ->whereNull('read_at')
+        ->update(['read_at' => now()]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => "$updated messages marked as read.",
+    ]);
+}
 }
