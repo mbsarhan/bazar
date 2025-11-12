@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { MessageSquare, Search, Clock, User as UserIcon, ChevronLeft } from 'lucide-react';
 import api from '../api';
 import '../styles/Conversations.css';
+import Echo from 'laravel-echo';
 
 const Conversations = () => {
     const { user: loggedInUser } = useAuth();
@@ -16,24 +17,72 @@ const Conversations = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!loggedInUser) {
-            navigate('/login');
-            return;
+    if (!loggedInUser) {
+        navigate('/login');
+        return;
+    }
+
+    const fetchConversations = async () => {
+        try {
+            const response = await api.get('/chat/conversations');
+            setConversations(response.data);
+        } catch (error) {
+            console.error("Failed to fetch conversations:", error);
+        } finally {
+            setLoading(false);
         }
+    };
 
-        const fetchConversations = async () => {
-            try {
-                const response = await api.get('/chat/conversations');
-                setConversations(response.data);
-            } catch (error) {
-                console.error("Failed to fetch conversations:", error);
-            } finally {
-                setLoading(false);
+    fetchConversations();
+
+    // --- Setup real-time updates ---
+    const echo = new Echo({
+        broadcaster: 'reverb',
+        key: 'rjd1p6mdpoowjxbenvzg',
+        wsHost: '127.0.0.1',
+        wsPort: 8080,
+        forceTLS: false,
+        enabledTransports: ['ws', 'wss'],
+    });
+
+    const channel = `chat.${loggedInUser.id}`;
+    echo.channel(channel).listen('.new-message', (event) => {
+        setConversations(prev => {
+            const updated = [...prev];
+            const index = updated.findIndex(conv => conv.user.id === event.sender_id);
+
+            const newLastMessage = {
+                body: event.body,
+                sender_id: event.sender_id,
+                created_at: event.created_at,
+            };
+
+            if (index !== -1) {
+                // Update existing conversation
+                const conv = { ...updated[index] };
+                conv.last_message = newLastMessage;
+                conv.unread_count = (conv.unread_count || 0) + 1;
+
+                // Move to top
+                updated.splice(index, 1);
+                updated.unshift(conv);
+            } else {
+                // New conversation
+                updated.unshift({
+                    user: event.sender,
+                    last_message: newLastMessage,
+                    unread_count: 1,
+                });
             }
-        };
 
-        fetchConversations();
-    }, [loggedInUser, navigate]);
+            return updated;
+        });
+    });
+
+    return () => {
+        echo.leave(channel);
+    };
+}, [loggedInUser, navigate]);
 
     const filteredConversations = conversations.filter(conv => {
         const fullName = `${conv.user.fname || ''} ${conv.user.lname || ''}`.toLowerCase();
