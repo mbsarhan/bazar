@@ -3,37 +3,50 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-// FIXED: Re-added ChevronLeft as it is used in the CSS for a back button
 import { MessageSquare, Search, Clock, User as UserIcon, ChevronLeft } from 'lucide-react';
 import api from '../api';
 import '../styles/Conversations.css';
 
 const Conversations = () => {
-    const { user: loggedInUser } = useAuth();
+    // 1. You already have this, which is correct.
+    const { user: loggedInUser, isLoading: isAuthLoading } = useAuth(); // Renamed to avoid conflict
     const navigate = useNavigate();
     const [conversations, setConversations] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true);
+    // This component's own loading state for fetching conversations
+    const [isConversationsLoading, setIsConversationsLoading] = useState(true);
 
+    // --- 2. THIS IS THE CORRECTED AUTHENTICATION CHECK ---
     useEffect(() => {
-        if (!loggedInUser) {
-            navigate('/login');
+        // Don't do anything until the initial authentication check is complete
+        if (isAuthLoading) {
             return;
         }
+        // If the check is done and there's no user, redirect to login
+        if (!loggedInUser) {
+            navigate('/login');
+        }
+    }, [isAuthLoading, loggedInUser, navigate]);
 
-        const fetchConversations = async () => {
-            try {
-                const response = await api.get('/chat/conversations');
-                setConversations(response.data);
-            } catch (error) {
-                console.error("Failed to fetch conversations:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        fetchConversations();
-    }, [loggedInUser, navigate]);
+    // --- 3. THIS EFFECT NOW SAFELY FETCHES DATA ---
+    useEffect(() => {
+        // Only fetch conversations if we have confirmed the user is logged in
+        if (loggedInUser) {
+            const fetchConversations = async () => {
+                setIsConversationsLoading(true); // Use this component's loading state
+                try {
+                    const response = await api.get('/chat/conversations');
+                    setConversations(response.data);
+                } catch (error) {
+                    console.error("Failed to fetch conversations:", error);
+                } finally {
+                    setIsConversationsLoading(false);
+                }
+            };
+            fetchConversations();
+        }
+    }, [loggedInUser]); // This effect now only depends on loggedInUser
 
     const filteredConversations = conversations.filter(conv => {
         const fullName = `${conv.user.fname || ''} ${conv.user.lname || ''}`.toLowerCase();
@@ -66,13 +79,13 @@ const Conversations = () => {
         navigate(`/chat/${otherUser.id}`, { state: { otherUser } });
     };
 
-    if (loading) {
+    // --- 4. THE COMPONENT NOW WAITS FOR BOTH LOADING STATES ---
+    if (isAuthLoading || isConversationsLoading) {
         return (
             <div className="conversations-page">
-                {/* FIXED: Changed className to match CSS */}
                 <div className="loading-state">
                     <div className="spinner"></div>
-                    <p>جاري تحميل المحادثات...</p>
+                    <p>جاري تحميل...</p>
                 </div>
             </div>
         );
@@ -82,14 +95,12 @@ const Conversations = () => {
         <div className="conversations-page">
             <div className="conversations-container">
                 <div className="conversations-header">
-                    {/* FIXED: Rebuilt header structure to match CSS (.header-top, .back-button, h1) */}
                     <div className="header-top">
                         <button className="back-button" onClick={() => navigate(-1)}>
                             <ChevronLeft size={24} />
                         </button>
                         <h1>المحادثات</h1>
                     </div>
-                    {/* FIXED: Changed className to match CSS */}
                     <div className="search-bar">
                         <Search size={20} />
                         <input
@@ -101,7 +112,7 @@ const Conversations = () => {
                     </div>
                 </div>
                 <div className="conversations-list">
-                    {filteredConversations.length === 0 && !loading ? (
+                    {filteredConversations.length === 0 ? (
                         <div className="no-conversations">
                            <MessageSquare size={48} />
                            <h3>لا توجد محادثات</h3>
