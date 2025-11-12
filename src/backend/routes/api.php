@@ -26,6 +26,8 @@ use App\Http\Controllers\ChatController; // <-- IMPORT THE CHAT CONTROLLER
 use App\Http\Controllers\Admin\PendingUpdateController; // <-- IMPORT THE CONTROLLER
 
 
+Route::get('/chat/messages/{senderId}/{recipientId}', [App\Http\Controllers\ChatController::class, 'getMessages']);
+Route::post('/chat/messages/{recipientId}', [App\Http\Controllers\ChatController::class, 'sendMessage']);
 
 
 
@@ -47,7 +49,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 // Advertisements & SearchFilters
 Route::get('/advertisements', [AdvertisementController::class, 'index']);
 //Search and filter
-Route::get('/advertisements/search', [AdvertisementSearchController::class, 'search']);
+    Route::get('/advertisements/search', [AdvertisementSearchController::class, 'search']);
 Route::get('/advertisements/{ad}', [AdvertisementController::class, 'show']);
 
 //Verify Email with Otp
@@ -69,21 +71,21 @@ Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword
 Route::post('/verify-password-reset-code', [PasswordResetController::class, 'verifyCode'])->name('password.verify.code');
 Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 Route::post('/resend-password-reset-code', [PasswordResetController::class, 'resendCode'])
-->middleware('throttle:1,1') // 1 attempt per 1 minute
-->name('password.resend.code');
+    ->middleware('throttle:1,1') // 1 attempt per 1 minute
+    ->name('password.resend.code');
 
 
 
 // THIS IS THE CORRECT PLACE FOR THE STREAMING ROUTE
 Route::get('/stream/{path}', [StreamingController::class, 'stream'])
-->where('path', '.*')
-->name('video.stream');
+    ->where('path', '.*')
+    ->name('video.stream');
 
 
 // Protected routes (require Sanctum authentication)
 Route::middleware('auth:sanctum')->group(function () {
-    
-    
+
+
     // Auth & User
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
@@ -91,28 +93,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/password', [UserController::class, 'updatePassword']);
     Route::put('/user/profile', [UserController::class, 'updateProfile']);
     Route::get('/user/reviews', [UserController::class, 'getReviews']);
-    
+
     
     // Car Ad Management
     Route::post('/car-ads', [CarAdsController::class, 'store']);
     Route::get('/user/car-ads', [CarAdsController::class, 'index']);
     Route::delete('/car-ads/{ad}', [CarAdsController::class, 'destroy']);
     Route::put('/car-ads/{ad}', [CarAdsController::class, 'update']);
-    
-    
-    
+
+  
+  
     // Real-Estate Management
     Route::post('/realestate-ads', [RealestateAdsController::class, 'store']);
     Route::get('/user/realestate-ads', [RealestateAdsController::class, 'index']);
     Route::delete('/realestate-ads/{ad}', [RealestateAdsController::class, 'destroy']);
     Route::put('/realestate-ads/{ad}', [RealestateAdsController::class, 'update']);
-    
-    
+
+
     // DASHBOARD
     Route::get('/dashboard/statistics', [DashboardController::class, 'getStatistics']);
     Route::get('/dashboard/views', [DashboardController::class, 'getViews']);
-    
-    
+
+
     
     //Update Email
     Route::post('/user/email/request-change', [EmailChangeController::class, 'requestChange']);
@@ -121,32 +123,36 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/user/email/resend-change', [EmailChangeController::class, 'resendChange'])
     ->middleware('throttle:1,2');
-    
-    
-    
+
+
+
     //Rating and Review
     Route::post('/users/rate', [UserRatingsController::class, 'store'])->middleware('throttle:5,1');
+
+
     
-    
-    
-    
-    
+
+
     //Video
     Route::post('/advertisements/{advertisement}/video', [VideoUploadController::class, 'store'])
-    ->name('api.video.store');
-    
-    
-    
+        ->name('api.video.store');
+
+
+
     // --- CHAT ROUTES ---
     Route::prefix('chat')->group(function () {
         Route::get('/conversations', [ChatController::class, 'getConversations']);
-        Route::get('/messages/{senderId}/{recipientId}', [App\Http\Controllers\ChatController::class, 'getMessages']);
-        Route::post('/messages/{recipientId}', [App\Http\Controllers\ChatController::class, 'sendMessage']);
+        Route::post('/read/{senderId}', [ChatController::class, 'markAsRead']);
         
     });
-    
-    
-    
+
+
+
+    Route::post('/users/{user}/report', [App\Http\Controllers\UserReportController::class, 'store'])
+    ->name('users.report');
+
+
+
 });
 
 

@@ -28,7 +28,7 @@ class CarAdResource extends JsonResource
         return [
             'id'                => $this->id,
             // Combining fields to create the 'title' as requested
-            'title'             => "{$this->carDetails->manufacturer} {$this->carDetails->model} {$this->carDetails->model_year}",
+            'title'             => "{$this->carDetails->manufacturer}  {$this->carDetails->model}  {$this->carDetails->model_year}",
             'manufacturer'      => $this->carDetails->manufacturer,
             'model'             => $this->carDetails->model,
             'model_year'        => $this->carDetails->model_year,

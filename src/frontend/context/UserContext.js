@@ -35,7 +35,26 @@ export const UserProvider = ({ children }) => {
         return response.data; // Return the success message and new average
     };
 
-    const value = { getUserReviews, getPublicProfile, rateUser};
+
+    // --- THIS IS THE NEW FUNCTION TO ADD ---
+    /**
+     * Submits a report against a user.
+     * @param {string} reportedUserId - The ID of the user being reported.
+     * @param {object} reportData - The report data, e.g., { reason: 'spam', description: '...' }.
+     */
+    const reportUser = async (reportedUserId, reportData) => {
+        try {
+            // The endpoint is POST /api/users/{user}/report
+            const response = await api.post(`/users/${reportedUserId}/report`, reportData);
+            return response.data; // Returns { message: "..." } on success
+        } catch (error) {
+            console.error('Failed to submit user report:', error);
+            // Re-throw the error so the component can catch it and display a message
+            throw error;
+        }
+    };
+
+    const value = { getUserReviews, getPublicProfile, rateUser, reportUser};
 
     return (
         <UserContext.Provider value={value}>

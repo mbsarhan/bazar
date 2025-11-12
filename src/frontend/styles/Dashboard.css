@@ -294,64 +294,36 @@
 
 .ad-card-actions {
     display: flex;
-    gap: 8px;
-    padding: 16px;
-    background: var(--color-bg-page);
     border-top: 1px solid var(--color-border-subtle);
 }
 
 .ad-card-actions .action-btn {
     flex: 1;
-    padding: 12px 16px;
-    background: var(--color-bg-card);
-    border: 2px solid var(--color-border-subtle);
-    border-radius: 12px;
+    padding: 12px;
+    background-color: transparent;
+    border: none;
+    border-left: 1px solid var(--color-border-subtle);
     cursor: pointer;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: 'Cairo', sans-serif;
+    transition: background-color 0.2s ease-in-out;
 }
 
-.action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.ad-card-actions .action-btn:last-child {
+    border-left: none;
 }
 
-.action-btn:active {
-    transform: translateY(0);
+.ad-card-actions .action-btn:hover {
+    background-color: var(--color-bg-page);
 }
 
-.action-btn.view-btn { 
-    color: #3498db;
-    border-color: #3498db;
-}
-.action-btn.view-btn:hover {
-    background: #3498db;
-    color: white;
-}
-
-.action-btn.edit-btn { 
-    color: #f39c12;
-    border-color: #f39c12;
-}
-.action-btn.edit-btn:hover {
-    background: #f39c12;
-    color: white;
-}
-
-.action-btn.delete-btn { 
-    color: #e74c3c;
-    border-color: #e74c3c;
-}
-.action-btn.delete-btn:hover {
-    background: #e74c3c;
-    color: white;
-}
+.action-btn.view-btn { color: #3498db; }
+.action-btn.edit-btn { color: #f39c12; }
+.action-btn.delete-btn { color: #e74c3c; }
 
 /* ============================================= */
 /* 7. Image Section with Modern Features         */
@@ -714,22 +686,13 @@
         gap: 12px;
     }
 
-    .ad-card-actions {
-        padding: 12px;
-        gap: 6px;
-    }
-
-    .action-btn {
-        padding: 10px 12px;
+    .ad-card-actions .action-btn {
         font-size: 13px;
+        padding: 10px 8px;
     }
 
-    .action-btn span {
+    .ad-card-actions .action-btn span {
         display: none;
-    }
-
-    .action-btn svg {
-        margin: 0;
     }
 
     .nav-arrow {
@@ -833,14 +796,8 @@
         font-size: 0.8rem;
     }
 
-    .ad-card-actions {
-        padding: 10px;
-        gap: 6px;
-    }
-
-    .action-btn {
-        padding: 10px;
-        border-radius: 10px;
+    .ad-card-actions .action-btn {
+        padding: 10px 6px;
     }
 
     .nav-arrow {
