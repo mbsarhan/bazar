@@ -456,3 +456,24 @@
     height: 18px;
   }
 }
+
+.new-messages-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 12px 0;
+    position: relative;
+    color: var(--color-accent-primary); /* Accent color */
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.new-messages-divider::before,
+.new-messages-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--color-accent-primary);
+    margin: 0 8px;
+    border-radius: 2px;
+}

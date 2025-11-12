@@ -22,6 +22,7 @@ const Chat = () => {
     const [otherUser, setOtherUser] = useState(location.state?.otherUser || null);
     const [isMessagesLoading, setIsMessagesLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const hasScrolledRef = useRef(false);
 
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
@@ -66,25 +67,42 @@ const Chat = () => {
         }
     }, [userId, loggedInUser]);
 
+    // Scroll logic for messages
     useEffect(() => {
-        if (isMessagesLoading) return;
+        if (isMessagesLoading || !loggedInUser || messages.length === 0) return;
 
-        if (firstUnreadRef.current) {
-            firstUnreadRef.current.scrollIntoView({
-                block: 'center',
-                behavior: 'auto'
-            });
-        } else {
-            scrollToBottom('auto');
+        const firstUnreadMsg = messages.find(
+            (msg) => msg.read_at === null && msg.receiver_id === loggedInUser.id
+        );
+
+        // Case 1: On first load, scroll to first unread if it exists
+        if (!hasScrolledRef.current) {
+            if (firstUnreadMsg && firstUnreadRef.current) {
+                firstUnreadRef.current.scrollIntoView({
+                    behavior: 'auto',
+                    block: 'center',
+                });
+            } else {
+                scrollToBottom('auto');
+            }
+            hasScrolledRef.current = true; // prevent re-scrolling
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isMessagesLoading]);
 
-    useEffect(() => {
-        if (!isMessagesLoading) {
+        // Case 2: On new messages — only scroll if the user sent them or if we're near the bottom
+        const lastMessage = messages[messages.length - 1];
+        const isUserSender = lastMessage?.sender_id === loggedInUser.id;
+
+        const container = messagesEndRef.current?.parentElement;
+        const isNearBottom =
+            container &&
+            container.scrollHeight - container.scrollTop - container.clientHeight < 200;
+
+        if (isUserSender || isNearBottom) {
             scrollToBottom('smooth');
         }
-    }, [messages, isMessagesLoading]);
+    }, [messages, isMessagesLoading, loggedInUser]);
+
 
     useEffect(() => {
         if (!loggedInUser) return;
@@ -199,12 +217,24 @@ const Chat = () => {
                             <div key={groupIndex} className="message-group">
                                 <div className="date-separator"><span>{group.date}</span></div>
                                 {group.messages.map((message) => (
-                                    <div key={message.id} ref={message.id === firstUnreadId ? firstUnreadRef : null} className={`message ${message.sender_id === loggedInUser.id ? 'sent' : 'received'}`}>
-                                        <div className="message-bubble">
-                                            <p className="message-text">{message.body}</p>
-                                            <span className="message-time">{formatTime(message.created_at)}</span>
+                                    <React.Fragment key={message.id}>
+                                        {/* Divider before the first unread message */}
+                                        {message.id === firstUnreadId && (
+                                            <div className="new-messages-divider">
+                                                <span>رسائل جديدة</span>
+                                            </div>
+                                        )}
+
+                                        <div
+                                            ref={message.id === firstUnreadId ? firstUnreadRef : null}
+                                            className={`message ${message.sender_id === loggedInUser.id ? 'sent' : 'received'}`}
+                                        >
+                                            <div className="message-bubble">
+                                                <p className="message-text">{message.body}</p>
+                                                <span className="message-time">{formatTime(message.created_at)}</span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </React.Fragment>
                                 ))}
                             </div>
                         ))
