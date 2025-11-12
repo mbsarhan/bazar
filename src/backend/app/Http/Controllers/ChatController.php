@@ -12,60 +12,60 @@ class ChatController extends Controller
 {
     // --- THIS IS THE NEW, ENHANCED VERSION ---
     public function getConversations(Request $request)
-{
-    $user = $request->user();
-    if (!$user) {
-        return response()->json(['error' => 'Unauthorized'], 401);
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $userId = $user->id;
+
+        // 1. Get the ID of the last message for each conversation
+        $latestMessages = DB::table('messages')
+            ->select(DB::raw('MAX(id) as last_message_id'))
+            // Only consider messages where the current user is either the sender or receiver
+            ->where(function ($query) use ($userId) {
+                $query->where('sender_id', $userId)
+                    ->orWhere('receiver_id', $userId);
+            })
+            // --- THIS IS THE FIX ---
+            // Explicitly exclude any messages where the sender and receiver are the same person.
+            ->where('sender_id', '!=', DB::raw('receiver_id'))
+            // --- END OF FIX ---
+            ->groupBy(DB::raw("LEAST(sender_id, receiver_id), GREATEST(sender_id, receiver_id)"));
+
+        // The rest of the function remains exactly the same...
+
+        // 2. Get the full message details for those last messages
+        $conversations = Message::whereIn('id', $latestMessages)
+            ->with(['sender', 'receiver'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // 3. Get all unread message counts
+        $unreadCounts = Message::select('sender_id', DB::raw('count(id) as count'))
+            ->where('receiver_id', $userId)
+            ->whereNull('read_at')
+            ->groupBy('sender_id')
+            ->get()
+            ->keyBy('sender_id');
+
+        // 4. Format the final response
+        $response = $conversations->map(function ($message) use ($userId, $unreadCounts) {
+            $otherUser = $message->sender_id == $userId ? $message->receiver : $message->sender;
+
+            return [
+                'user' => [
+                    'id' => $otherUser->id,
+                    'fname' => $otherUser->fname,
+                    'lname' => $otherUser->lname,
+                ],
+                'last_message' => $message,
+                'unread_count' => $unreadCounts->get($otherUser->id)->count ?? 0,
+            ];
+        });
+
+        return response()->json($response);
     }
-    $userId = $user->id;
-
-    // 1. Get the ID of the last message for each conversation
-    $latestMessages = DB::table('messages')
-        ->select(DB::raw('MAX(id) as last_message_id'))
-        // Only consider messages where the current user is either the sender or receiver
-        ->where(function ($query) use ($userId) {
-            $query->where('sender_id', $userId)
-                  ->orWhere('receiver_id', $userId);
-        })
-        // --- THIS IS THE FIX ---
-        // Explicitly exclude any messages where the sender and receiver are the same person.
-        ->where('sender_id', '!=', DB::raw('receiver_id'))
-        // --- END OF FIX ---
-        ->groupBy(DB::raw("LEAST(sender_id, receiver_id), GREATEST(sender_id, receiver_id)"));
-
-    // The rest of the function remains exactly the same...
-    
-    // 2. Get the full message details for those last messages
-    $conversations = Message::whereIn('id', $latestMessages)
-        ->with(['sender', 'receiver'])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    // 3. Get all unread message counts
-    $unreadCounts = Message::select('sender_id', DB::raw('count(id) as count'))
-        ->where('receiver_id', $userId)
-        ->whereNull('read_at')
-        ->groupBy('sender_id')
-        ->get()
-        ->keyBy('sender_id');
-
-    // 4. Format the final response
-    $response = $conversations->map(function ($message) use ($userId, $unreadCounts) {
-        $otherUser = $message->sender_id == $userId ? $message->receiver : $message->sender;
-
-        return [
-            'user' => [
-                'id' => $otherUser->id,
-                'fname' => $otherUser->fname,
-                'lname' => $otherUser->lname,
-            ],
-            'last_message' => $message,
-            'unread_count' => $unreadCounts->get($otherUser->id)->count ?? 0,
-        ];
-    });
-
-    return response()->json($response);
-}
 
     // ✅ Public route: Fetch messages between two users
     public function getMessages($senderId, $recipientId)
@@ -80,12 +80,12 @@ class ChatController extends Controller
 
         $messages = Message::where(function ($query) use ($senderId, $recipientId) {
             $query->where('sender_id', $senderId)
-                  ->where('receiver_id', $recipientId);
+                ->where('receiver_id', $recipientId);
         })->orWhere(function ($query) use ($senderId, $recipientId) {
             $query->where('sender_id', $recipientId)
-                  ->where('receiver_id', $senderId);
+                ->where('receiver_id', $senderId);
         })->orderBy('created_at', 'asc')
-          ->get();
+            ->get();
 
         return response()->json($messages);
     }
@@ -119,18 +119,45 @@ class ChatController extends Controller
 
 
     public function markAsRead(Request $request, $senderId)
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
+        $receiverId = $user->id;
 
-    // Mark all messages sent by $senderId to the current user as read
-    $updated = \App\Models\Message::where('sender_id', $senderId)
-        ->where('receiver_id', $user->id)
-        ->whereNull('read_at')
-        ->update(['read_at' => now()]);
+        $startTime = microtime(true);
 
-    return response()->json([
-        'status' => 'success',
-        'message' => "$updated messages marked as read.",
-    ]);
-}
+        // 🔹 1. Find the highest unread message ID (latest unread)
+        $latestUnreadId = \DB::table('messages')
+            ->where('sender_id', $senderId)
+            ->where('receiver_id', $receiverId)
+            ->whereNull('read_at')
+            ->orderByDesc('id')
+            ->limit(1)
+            ->value('id');
+
+        if (!$latestUnreadId) {
+            return response()->json([
+                'status' => 'success',
+                'updated_count' => 0,
+                'message' => 'No unread messages found.',
+                'time_ms' => round((microtime(true) - $startTime) * 1000, 2),
+            ]);
+        }
+
+        // 🔹 2. Bulk-update all unread messages up to that ID
+        $updated = \DB::table('messages')
+            ->where('sender_id', $senderId)
+            ->where('receiver_id', $receiverId)
+            ->whereNull('read_at')
+            ->where('id', '<=', $latestUnreadId)
+            ->update(['read_at' => now()]);
+
+        $duration = round((microtime(true) - $startTime) * 1000, 2);
+
+        return response()->json([
+            'status' => 'success',
+            'updated_count' => $updated,
+            'latest_unread_id' => $latestUnreadId,
+            'time_ms' => $duration,
+        ]);
+    }
 }
