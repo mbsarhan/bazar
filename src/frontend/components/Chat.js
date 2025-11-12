@@ -97,7 +97,7 @@ const markMessagesAsRead = async () => {
         if (!loggedInUser) return;
         const echo = new Echo({
             broadcaster: 'reverb',
-            key: 'rjd1p6mdpoowjxbenvzg',
+            key: 'zikpuddf0rigwtkichwa',
             wsHost: '127.0.0.1',
             wsPort: 8080,
             forceTLS: false,
