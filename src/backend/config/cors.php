@@ -15,7 +15,7 @@ return [
     'allowed_origins' => [
         'http://localhost:3000',
         'http://localhost:3001',
-        'https://dayyelha.onrender.com',
+        'https://dayyelhaa.onrender.com',
     ],
 
     'allowed_origins_patterns' => [],
