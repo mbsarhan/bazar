@@ -120,7 +120,7 @@ const Conversations = () => {
         } else if (days === 1) {
             return 'أمس';
         } else {
-            return date.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' });
+            return date.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
         }
     };
 
