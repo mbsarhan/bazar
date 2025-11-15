@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { MessageSquare, Search, Clock, User as UserIcon, ChevronLeft } from 'lucide-react';
 import api from '../api';
 import '../styles/Conversations.css';
+import Echo from 'laravel-echo';
 
 const Conversations = () => {
     // 1. You already have this, which is correct.
@@ -45,7 +46,55 @@ const Conversations = () => {
                 }
             };
             fetchConversations();
+            // --- Setup real-time updates ---
+            const echo = new Echo({
+                broadcaster: 'reverb',
+                key: 'ccgv9x8aeypbok8hfyor',
+                wsHost: '127.0.0.1',
+                wsPort: 8080,
+                forceTLS: false,
+                enabledTransports: ['ws', 'wss'],
+            });
+    
+            const channel = `chat.${loggedInUser.id}`;
+            echo.channel(channel).listen('.new-message', (event) => {
+                setConversations(prev => {
+                    const updated = [...prev];
+                    const index = updated.findIndex(conv => conv.user.id === event.sender_id);
+    
+                    const newLastMessage = {
+                        body: event.body,
+                        sender_id: event.sender_id,
+                        created_at: event.created_at,
+                    };
+    
+                    if (index !== -1) {
+                        // Update existing conversation
+                        const conv = { ...updated[index] };
+                        conv.last_message = newLastMessage;
+                        conv.unread_count = (conv.unread_count || 0) + 1;
+    
+                        // Move to top
+                        updated.splice(index, 1);
+                        updated.unshift(conv);
+                    } else {
+                        // New conversation
+                        updated.unshift({
+                            user: event.sender,
+                            last_message: newLastMessage,
+                            unread_count: 1,
+                        });
+                    }
+    
+                    return updated;
+                });
+            });
+    
+            return () => {
+                echo.leave(channel);
+            };
         }
+
     }, [loggedInUser]); // This effect now only depends on loggedInUser
 
     const filteredConversations = conversations.filter(conv => {
@@ -71,7 +120,7 @@ const Conversations = () => {
         } else if (days === 1) {
             return 'أمس';
         } else {
-            return date.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' });
+            return date.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
         }
     };
 
@@ -114,9 +163,9 @@ const Conversations = () => {
                 <div className="conversations-list">
                     {filteredConversations.length === 0 ? (
                         <div className="no-conversations">
-                           <MessageSquare size={48} />
-                           <h3>لا توجد محادثات</h3>
-                           <p>عندما تبدأ محادثة جديدة، ستظهر هنا.</p>
+                            <MessageSquare size={48} />
+                            <h3>لا توجد محادثات</h3>
+                            <p>عندما تبدأ محادثة جديدة، ستظهر هنا.</p>
                         </div>
                     ) : (
                         filteredConversations.map((conv) => (

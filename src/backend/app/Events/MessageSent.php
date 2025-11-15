@@ -47,13 +47,19 @@ class MessageSent implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
-        // We can format the data here using a resource if needed
-        return [
-            'id' => $this->message->id,
-            'sender_id' => $this->message->sender_id,
-            'receiver_id' => $this->message->receiver_id,
-            'body' => $this->message->body,
-            'created_at' => $this->message->created_at->toDateTimeString(),
-        ];
+        // Match exactly what your API returns for a message
+    return [
+        'id' => $this->message->id,
+        'body' => $this->message->body,
+        'sender_id' => $this->message->sender_id,
+        'receiver_id' => $this->message->receiver_id,
+        'created_at' => $this->message->created_at,
+        'read_at' => $this->message->read_at,
+        'sender' => [
+            'id' => $this->message->sender->id,
+            'fname' => $this->message->sender->fname,
+            'lname' => $this->message->sender->lname,
+        ],
+    ];
     }
 }

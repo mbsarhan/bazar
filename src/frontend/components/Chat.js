@@ -170,8 +170,42 @@ const Chat = () => {
     };
 
     const scrollToBottom = (behavior = 'smooth') => { messagesEndRef.current?.scrollIntoView({ behavior }); };
-    const formatTime = (timestamp) => { const date = new Date(timestamp); return date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }); };
-    const formatDate = (timestamp) => { const date = new Date(timestamp); const today = new Date(); if (date.toDateString() === today.toDateString()) return 'اليوم'; const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1); if (date.toDateString() === yesterday.toDateString()) return 'أمس'; return date.toLocaleDateString('ar-SA'); };
+    const formatTime = (timestamp) => {
+        const date = new Date(timestamp);
+
+        // Return time in ENGLISH numerals (e.g., 14:35)
+        return date.toLocaleTimeString('ar-EG', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+    };
+
+    const formatDate = (timestamp) => {
+        const date = new Date(timestamp);
+        const today = new Date();
+
+        // Compare dates only by Y/M/D
+        const isSameDay = (d1, d2) =>
+            d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate();
+
+        if (isSameDay(date, today)) return 'اليوم';
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (isSameDay(date, yesterday)) return 'أمس';
+
+        // Return date in English-syntax, Gregorian, like: 12 Jan 2025
+        return date.toLocaleDateString('ar-EG', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    };
+
     const groupMessagesByDate = (messages) => { const groups = []; let currentDate = null; messages.forEach(message => { const messageDate = formatDate(message.created_at); if (messageDate !== currentDate) { currentDate = messageDate; groups.push({ date: messageDate, messages: [message] }); } else { groups[groups.length - 1].messages.push(message); } }); return groups; };
 
     let firstUnreadId = null;
