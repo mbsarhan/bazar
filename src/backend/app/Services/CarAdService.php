@@ -267,7 +267,7 @@ class CarAdService
                 'advertisement_id' => $ad->id,
                 
                 // Advertisement fields
-                'title' => $data['manufacturer'] .$data['model'] .$data['model_year'],
+                'title' => $data['manufacturer']." ".$data['model']." ".$data['model_year'],
                 'price' => $data['price'],
                 'description' => $data['description'] ?? null,
                 'transaction_type' => $data['transaction_type'],

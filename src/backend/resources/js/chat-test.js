@@ -1,5 +1,3 @@
-// resources/js/chat-test.js
-
 // Import the libraries we installed
 import axios from 'axios';
 import Echo from 'laravel-echo';
@@ -53,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // NOTE: Replace these with your actual Reverb credentials
         const echo = new Echo({
             broadcaster: 'reverb',
-            key: 'risjrquzwct2dxqmgifs', 
+            key: 'rjd1p6mdpoowjxbenvzg', 
             wsHost: '127.0.0.1',       
             wsPort: 8080,                
             forceTLS: false,

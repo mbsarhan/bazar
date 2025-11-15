@@ -1,254 +1,287 @@
 // src/frontend/pages/Chat.js
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Send, ArrowLeft, User as UserIcon, MoreVertical } from 'lucide-react';
-import { mockUsers, mockMessages } from './mockChatData';
+import api from '../api';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 import '../styles/Chat.css';
 
+window.Pusher = Pusher;
+
 const Chat = () => {
-  const { userId } = useParams();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [otherUser, setOtherUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
-  const messagesEndRef = useRef(null);
-  const messagesContainerRef = useRef(null);
-  const inputRef = useRef(null);
+    const { userId } = useParams();
+    const { user: loggedInUser, isLoading: isAuthLoading } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
+    // eslint-disable-next-line no-unused-vars
+    const [otherUser, setOtherUser] = useState(location.state?.otherUser || null);
+    const [isMessagesLoading, setIsMessagesLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    const hasScrolledRef = useRef(false);
 
-    // --- START: FIX ---
-    // The loadMockData function is now defined INSIDE the useEffect hook.
-    const loadMockData = () => {
-      // Find the user
-      const foundUser = mockUsers.find(u => u.id === parseInt(userId));
-      if (foundUser) {
-        setOtherUser(foundUser);
-      }
-      
-      // Load messages for this user
-      const userMessages = mockMessages[parseInt(userId)] || [];
-      setMessages(userMessages);
-      setLoading(false);
-      
-      // Mark messages as read (mock)
-      const updatedMessages = userMessages.map(msg => {
-        if (msg.receiver_id === 999 && !msg.read_at) {
-          return { ...msg, read_at: new Date().toISOString() };
+    const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
+    const firstUnreadRef = useRef(null);
+
+    useEffect(() => {
+        if (isAuthLoading) {
+            return;
         }
-        return msg;
-      });
-      setMessages(updatedMessages);
-    };
-    // --- END: FIX ---
-    
-    // Simulate loading delay
-    setTimeout(() => {
-      loadMockData();
-    }, 300);
+        if (!loggedInUser) {
+            navigate('/login');
+        }
+    }, [isAuthLoading, loggedInUser, navigate]);
 
-  // The dependency array no longer needs loadMockData, so the warning is gone.
-  }, [userId, user, navigate]);
+    useEffect(() => {
+        if (loggedInUser) {
+            const markMessagesAsRead = async () => {
+                try {
+                    await api.post(`/chat/read/${userId}`);
+                } catch (error) {
+                    console.error('Error marking messages as read:', error);
+                }
+            };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+            const fetchMessages = async () => {
+                setIsMessagesLoading(true);
+                try {
+                    const response = await api.get(`/chat/messages/${userId}/${loggedInUser.id}`);
+                    setMessages(response.data);
 
-  // The original loadMockData function is removed from here.
+                    // --- FIXED: Mark messages as read AFTER successfully fetching them ---
+                    await markMessagesAsRead();
 
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    
-    if (!newMessage.trim() || sending) return;
-    
-    setSending(true);
-    const messageContent = newMessage.trim();
-    setNewMessage('');
-    
-    const newMsg = {
-      id: Date.now(),
-      body: messageContent,
-      sender_id: 999,
-      receiver_id: parseInt(userId),
-      created_at: new Date().toISOString(),
-      read_at: null
-    };
-    
-    setMessages(prev => [...prev, newMsg]);
-    
-    setTimeout(() => {
-      setSending(false);
-      inputRef.current?.focus();
-    }, 500);
-  };
+                } catch (error) {
+                    console.error("Error fetching messages:", error);
+                } finally {
+                    setIsMessagesLoading(false);
+                }
+            };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+            fetchMessages();
+        }
+    }, [userId, loggedInUser]);
 
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('ar-SA', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  };
+    // Scroll logic for messages
+    useEffect(() => {
+        if (isMessagesLoading || !loggedInUser || messages.length === 0) return;
 
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const today = new Date();
-    
-    if (date.toDateString() === today.toDateString()) {
-      return 'اليوم';
-    }
-    
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    if (date.toDateString() === yesterday.toDateString()) {
-      return 'أمس';
-    }
-    
-    return date.toLocaleDateString('ar-SA');
-  };
+        const firstUnreadMsg = messages.find(
+            (msg) => msg.read_at === null && msg.receiver_id === loggedInUser.id
+        );
 
-  const groupMessagesByDate = (messages) => {
-    const groups = [];
-    let currentDate = null;
-    
-    messages.forEach(message => {
-      const messageDate = formatDate(message.created_at);
-      
-      if (messageDate !== currentDate) {
-        currentDate = messageDate;
-        groups.push({
-          date: messageDate,
-          messages: [message]
+        // Case 1: On first load, scroll to first unread if it exists
+        if (!hasScrolledRef.current) {
+            if (firstUnreadMsg && firstUnreadRef.current) {
+                firstUnreadRef.current.scrollIntoView({
+                    behavior: 'auto',
+                    block: 'center',
+                });
+            } else {
+                scrollToBottom('auto');
+            }
+            hasScrolledRef.current = true; // prevent re-scrolling
+            return;
+        }
+
+        // Case 2: On new messages — only scroll if the user sent them or if we're near the bottom
+        const lastMessage = messages[messages.length - 1];
+        const isUserSender = lastMessage?.sender_id === loggedInUser.id;
+
+        const container = messagesEndRef.current?.parentElement;
+        const isNearBottom =
+            container &&
+            container.scrollHeight - container.scrollTop - container.clientHeight < 200;
+
+        if (isUserSender || isNearBottom) {
+            scrollToBottom('smooth');
+        }
+    }, [messages, isMessagesLoading, loggedInUser]);
+
+
+    useEffect(() => {
+        if (!loggedInUser) return;
+        const echo = new Echo({
+            broadcaster: 'reverb',
+            key: 'zikpuddf0rigwtkichwa',
+            wsHost: '127.0.0.1',
+            wsPort: 8080,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss'],
         });
-      } else {
-        groups[groups.length - 1].messages.push(message);
-      }
-    });
-    
-    return groups;
-  };
+        const channel = `chat.${loggedInUser.id}`;
+        echo.channel(channel)
+            .listen('.new-message', (event) => {
+                if (event.sender_id === Number(userId)) {
+                    setMessages(prevMessages => [...prevMessages, event]);
+                }
+            });
+        return () => {
+            echo.leave(channel);
+        };
+    }, [loggedInUser, userId]);
 
-  if (loading) {
-    return (
-      <div className="chat-page">
-        <div className="chat-container">
-          <div className="chat-loading">
-            <div className="spinner"></div>
-            <p>جاري تحميل المحادثة...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    // Auto-focus message input when user types anywhere
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Ignore keys that shouldn't trigger typing
+            const isModifier = e.ctrlKey || e.altKey || e.metaKey;
+            if (isModifier) return;
 
-  const messageGroups = groupMessagesByDate(messages);
+            // Ignore navigation keys like arrows, tab, etc.
+            if (["Shift", "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Escape"].includes(e.key)) {
+                return;
+            }
 
-  return (
-    <div className="chat-page">
-      <div className="chat-container">
-        <div className="chat-header">
-          <button 
-            className="chat-back-button" 
-            onClick={() => navigate('/conversations')}
-          >
-            <ArrowLeft size={24} />
-          </button>
-          
-          <div className="chat-user-info">
-            {otherUser?.profilePicture ? (
-              <img 
-                src={otherUser.profilePicture} 
-                alt="avatar" 
-                className="user-avatar"
-              />
-            ) : (
-              <div className="avatar-placeholder">
-                <UserIcon size={20} />
-              </div>
-            )}
-            <div className="user-details">
-              <h3>{otherUser ? `${otherUser.fname} ${otherUser.lname}` : 'المستخدم'}</h3>
-              <span className="user-status">
-                {otherUser && new Date() - new Date(otherUser.lastSeen) < 300000 
-                  ? 'متصل' 
-                  : 'غير متصل'}
-              </span>
-            </div>
-          </div>
+            // If the input is not focused, focus it
+            if (document.activeElement !== inputRef.current) {
+                inputRef.current?.focus();
+            }
+        };
 
-          <button className="chat-options-button">
-            <MoreVertical size={20} />
-          </button>
-        </div>
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
 
-        <div className="messages-container" ref={messagesContainerRef}>
-          {messageGroups.length === 0 ? (
-            <div className="no-messages">
-              <p>لا توجد رسائل بعد</p>
-              <span>ابدأ المحادثة بإرسال رسالة</span>
-            </div>
-          ) : (
-            messageGroups.map((group, groupIndex) => (
-              <div key={groupIndex} className="message-group">
-                <div className="date-separator">
-                  <span>{group.date}</span>
-                </div>
-                {group.messages.map((message, index) => (
-                  <div
-                    key={message.id || index}
-                    className={`message ${
-                      message.sender_id === 999 ? 'sent' : 'received'
-                    }`}
-                  >
-                    <div className="message-bubble">
-                      <p className="message-text">{message.body}</p>
-                      <span className="message-time">
-                        {formatTime(message.created_at)}
-                      </span>
+
+    const sendMessage = async (e) => {
+        e.preventDefault();
+        if (!newMessage.trim() || sending) return;
+        setSending(true);
+        const messageContent = newMessage.trim();
+        const optimisticMessage = { id: `temp-${Date.now()}`, body: messageContent, sender_id: loggedInUser.id, receiver_id: parseInt(userId), created_at: new Date().toISOString() };
+        setMessages(prev => [...prev, optimisticMessage]);
+        setNewMessage('');
+        try {
+            const response = await api.post(`/chat/messages/${userId}`, { body: messageContent, sender_id: loggedInUser.id });
+            setMessages(prev => prev.map(msg => msg.id === optimisticMessage.id ? response.data : msg));
+        } catch (error) {
+            console.error("Error sending message:", error);
+            setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+        } finally {
+            setSending(false);
+            inputRef.current?.focus();
+        }
+    };
+
+    const scrollToBottom = (behavior = 'smooth') => { messagesEndRef.current?.scrollIntoView({ behavior }); };
+    const formatTime = (timestamp) => {
+        const date = new Date(timestamp);
+
+        // Return time in ENGLISH numerals (e.g., 14:35)
+        return date.toLocaleTimeString('ar-EG', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+    };
+
+    const formatDate = (timestamp) => {
+        const date = new Date(timestamp);
+        const today = new Date();
+
+        // Compare dates only by Y/M/D
+        const isSameDay = (d1, d2) =>
+            d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate();
+
+        if (isSameDay(date, today)) return 'اليوم';
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (isSameDay(date, yesterday)) return 'أمس';
+
+        // Return date in English-syntax, Gregorian, like: 12 Jan 2025
+        return date.toLocaleDateString('ar-EG', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    };
+
+    const groupMessagesByDate = (messages) => { const groups = []; let currentDate = null; messages.forEach(message => { const messageDate = formatDate(message.created_at); if (messageDate !== currentDate) { currentDate = messageDate; groups.push({ date: messageDate, messages: [message] }); } else { groups[groups.length - 1].messages.push(message); } }); return groups; };
+
+    let firstUnreadId = null;
+    if (!isMessagesLoading && messages.length > 0 && loggedInUser) {
+        const firstUnreadMsg = messages.find(msg => msg.read_at === null && msg.receiver_id === loggedInUser.id);
+        if (firstUnreadMsg) { firstUnreadId = firstUnreadMsg.id; }
+    }
+
+    if (isAuthLoading || isMessagesLoading) {
+        return (
+            <div className="chat-page">
+                <div className="chat-container">
+                    <div className="chat-loading">
+                        <div className="spinner"></div>
+                        <p>جاري تحميل...</p>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ))
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+                </div>
+            </div>
+        );
+    }
 
-        <form className="message-input-container" onSubmit={sendMessage}>
-          <input
-            ref={inputRef}
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="اكتب رسالتك..."
-            className="message-input"
-            disabled={sending}
-            dir="rtl"
-          />
-          <button 
-            type="submit" 
-            className="send-button" 
-            disabled={!newMessage.trim() || sending}
-          >
-            <Send size={20} />
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+    const messageGroups = groupMessagesByDate(messages);
+
+    return (
+        <div className="chat-page">
+            <div className="chat-container">
+                <div className="chat-header">
+                    <button className="chat-back-button" onClick={() => navigate('/conversations')}><ArrowLeft size={24} /></button>
+                    <div className="chat-user-info">
+                        {otherUser?.profilePicture ? (<img src={otherUser.profilePicture} alt="avatar" className="user-avatar" />) : (<div className="avatar-placeholder"><UserIcon size={20} /></div>)}
+                        <div className="user-details">
+                            <h3>{otherUser ? `${otherUser.fname} ${otherUser.lname}` : 'المستخدم'}</h3>
+                            <span className="user-status">{otherUser && new Date() - new Date(otherUser.lastSeen) < 300000 ? 'متصل' : 'غير متصل'}</span>
+                        </div>
+                    </div>
+                    <button className="chat-options-button"><MoreVertical size={20} /></button>
+                </div>
+                <div className="messages-container">
+                    {messageGroups.length === 0 ? (
+                        <div className="no-messages"><p>لا توجد رسائل بعد</p><span>ابدأ المحادثة بإرسال رسالة</span></div>
+                    ) : (
+                        messageGroups.map((group, groupIndex) => (
+                            <div key={groupIndex} className="message-group">
+                                <div className="date-separator"><span>{group.date}</span></div>
+                                {group.messages.map((message) => (
+                                    <React.Fragment key={message.id}>
+                                        {/* Divider before the first unread message */}
+                                        {message.id === firstUnreadId && (
+                                            <div className="new-messages-divider">
+                                                <span>رسائل جديدة</span>
+                                            </div>
+                                        )}
+
+                                        <div
+                                            ref={message.id === firstUnreadId ? firstUnreadRef : null}
+                                            className={`message ${message.sender_id === loggedInUser.id ? 'sent' : 'received'}`}
+                                        >
+                                            <div className="message-bubble">
+                                                <p className="message-text">{message.body}</p>
+                                                <span className="message-time">{formatTime(message.created_at)}</span>
+                                            </div>
+                                        </div>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        ))
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+                <form className="message-input-container" onSubmit={sendMessage}>
+                    <input ref={inputRef} type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="اكتب رسالتك..." className="message-input" disabled={sending} dir="rtl" />
+                    <button type="submit" className="send-button" disabled={!newMessage.trim() || sending}><Send size={20} /></button>
+                </form>
+            </div>
+        </div>
+    );
 };
 
 export default Chat;

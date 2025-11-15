@@ -26,6 +26,10 @@ use App\Http\Controllers\ChatController; // <-- IMPORT THE CHAT CONTROLLER
 use App\Http\Controllers\Admin\PendingUpdateController; // <-- IMPORT THE CONTROLLER
 
 
+Route::get('/chat/messages/{senderId}/{recipientId}', [App\Http\Controllers\ChatController::class, 'getMessages']);
+Route::post('/chat/messages/{recipientId}', [App\Http\Controllers\ChatController::class, 'sendMessage']);
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -138,9 +142,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- CHAT ROUTES ---
     Route::prefix('chat')->group(function () {
         Route::get('/conversations', [ChatController::class, 'getConversations']);
-        Route::get('/messages/{recipient}', [ChatController::class, 'getMessages']);
-        Route::post('/messages/{recipient}', [ChatController::class, 'sendMessage']);
+        Route::post('/read/{senderId}', [ChatController::class, 'markAsRead']);
+        
     });
+
+
+
+    Route::post('/users/{user}/report', [App\Http\Controllers\UserReportController::class, 'store'])
+    ->name('users.report');
 
 
 
