@@ -1,7 +1,7 @@
 // admin-panel/src/components/admin/AdminLayout.js
 import React, { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Shield, FileText, Users, LogOut, PanelLeftClose, PanelRightClose } from 'lucide-react';
+import { Shield, FileText, Users, LogOut, PanelLeftClose, PanelRightClose, Flag } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/Dashboard.css';
 
@@ -31,6 +31,7 @@ const AdminLayout = () => {
                         <li><NavLink to="/" end><Shield size={20} /><span>نظرة عامة</span></NavLink></li>
                         <li><NavLink to="/manage-ads"><FileText size={20} /><span>إدارة الإعلانات</span></NavLink></li>
                         <li><NavLink to="/manage-users"><Users size={20} /><span>إدارة المستخدمين</span></NavLink></li>
+                        <li><NavLink to="/manage-reports"><Flag size={20} /><span>البلاغات</span></NavLink></li>
                     </ul>
                 </nav>
                 <div className="sidebar-footer">

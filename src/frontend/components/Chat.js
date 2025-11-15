@@ -177,7 +177,7 @@ const Chat = () => {
         return date.toLocaleTimeString('ar-EG', {
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false
+            hour12: true
         });
     };
 
