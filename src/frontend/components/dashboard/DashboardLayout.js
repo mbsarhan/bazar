@@ -59,23 +59,10 @@ const DashboardLayout = () => {
 
     return (
         <div>
-            {/* Mobile menu button */}
+            {/* Mobile menu button - STYLES REMOVED FROM HERE */}
             <button 
                 className="mobile-menu-btn"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                style={{
-                    display: 'none',
-                    position: 'fixed',
-                    top: '75px',
-                    right: '15px',
-                    zIndex: 1000,
-                    background: 'var(--color-bg-card)',
-                    border: '1px solid var(--color-border-subtle)',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}
             >
                 <Menu size={24} />
             </button>
@@ -91,7 +78,10 @@ const DashboardLayout = () => {
                     <div></div>
                     <button 
                         className="sidebar-toggle-btn" 
-                        onClick={() => setIsDashboardCollapsed(!isDashboardCollapsed)}
+                        onClick={() => {
+                            if (window.innerWidth <= 768) return; // disable collapse on mobile
+                            setIsDashboardCollapsed(!isDashboardCollapsed)}
+                        }
                     >
                         {isDashboardCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
                     </button>
@@ -162,14 +152,8 @@ const DashboardLayout = () => {
             >
                 <p>هل أنت متأكد أنك تريد تسجيل الخروج؟</p>
             </Modal>
-
-            <style jsx>{`
-                @media (max-width: 768px) {
-                    .mobile-menu-btn {
-                        display: block !important;
-                    }
-                }
-            `}</style>
+            
+            {/* JSX style block is no longer needed */}
         </div>
     );
 };

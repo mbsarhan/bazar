@@ -124,9 +124,9 @@ const AdDetailPage = () => {
         }
     };
 
-    const handleChatClick = () => {
+    const handleChatClick = (otherUser) => {
         if (user) {
-            navigate(`/chat/${ad.owner.id}`);
+            navigate(`/chat/${otherUser.id}`, { state: { otherUser } });
         } else {
             navigate('/login', { state: { from: `/ad/${adId}` } });
         }
@@ -379,7 +379,7 @@ const AdDetailPage = () => {
                         </div>
 
                         <div className="AdDetail-contact-buttons">
-                            <button className="AdDetail-contact-button AdDetail-chat-btn" onClick={handleChatClick}>
+                            <button className="AdDetail-contact-button AdDetail-chat-btn" onClick={() => handleChatClick(ad.owner)}>
                                 <MessageCircle size={20} />
                                 <span>محادثة</span>
                             </button>

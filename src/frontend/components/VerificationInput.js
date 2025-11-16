@@ -7,7 +7,8 @@ const VerificationInput = ({ onComplete }) => {
     const inputsRef = useRef([]);
 
     const handleChange = (element, index) => {
-        if (isNaN(element.value)) return false; // Only allow numbers
+        // The check can be more robust by checking the pattern
+        if (!/^[0-9]*$/.test(element.value)) return false;
 
         const newOtp = [...otp];
         newOtp[index] = element.value;
@@ -51,7 +52,11 @@ const VerificationInput = ({ onComplete }) => {
                 return (
                     <input
                         className="otp-input"
-                        type="text"
+                        // --- CHANGES FOR BETTER MOBILE UX ---
+                        type="tel"          // Use "tel" to bring up a numeric-style keypad
+                        inputMode="numeric"   // The most modern and direct way to request a numeric keypad
+                        pattern="[0-9]*"    // Helps ensure only numbers are entered
+                        // --- END OF CHANGES ---
                         name="otp"
                         maxLength="1"
                         key={index}

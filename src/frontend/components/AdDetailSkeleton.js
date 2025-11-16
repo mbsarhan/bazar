@@ -1,54 +1,71 @@
-// src/frontend/components/AdDetailSkeleton.js
 import React from 'react';
+import '../styles/AdDetailPage.css'; 
 import '../styles/AdDetailSkeleton.css';
 
 const AdDetailSkeleton = () => {
     return (
-        <div className="ad-detail-skeleton-container">
-            {/* --- Skeleton for the Header --- */}
-            <div className="skeleton-header">
-                <div className="skeleton shimmer-line full"></div>
-                <div className="skeleton shimmer-line medium"></div>
-            </div>
-
-            {/* --- Skeleton for the Main Content (column layout) --- */}
-            <div className="skeleton-main-content">
-                {/* --- Skeleton for the Image Gallery --- */}
-                <div className="skeleton-image-gallery">
-                    <div className="skeleton shimmer-image large"></div>
-                    
-                    {/* --- Skeleton for the Thumbnail Bar --- */}
-                    <div className="skeleton-thumbnail-wrapper">
-                        {/* Video Thumbnail Placeholder */}
-                        <div className="skeleton shimmer-video-thumb"></div>
-                        
-                        {/* Photo Thumbnail Placeholders */}
-                        <div className="skeleton-thumb-scroller">
-                            <div className="skeleton shimmer-thumb"></div>
-                            <div className="skeleton shimmer-thumb"></div>
-                            <div className="skeleton shimmer-thumb"></div>
-                            <div className="skeleton shimmer-thumb"></div>
-                            <div className="skeleton shimmer-thumb"></div>
+        <div className="ad-detail-container">
+            <div className="ad-detail-grid">
+                {/* Left Column */}
+                <div className="ad-gallery-section">
+                    <div className="skeleton main-image-skeleton"></div>
+                    <div className="thumbnails-grid">
+                        <div className="skeleton thumbnail-skeleton"></div>
+                        <div className="skeleton thumbnail-skeleton"></div>
+                        <div className="skeleton thumbnail-skeleton"></div>
+                        <div className="skeleton thumbnail-skeleton"></div>
+                        <div className="skeleton thumbnail-skeleton"></div>
+                        <div className="skeleton thumbnail-skeleton"></div>
+                    </div>
+                </div>
+                {/* Right Column */}
+                <div className="ad-details-section">
+                    <div className="detail-card">
+                        <div className="skeleton skeleton-line stats-line"></div>
+                        <div className="skeleton skeleton-line title-line"></div>
+                        <div className="skeleton skeleton-line title-line short"></div>
+                        <div className="skeleton skeleton-line price-line"></div>
+                    </div>
+                    <div className="detail-card">
+                        <div className="skeleton skeleton-line spec-title"></div>
+                        <div className="specs-grid">
+                            <div className="skeleton spec-item-skeleton"></div>
+                            <div className="skeleton spec-item-skeleton"></div>
+                            <div className="skeleton spec-item-skeleton"></div>
+                            <div className="skeleton spec-item-skeleton"></div>
+                            <div className="skeleton spec-item-skeleton"></div>
+                            <div className="skeleton spec-item-skeleton"></div>
+                        </div>
+                    </div>
+                    <div className="detail-card">
+                        <div className="skeleton skeleton-line spec-title"></div>
+                        <div className="skeleton skeleton-line"></div>
+                        <div className="skeleton skeleton-line"></div>
+                        <div className="skeleton skeleton-line w-75"></div>
+                    </div>
+                    <div className="detail-card">
+                        <div className="skeleton skeleton-line spec-title"></div>
+                        <div className="skeleton-seller-info">
+                            <div className="skeleton skeleton-circle"></div>
+                            <div className="skeleton-seller-details">
+                                <div className="skeleton skeleton-line"></div>
+                                <div className="skeleton skeleton-line w-50"></div>
+                            </div>
+                        </div>
+                        <div className="skeleton-contact-buttons">
+                            <div className="skeleton skeleton-button"></div>
+                            <div className="skeleton skeleton-button"></div>
                         </div>
                     </div>
                 </div>
-
-                {/* --- Skeleton for the Ad Info Section --- */}
-                <div className="skeleton-info-section">
-                    <div className="skeleton shimmer-line small"></div>
-                    <div className="skeleton-info-grid">
-                        <div className="skeleton shimmer-info-item"></div>
-                        <div className="skeleton shimmer-info-item"></div>
-                        <div className="skeleton shimmer-info-item"></div>
-                    </div>
-                    <div className="skeleton shimmer-line small second-header"></div>
-                    <div className="skeleton shimmer-line long-text"></div>
-                    <div className="skeleton shimmer-line long-text"></div>
-                    <div className="skeleton shimmer-line long-text short"></div>
+                {/* Navigation Bar */}
+                <div className="ad-navigation-bar">
+                    <div className="skeleton nav-button-skeleton"></div>
+                    <div className="skeleton home-button-skeleton"></div>
+                    <div className="skeleton nav-button-skeleton"></div>
                 </div>
             </div>
         </div>
     );
 };
-
 export default AdDetailSkeleton;

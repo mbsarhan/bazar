@@ -110,6 +110,47 @@ class AdvertisementController extends Controller
     }
 
 
+
+
+        /**
+     * Update advertisement status (فعال → مباع/مؤجر).
+     */
+    public function updateStatus(Request $request, Advertisement $ad)
+    {
+        $user = $request->user();
+
+        // 1. Ownership check
+        if ($ad->owner_id !== $user->id) {
+            return response()->json([
+                'message' => 'لا يمكنك تعديل حالة هذا الإعلان.'
+            ], 403);
+        }
+
+        // 2. Validate incoming status
+        $request->validate([
+            'status' => 'required|string|in:مباع,مؤجر,فعال'
+        ]);
+
+        // 3. Only allow change if current status is 'فعال'
+        if ($ad->ad_status == 'قيد المراجعة') {
+            return response()->json([
+                'message' => 'لا يمكن تغيير حالة الإعلان لأنه غير فعال حالياً.'
+            ], 400);
+        }
+
+        // 4. Update status
+        $ad->update([
+            'ad_status' => $request->status
+        ]);
+
+        return response()->json([
+            'message' => 'تم تحديث حالة الإعلان بنجاح.',
+            'ad' => $ad
+        ]);
+    }
+
+
+
     /**
      * Display a listing of advertisements for the admin panel.
      */

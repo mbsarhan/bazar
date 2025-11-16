@@ -1,4 +1,4 @@
-/* src/frontend/styles/VerificationInput.css (Final Version) */
+/* src/frontend/styles/VerificationInput.css (Final Responsive Version) */
 
 .otp-input-container {
     display: flex;
@@ -32,4 +32,45 @@ input.otp-input:focus {
     outline: none !important;
     border-color: var(--color-accent-primary) !important;
     box-shadow: 0 0 0 3px rgba(144, 238, 144, 0.3) !important;
+}
+
+
+/* ============================================= */
+/*           RESPONSIVE DESIGN                   */
+/* ============================================= */
+
+/* For smaller mobile devices (e.g., screen width <= 480px) */
+@media (max-width: 480px) {
+    .otp-input-container {
+        /* Reduce the gap to save space */
+        gap: 8px;
+    }
+
+    input.otp-input {
+        /* Reduce size for smaller screens */
+        width: 48px !important;
+        height: 48px !important;
+
+        /* Adjust font and line-height accordingly */
+        font-size: 1.5rem;
+        line-height: 46px !important;
+    }
+}
+
+/* For very small devices (e.g., screen width <= 380px) */
+@media (max-width: 380px) {
+    .otp-input-container {
+        /* Further reduce the gap */
+        gap: 5px;
+    }
+
+    input.otp-input {
+        /* Make inputs even smaller to fit */
+        width: 40px !important;
+        height: 40px !important;
+        
+        /* Adjust font and line-height */
+        font-size: 1.3rem;
+        line-height: 38px !important;
+    }
 }

@@ -8,20 +8,39 @@
     background-color: var(--color-bg-card);
     border-left: 1px solid var(--color-border-subtle);
     position: fixed;
-    top: 65px;
+    /* USE THE DYNAMIC VARIABLE */
+    top: var(--header-height, 65px);
     right: 0;
     bottom: 0;
     z-index: 990;
     display: flex;
     flex-direction: column;
     padding: 15px;
-    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out, top 0.3s ease; /* Added top transition */
 }
 
 .dashboard-content {
     margin-right: 260px; 
     padding: 40px;
     transition: margin-right 0.3s ease-in-out; 
+    /* ADD PADDING-TOP TO ACCOUNT FOR FIXED HEADER ON MOBILE */
+    padding-top: calc(var(--header-height, 65px) + 40px);
+}
+
+/* ADD STYLES FOR THE MOBILE MENU BUTTON */
+.mobile-menu-btn {
+    display: none; /* Hidden by default */
+    position: fixed;
+    /* Position it relative to the dynamic header height */
+    top: calc(var(--header-height, 65px) + 15px);
+    right: 15px;
+    z-index: 1000;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* ============================================= */
@@ -581,6 +600,11 @@
 /* ============================================= */
 
 /* Large Desktop (≤992px) */
+/* ============================================================
+   RESPONSIVE REWRITE — CLEAN, STABLE, MOBILE-SAFE
+   ============================================================ */
+
+/* ---------- Large Tablets & Small Laptops (≤992px) ---------- */
 @media (max-width: 992px) {
     .dashboard-content {
         padding: 30px 20px;
@@ -617,25 +641,40 @@
     }
 }
 
-/* Tablet (≤768px) - Sidebar becomes overlay */
+/* ---------- Tablets (≤768px) — SIDEBAR BECOMES OVERLAY ---------- */
 @media (max-width: 768px) {
     .dashboard-sidebar {
-        transform: translateX(100%);
         width: 260px;
+        transform: translateX(100%);
+        /* USE THE DYNAMIC VARIABLE */
+        top: var(--header-height, 65px);
+        right: 0;
+        bottom: 0;
+        position: fixed;
         box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
     }
 
     .dashboard-sidebar.mobile-open {
         transform: translateX(0);
     }
+    
+    /* SHOW THE MOBILE MENU BUTTON */
+    .mobile-menu-btn {
+        display: block;
+    }
 
-    .dashboard-content {
-        margin-right: 0;
+    /* Do NOT shift content on mobile */
+    .dashboard-content,
+    .dashboard-content.collapsed {
+        margin-right: 0 !important;
         padding: 20px 15px;
     }
 
-    .dashboard-content.collapsed {
-        margin-right: 0;
+    /* Push content below header */
+    .dashboard-content {
+        /* RESET PADDING, MARGIN-TOP WILL HANDLE SPACING */
+        padding-top: 20px;
+        margin-top: var(--header-height, 65px);
     }
 
     .content-header {
@@ -648,6 +687,7 @@
         width: 100%;
     }
 
+    /* Cards / Lists */
     .stats-container {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -661,63 +701,8 @@
         font-size: 1.75rem;
     }
 
-    .stat-card p {
-        font-size: 0.95rem;
-    }
-
-    .chart-container {
-        padding: 16px;
-        margin-bottom: 30px;
-    }
-
-    .stats-header {
-        font-size: 1.25rem;
-        margin-top: 30px;
-        margin-bottom: 16px;
-    }
-
-    .view-changer button {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
-
-    .ads-list-container {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .ad-card-actions .action-btn {
-        font-size: 13px;
-        padding: 10px 8px;
-    }
-
     .ad-card-actions .action-btn span {
         display: none;
-    }
-
-    .nav-arrow {
-        width: 36px;
-        height: 36px;
-    }
-
-    .ad-card-status {
-        font-size: 11px;
-        padding: 5px 12px;
-    }
-
-    .ad-card-views {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-
-    .dashboard-add-ad-btn {
-        padding: 10px 20px;
-        font-size: 15px;
-    }
-
-    .dashboard-add-ad-btn svg {
-        width: 16px;
-        height: 16px;
     }
 
     .sidebar-toggle-btn {
@@ -725,14 +710,17 @@
     }
 }
 
-/* Mobile (≤576px) */
+/* ---------- Normal Mobile (≤576px) ---------- */
 @media (max-width: 576px) {
     .dashboard-sidebar {
-        width: 280px;
+        width: 260px; /* STAYS FIXED — never full width */
+        transform: translateX(100%);
     }
 
     .dashboard-content {
         padding: 15px 10px;
+        padding-top: 15px;
+        margin-top: var(--header-height, 65px); /* keep alignment with header */
     }
 
     .content-header h1 {
@@ -743,121 +731,37 @@
         padding: 16px;
     }
 
-    .stat-card h2 {
-        font-size: 1.5rem;
-    }
-
-    .stat-card p {
-        font-size: 0.9rem;
-    }
-
     .chart-container {
         padding: 12px;
-        margin-bottom: 25px;
-    }
-
-    .stats-header {
-        font-size: 1.15rem;
-    }
-
-    .stats-header.with-toggle {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .view-changer {
-        width: 100%;
-        justify-content: center;
     }
 
     .view-changer button {
         flex: 1;
         padding: 10px 8px;
-        font-size: 0.85rem;
     }
 
     .ad-card-image {
         height: 180px;
     }
-
-    .ad-card-details {
-        padding: 15px;
-    }
-
-    .ad-card-details h3 {
-        font-size: 1.1rem;
-    }
-
-    .ad-card-price {
-        font-size: 1rem;
-    }
-
-    .spec-item {
-        font-size: 0.8rem;
-    }
-
-    .ad-card-actions .action-btn {
-        padding: 10px 6px;
-    }
-
-    .nav-arrow {
-        width: 32px;
-        height: 32px;
-    }
-
-    .nav-arrow.left { left: 8px; }
-    .nav-arrow.right { right: 8px; }
-
-    .ad-card-status {
-        top: 10px;
-        right: 10px;
-        font-size: 10px;
-        padding: 4px 10px;
-    }
-
-    .ad-card-views {
-        top: 10px;
-        left: 10px;
-        font-size: 11px;
-        padding: 6px 10px;
-        gap: 4px;
-    }
-
-    .pagination-dots {
-        bottom: 10px;
-        padding: 4px 10px;
-        gap: 5px;
-    }
-
-    .dot {
-        width: 6px;
-        height: 6px;
-    }
-
-    .dot.active {
-        width: 20px;
-    }
-
-    .dot.small {
-        width: 5px;
-        height: 5px;
-    }
-
-    .dashboard-add-ad-btn span {
-        display: none;
-    }
-
-    .dashboard-add-ad-btn {
-        padding: 10px 16px;
-        min-width: 44px;
-        justify-content: center;
-    }
 }
 
-/* Extra small mobile (≤380px) */
+/* ---------- Extra Small Mobile (≤380px) — THE FIX ---------- */
 @media (max-width: 380px) {
+    /* Sidebar NEVER takes full width — stays drawer style */
     .dashboard-sidebar {
-        width: 100%;
+        width: 240px !important;
+        transform: translateX(100%) !important;
+        top: var(--header-height, 65px);
+        right: 0;
+    }
+
+    .dashboard-sidebar.mobile-open {
+        transform: translateX(0) !important;
+    }
+
+    .dashboard-content {
+        margin-top: var(--header-height, 65px) !important;
+        padding: 15px 8px;
     }
 
     .content-header h1 {
@@ -868,42 +772,29 @@
         font-size: 1.35rem;
     }
 
-    .chart-container {
-        padding: 10px;
-    }
-
-    .stats-header {
-        font-size: 1.1rem;
-    }
-
-    .view-changer button {
-        padding: 8px 6px;
-        font-size: 0.8rem;
-    }
-
     .ad-card-details h3 {
         font-size: 1rem;
     }
-
-    .ad-card-price {
-        font-size: 0.95rem;
-    }
 }
 
-/* Mobile Menu Overlay */
+/* ---------- Mobile Overlay ---------- */
 @media (max-width: 768px) {
     .mobile-menu-overlay {
         display: none;
         position: fixed;
         top: 0;
+        bottom: 0;
         left: 0;
         right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.45);
         z-index: 989;
     }
 
     .mobile-menu-overlay.active {
         display: block;
+    }
+
+    .sidebar-toggle-btn {
+        display: none !important;
     }
 }

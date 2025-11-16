@@ -44,6 +44,8 @@ class AdvertisementResource extends JsonResource
             'isPublic'          => true,
             'owner'             => [
                 'name'          => "{$this->owner->fname} {$this->owner->lname}",
+                'fname'         => $this->owner->fname,
+                'lname'         => $this->owner->lname,
                 'phone'         => "{$this->owner->phone}",
                 'id'            => $this->owner->id,
                 // You can add more owner details here if needed later, like phone number

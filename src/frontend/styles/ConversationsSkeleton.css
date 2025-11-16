@@ -1,0 +1,102 @@
+/* src/frontend/styles/ConversationsSkeleton.css */
+
+/* --- Base Shimmer Animation --- */
+.skeleton {
+    background-color: #e2e8f0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px; /* A default border-radius */
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.8s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* --- Specific Skeleton Element Styles --- */
+
+/* General line for text */
+.skeleton-line {
+    height: 14px;
+    border-radius: 4px;
+}
+
+/* Width utility classes */
+.w-20 { width: 20%; }
+.w-40 { width: 40%; }
+.w-80 { width: 80%; }
+
+/* Header Skeletons */
+.skeleton-back-button {
+    width: 44px; /* Matches .back-button padding */
+    height: 44px;
+    border-radius: 12px;
+}
+
+.skeleton-title {
+    height: 28px; /* Matches h1 font-size */
+    width: 200px;
+}
+
+.skeleton-search-bar {
+    width: 100%;
+    height: 48px; /* Matches .search-bar padding and height */
+    border-radius: 12px;
+}
+
+/* Conversation Item Skeletons */
+.skeleton-circle {
+    width: 56px;  /* Matches .conversation-avatar width */
+    height: 56px; /* Matches .conversation-avatar height */
+    border-radius: 50%;
+}
+
+/* --- Responsive Adjustments for Skeleton --- */
+
+/* Match tablet styles */
+@media (max-width: 768px) {
+    .skeleton-circle {
+        width: 48px;
+        height: 48px;
+    }
+
+    .skeleton-title {
+        height: 24px;
+        width: 150px;
+    }
+}
+
+/* Match mobile styles */
+@media (max-width: 480px) {
+    .skeleton-circle {
+        width: 40px;
+        height: 40px;
+    }
+
+    .skeleton-title {
+        height: 20px;
+        width: 120px;
+    }
+
+    .skeleton-back-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .skeleton-search-bar {
+        height: 42px;
+    }
+}
