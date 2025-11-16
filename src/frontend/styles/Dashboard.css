@@ -8,6 +8,7 @@
     background-color: var(--color-bg-card);
     border-left: 1px solid var(--color-border-subtle);
     position: fixed;
+    /* USE THE DYNAMIC VARIABLE */
     top: var(--header-height, 65px);
     right: 0;
     bottom: 0;
@@ -15,13 +16,31 @@
     display: flex;
     flex-direction: column;
     padding: 15px;
-    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out, top 0.3s ease; /* Added top transition */
 }
 
 .dashboard-content {
     margin-right: 260px; 
     padding: 40px;
     transition: margin-right 0.3s ease-in-out; 
+    /* ADD PADDING-TOP TO ACCOUNT FOR FIXED HEADER ON MOBILE */
+    padding-top: calc(var(--header-height, 65px) + 40px);
+}
+
+/* ADD STYLES FOR THE MOBILE MENU BUTTON */
+.mobile-menu-btn {
+    display: none; /* Hidden by default */
+    position: fixed;
+    /* Position it relative to the dynamic header height */
+    top: calc(var(--header-height, 65px) + 15px);
+    right: 15px;
+    z-index: 1000;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* ============================================= */
@@ -627,6 +646,7 @@
     .dashboard-sidebar {
         width: 260px;
         transform: translateX(100%);
+        /* USE THE DYNAMIC VARIABLE */
         top: var(--header-height, 65px);
         right: 0;
         bottom: 0;
@@ -637,6 +657,11 @@
     .dashboard-sidebar.mobile-open {
         transform: translateX(0);
     }
+    
+    /* SHOW THE MOBILE MENU BUTTON */
+    .mobile-menu-btn {
+        display: block;
+    }
 
     /* Do NOT shift content on mobile */
     .dashboard-content,
@@ -645,19 +670,11 @@
         padding: 20px 15px;
     }
 
-    /* Header stays visually attached */
-    header,
-    .main-header {
-        position: fixed;
-        top: 0;
-        right: 0;
-        left: 0;
-        z-index: 995;
-    }
-
     /* Push content below header */
     .dashboard-content {
-        top: var(--header-height, 65px);
+        /* RESET PADDING, MARGIN-TOP WILL HANDLE SPACING */
+        padding-top: 20px;
+        margin-top: var(--header-height, 65px);
     }
 
     .content-header {
@@ -702,7 +719,8 @@
 
     .dashboard-content {
         padding: 15px 10px;
-        top: var(--header-height, 65px); /* keep alignment with header */
+        padding-top: 15px;
+        margin-top: var(--header-height, 65px); /* keep alignment with header */
     }
 
     .content-header h1 {
@@ -741,20 +759,8 @@
         transform: translateX(0) !important;
     }
 
-    /* Header and sidebar stay visually connected */
-    header,
-    .main-header {
-        height: 65px;
-        line-height: 65px;
-        position: fixed;
-        right: 0;
-        left: 0;
-        top: 0;
-        z-index: 995;
-    }
-
     .dashboard-content {
-        margin-top: 65px !important;
+        margin-top: var(--header-height, 65px) !important;
         padding: 15px 8px;
     }
 
