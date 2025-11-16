@@ -86,6 +86,10 @@ Route::get('/stream/{path}', [StreamingController::class, 'stream'])
 Route::middleware('auth:sanctum')->group(function () {
 
 
+    Route::patch('/advertisements/{ad}/status', [AdvertisementController::class, 'updateStatus']);
+
+
+
     // Auth & User
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
