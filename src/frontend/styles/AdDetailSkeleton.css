@@ -2,7 +2,7 @@
 
 /* Base styles for a skeleton element with the shimmer animation */
 .skeleton {
-    background: #f0f0f0;
+    background-color: #e2e8f0;
     position: relative;
     overflow: hidden;
     border-radius: 8px; /* Default border radius */
@@ -12,19 +12,17 @@
     content: '';
     position: absolute;
     top: 0;
-    left: -150%;
-    width: 150%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
-    animation: shimmer 1.8s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.8s infinite;
 }
 
 @keyframes shimmer {
-    0% {
-        left: -150%;
-    }
     100% {
-        left: 150%;
+        transform: translateX(100%);
     }
 }
 

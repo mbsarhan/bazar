@@ -1,6 +1,4 @@
-// src/frontend/components/AdDetailSkeleton.js - Final Version
 import React from 'react';
-// We will reuse the main detail page CSS for layout and create a new one for skeleton specifics
 import '../styles/AdDetailPage.css'; 
 import '../styles/AdDetailSkeleton.css';
 
@@ -8,12 +6,9 @@ const AdDetailSkeleton = () => {
     return (
         <div className="ad-detail-container">
             <div className="ad-detail-grid">
-                {/* --- Left Column: Gallery Skeleton --- */}
+                {/* Left Column */}
                 <div className="ad-gallery-section">
-                    {/* Main Image */}
                     <div className="skeleton main-image-skeleton"></div>
-                    
-                    {/* Thumbnails */}
                     <div className="thumbnails-grid">
                         <div className="skeleton thumbnail-skeleton"></div>
                         <div className="skeleton thumbnail-skeleton"></div>
@@ -23,20 +18,14 @@ const AdDetailSkeleton = () => {
                         <div className="skeleton thumbnail-skeleton"></div>
                     </div>
                 </div>
-
-                {/* --- Right Column: Details Skeleton --- */}
+                {/* Right Column */}
                 <div className="ad-details-section">
-                    {/* Header Card Skeleton */}
                     <div className="detail-card">
-                        <div className="skeleton-header-card">
-                            <div className="skeleton skeleton-line stats-line"></div>
-                            <div className="skeleton skeleton-line title-line"></div>
-                            <div className="skeleton skeleton-line title-line short"></div>
-                            <div className="skeleton skeleton-line price-line"></div>
-                        </div>
+                        <div className="skeleton skeleton-line stats-line"></div>
+                        <div className="skeleton skeleton-line title-line"></div>
+                        <div className="skeleton skeleton-line title-line short"></div>
+                        <div className="skeleton skeleton-line price-line"></div>
                     </div>
-
-                    {/* Specs Card Skeleton */}
                     <div className="detail-card">
                         <div className="skeleton skeleton-line spec-title"></div>
                         <div className="specs-grid">
@@ -48,16 +37,12 @@ const AdDetailSkeleton = () => {
                             <div className="skeleton spec-item-skeleton"></div>
                         </div>
                     </div>
-
-                    {/* Description Card Skeleton */}
                     <div className="detail-card">
                         <div className="skeleton skeleton-line spec-title"></div>
                         <div className="skeleton skeleton-line"></div>
                         <div className="skeleton skeleton-line"></div>
                         <div className="skeleton skeleton-line w-75"></div>
                     </div>
-
-                    {/* Seller Card Skeleton */}
                     <div className="detail-card">
                         <div className="skeleton skeleton-line spec-title"></div>
                         <div className="skeleton-seller-info">
@@ -73,8 +58,7 @@ const AdDetailSkeleton = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* --- Navigation Bar Skeleton --- */}
+                {/* Navigation Bar */}
                 <div className="ad-navigation-bar">
                     <div className="skeleton nav-button-skeleton"></div>
                     <div className="skeleton home-button-skeleton"></div>
@@ -84,5 +68,4 @@ const AdDetailSkeleton = () => {
         </div>
     );
 };
-
 export default AdDetailSkeleton;
