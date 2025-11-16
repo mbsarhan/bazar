@@ -16,6 +16,7 @@ return [
         'http://localhost:3000',
         'http://localhost:3001',
         'https://dayyelhaa.onrender.com',
+        'https://admin-dayyelha.onrender.com',
     ],
 
     'allowed_origins_patterns' => [],
