@@ -91,7 +91,10 @@ const DashboardLayout = () => {
                     <div></div>
                     <button 
                         className="sidebar-toggle-btn" 
-                        onClick={() => setIsDashboardCollapsed(!isDashboardCollapsed)}
+                        onClick={() => {
+                            if (window.innerWidth <= 768) return; // disable collapse on mobile
+                            setIsDashboardCollapsed(!isDashboardCollapsed)}
+                        }
                     >
                         {isDashboardCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
                     </button>
