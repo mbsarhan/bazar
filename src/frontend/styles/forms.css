@@ -1,4 +1,4 @@
-/* src/styles/forms.css */
+/* src/styles/forms.css (Final Responsive Version) */
 
 /* 1. تعريف متغيرات الألوان الرئيسية للتصميم */
 :root {
@@ -21,7 +21,6 @@
 html {
     overflow-y: scroll;
 }
-/* src/styles/forms.css */
 body {
     font-family: 'Cairo', sans-serif;
     background-color: var(--color-bg-page);
@@ -242,4 +241,53 @@ body {
 
 .link-style-btn:hover {
     text-decoration: underline;
+}
+
+/* ============================================= */
+/*           8. تصميم متجاوب (Responsive)         */
+/* ============================================= */
+
+/* للشاشات الصغيرة (الجوالات) - أقل من 576 بكسل */
+@media (max-width: 576px) {
+    .centered-page-container {
+        /* تغيير المحاذاة للبداية وإضافة هوامش جانبية */
+        align-items: flex-start;
+        padding: 20px;
+    }
+
+    .form-container {
+        /* تقليل الهوامش الداخلية للجوال */
+        padding: 25px;
+        /* السماح للحاوية بأخذ العرض المتاح */
+        max-width: none;
+        margin-top: 15px; /* إضافة مسافة من أعلى الشاشة */
+    }
+
+    .form-container h2 {
+        /* تصغير حجم العنوان الرئيسي */
+        font-size: 1.5rem;
+    }
+
+    .form-row {
+        /* تحويل العمودين إلى عمود واحد */
+        grid-template-columns: 1fr;
+    }
+
+    .submit-btn,
+    .form-group input {
+        /* تصغير حجم الخط قليلاً داخل الأزرار والحقول */
+        font-size: 15px;
+    }
+}
+
+/* للشاشات الصغيرة جداً - أقل من 380 بكسل */
+@media (max-width: 380px) {
+    .form-container {
+        /* تقليل الهوامش بشكل أكبر */
+        padding: 20px 15px;
+    }
+
+    .form-container h2 {
+        font-size: 1.3rem;
+    }
 }
