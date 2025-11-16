@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
                     const response = await api.get('/user');
                     // --- THIS IS THE FIX ---
                     // Check for the 'is_admin' property from the Laravel User model.
-                    if (response.data && response.data.admin === 1) {
+                    if (response.data && response.data.admin == 1) {
                         setUser(response.data);
                     } else {
                         localStorage.removeItem('authToken');
