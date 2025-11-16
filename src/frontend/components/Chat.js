@@ -108,7 +108,7 @@ const Chat = () => {
         if (!loggedInUser) return;
         const echo = new Echo({
             broadcaster: 'reverb',
-            key: 'ccgv9x8aeypbok8hfyor',
+            key: 'rjd1p6mdpoowjxbenvzg',
             wsHost: '127.0.0.1',
             wsPort: 8080,
             forceTLS: false,
@@ -118,6 +118,7 @@ const Chat = () => {
         echo.channel(channel)
             .listen('.new-message', (event) => {
                 if (event.sender_id === Number(userId)) {
+                    markOneRead(event.id);
                     setMessages(prevMessages => [...prevMessages, event]);
                 }
             });
@@ -205,6 +206,17 @@ const Chat = () => {
             year: 'numeric'
         });
     };
+
+
+
+    const markOneRead = async (messageId) => {
+  try {
+    const res = await api.post(`/chat/message/${messageId}/read`);
+    console.log('markSingleMessageAsRead response', res.data);
+  } catch (err) {
+    console.error('Failed to mark message read', err.response?.data || err.message);
+  }
+};
 
     const groupMessagesByDate = (messages) => { const groups = []; let currentDate = null; messages.forEach(message => { const messageDate = formatDate(message.created_at); if (messageDate !== currentDate) { currentDate = messageDate; groups.push({ date: messageDate, messages: [message] }); } else { groups[groups.length - 1].messages.push(message); } }); return groups; };
 

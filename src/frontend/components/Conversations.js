@@ -49,7 +49,7 @@ const Conversations = () => {
             // --- Setup real-time updates ---
             const echo = new Echo({
                 broadcaster: 'reverb',
-                key: 'ccgv9x8aeypbok8hfyor',
+                key: 'rjd1p6mdpoowjxbenvzg',
                 wsHost: '127.0.0.1',
                 wsPort: 8080,
                 forceTLS: false,
