@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://dayyelha.onrender.com/api/admin', // Your Laravel API URL
+    baseURL: 'https://dayyelha.onrender.com/api', // Your Laravel API URL
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

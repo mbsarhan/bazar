@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://dayyelha.onrender.com/api/admin',
+    baseURL: 'https://dayyelha.onrender.com/api',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     withCredentials: true,
 });
