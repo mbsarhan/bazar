@@ -160,4 +160,59 @@ class ChatController extends Controller
             'time_ms' => $duration,
         ]);
     }
+    public function markSingleMessageAsRead(Request $request, $id)
+{
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+    }
+
+    $messageId = (int) $id;
+
+    // Try to atomically mark the message as read (only if receiver is current user and read_at is null)
+    $updated = DB::table('messages')
+        ->where('id', $messageId)
+        ->where('receiver_id', $user->id)
+        ->whereNull('read_at')
+        ->update(['read_at' => now()]);
+
+    // If nothing was updated, figure out why and return a helpful response
+    if (! $updated) {
+        // Does the message exist?
+        $exists = DB::table('messages')->where('id', $messageId)->exists();
+        if (! $exists) {
+            return response()->json(['status' => 'error', 'message' => 'Message not found'], 404);
+        }
+
+        // Is the current user the receiver?
+        $isReceiver = DB::table('messages')
+            ->where('id', $messageId)
+            ->where('receiver_id', $user->id)
+            ->exists();
+
+        if (! $isReceiver) {
+            return response()->json(['status' => 'error', 'message' => 'You are not the receiver of this message'], 403);
+        }
+
+        // If we reach here, message exists and user is receiver but nothing updated => already read
+        $readAt = DB::table('messages')->where('id', $messageId)->value('read_at');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Message already read.',
+            'message_id' => $messageId,
+            'read_at' => $readAt,
+        ]);
+    }
+
+    // Fetch and return the updated read_at
+    $readAt = DB::table('messages')->where('id', $messageId)->value('read_at');
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Message marked as read.',
+        'message_id' => $messageId,
+        'read_at' => $readAt,
+    ]);
+}
 }

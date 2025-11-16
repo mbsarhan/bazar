@@ -8,6 +8,7 @@ import ManageAds from './components/admin/ManageAds';
 import AdminAdDetailView from './components/admin/AdminAdDetailView';
 import ManageUsers from './components/admin/ManageUsers';
 import AdminDashboard from './components/admin/AdminDashboard';
+import ManageReports from './components/admin/ManageReports';
 import './styles/forms.css';
 
 // --- Your AdminHeader component is perfect as is ---
@@ -83,6 +84,7 @@ function App() {
                     <Route path="/" element={<AdminDashboard />} />
                     <Route path="/manage-ads" element={<ManageAds />} />
                     <Route path="/manage-users" element={<ManageUsers />} />
+                    <Route path="/manage-reports" element={<ManageReports />} />
                 </Route>
                 <Route path="/admin/view-ad/:adId" element={<AdminAdDetailView />} />
               </Route>

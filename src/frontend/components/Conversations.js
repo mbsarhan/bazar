@@ -1,4 +1,4 @@
-// src/frontend/pages/Conversations.js
+// src/frontend/pages/Conversations.js - (Add these changes)
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,34 +8,33 @@ import api from '../api';
 import '../styles/Conversations.css';
 import Echo from 'laravel-echo';
 
+// --- 1. IMPORT THE NEW SKELETON COMPONENT ---
+import ConversationsSkeleton from '../components/ConversationsSkeleton';
+
 const Conversations = () => {
-    // 1. You already have this, which is correct.
-    const { user: loggedInUser, isLoading: isAuthLoading } = useAuth(); // Renamed to avoid conflict
+    // ... (all your existing hooks and state remain the same)
+    const { user: loggedInUser, isLoading: isAuthLoading } = useAuth();
     const navigate = useNavigate();
     const [conversations, setConversations] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    // This component's own loading state for fetching conversations
     const [isConversationsLoading, setIsConversationsLoading] = useState(true);
 
-    // --- 2. THIS IS THE CORRECTED AUTHENTICATION CHECK ---
+
+    // ... (all your useEffects and functions remain the same)
     useEffect(() => {
-        // Don't do anything until the initial authentication check is complete
         if (isAuthLoading) {
             return;
         }
-        // If the check is done and there's no user, redirect to login
         if (!loggedInUser) {
             navigate('/login');
         }
     }, [isAuthLoading, loggedInUser, navigate]);
 
 
-    // --- 3. THIS EFFECT NOW SAFELY FETCHES DATA ---
     useEffect(() => {
-        // Only fetch conversations if we have confirmed the user is logged in
         if (loggedInUser) {
             const fetchConversations = async () => {
-                setIsConversationsLoading(true); // Use this component's loading state
+                setIsConversationsLoading(true);
                 try {
                     const response = await api.get('/chat/conversations');
                     setConversations(response.data);
@@ -49,7 +48,7 @@ const Conversations = () => {
             // --- Setup real-time updates ---
             const echo = new Echo({
                 broadcaster: 'reverb',
-                key: 'ccgv9x8aeypbok8hfyor',
+                key: 'rjd1p6mdpoowjxbenvzg',
                 wsHost: '127.0.0.1',
                 wsPort: 8080,
                 forceTLS: false,
@@ -69,16 +68,12 @@ const Conversations = () => {
                     };
     
                     if (index !== -1) {
-                        // Update existing conversation
                         const conv = { ...updated[index] };
                         conv.last_message = newLastMessage;
                         conv.unread_count = (conv.unread_count || 0) + 1;
-    
-                        // Move to top
                         updated.splice(index, 1);
                         updated.unshift(conv);
                     } else {
-                        // New conversation
                         updated.unshift({
                             user: event.sender,
                             last_message: newLastMessage,
@@ -95,7 +90,7 @@ const Conversations = () => {
             };
         }
 
-    }, [loggedInUser]); // This effect now only depends on loggedInUser
+    }, [loggedInUser]);
 
     const filteredConversations = conversations.filter(conv => {
         const fullName = `${conv.user.fname || ''} ${conv.user.lname || ''}`.toLowerCase();
@@ -128,18 +123,13 @@ const Conversations = () => {
         navigate(`/chat/${otherUser.id}`, { state: { otherUser } });
     };
 
-    // --- 4. THE COMPONENT NOW WAITS FOR BOTH LOADING STATES ---
+
+    // --- 2. REPLACE THE OLD LOADING STATE WITH THE SKELETON ---
     if (isAuthLoading || isConversationsLoading) {
-        return (
-            <div className="conversations-page">
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>جاري تحميل...</p>
-                </div>
-            </div>
-        );
+        return <ConversationsSkeleton />;
     }
 
+    // ... (the rest of your return statement remains the same)
     return (
         <div className="conversations-page">
             <div className="conversations-container">

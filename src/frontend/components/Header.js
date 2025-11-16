@@ -1,5 +1,5 @@
 // src/frontend/components/Header.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import { Link, useNavigate, useLocation as useReactRouterLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocation, countries } from '../context/LocationContext';
@@ -11,6 +11,7 @@ const Header = () => {
   const { country, setCountry } = useLocation();
   const navigate = useNavigate();
   const reactRouterLocation = useReactRouterLocation();
+  const headerRef = useRef(null); // Create a ref for the header element
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -20,6 +21,28 @@ const Header = () => {
   const [lastFilterType, setLastFilterType] = useState(() => {
     return localStorage.getItem('lastFilterType') || 'cars';
   });
+
+  // Effect to set the --header-height CSS variable
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        const headerHeight = headerRef.current.offsetHeight;
+        document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+      }
+    };
+
+    // Run on mount
+    updateHeaderHeight();
+
+    // Use ResizeObserver to detect header size changes
+    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+    if (headerRef.current) {
+      resizeObserver.observe(headerRef.current);
+    }
+
+    // Cleanup observer on unmount
+    return () => resizeObserver.disconnect();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,7 +98,7 @@ const Header = () => {
   };
 
   return (
-    <header className={`modern-header ${isScrolled ? 'scrolled' : ''}`}>
+    <header ref={headerRef} className={`modern-header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         {/* Logo Section */}
         <Link to={homeLink} className="logo-section" onClick={handleLogoClick}>
