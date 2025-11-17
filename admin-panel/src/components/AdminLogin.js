@@ -22,6 +22,7 @@ const AdminLogin = () => {
             navigate('/manage-ads');
         } catch (err) {
             setError(err.response?.data?.message || err.message || 'Login failed.');
+            console.log(err);
         } finally {
             setIsSubmitting(false);
         }
