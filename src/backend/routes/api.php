@@ -207,4 +207,18 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- THIS IS THE NEW ROUTE FOR THE CHART ---
     Route::get('/dashboard/weekly-ads-chart', [AdminDashboardController::class, 'getWeeklyAdsChart']);
+
+
+
+    // --- ADD THESE NEW ROUTES FOR MANAGING REPORTS ---
+    
+    // GET /api/admin/reports?status=pending
+    Route::get('/reports', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])
+        ->name('reports.index');
+
+    // POST /api/admin/reports/{report}/process
+    Route::post('/reports/{report}/process', [App\Http\Controllers\Admin\AdminReportController::class, 'process'])
+        ->name('reports.process');
+
+    // --- END OF NEW ROUTES ---
 });

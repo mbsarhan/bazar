@@ -3,10 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon; // Import Carbon
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany; // Import for type hinting
 use App\Notifications\VerifyEmailWithOtp;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -32,6 +34,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'admin',
         'review',
         'total_view',
+        // --- ADD THESE NEW FILLABLE FIELDS ---
+        'strike_count',
+        'banned_until',
+        // ---
         'verification_code',         
         'verification_code_expires_at',
         'pending_email', 
@@ -62,6 +68,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'pending_email_expires_at' => 'datetime',
             'password' => 'hashed',
             'name_last_updated_at' => 'datetime', // <-- 2. ADD TO CASTS
+            // --- ADD THIS NEW CAST ---
+            'banned_until' => 'datetime',
         ];
     }
 
@@ -79,6 +87,17 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
+    // --- ADD THIS HELPER METHOD ---
+    /**
+     * Check if the user is currently banned.
+     * @return bool
+     */
+    public function isBanned(): bool
+    {
+        return $this->banned_until && Carbon::now()->lessThan($this->banned_until);
+    }
+
+
        public function advertisements()
     {
         
@@ -92,6 +111,26 @@ class User extends Authenticatable implements MustVerifyEmail
       public function ratingsReceived()
     {
         return $this->hasMany(UserRating::class, 'rated_id');
+    }
+
+
+
+    // --- ADD THESE NEW RELATIONSHIPS ---
+
+    /**
+     * Get all reports filed against this user.
+     */
+    public function reportsAgainst(): HasMany
+    {
+        return $this->hasMany(UserReport::class, 'reported_id');
+    }
+
+    /**
+     * Get all strikes issued to this user.
+     */
+    public function strikes(): HasMany
+    {
+        return $this->hasMany(UserStrike::class, 'user_id');
     }
 
   
