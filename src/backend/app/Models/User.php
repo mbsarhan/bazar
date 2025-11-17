@@ -62,6 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'pending_email_expires_at' => 'datetime',
             'password' => 'hashed',
             'name_last_updated_at' => 'datetime', // <-- 2. ADD TO CASTS
+            'admin'=>'boolean',
         ];
     }
 
