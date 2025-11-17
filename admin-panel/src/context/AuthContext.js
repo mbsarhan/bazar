@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
         // --- THIS IS THE CRITICAL FIX ---
         // We must check for the property that the API actually sends: `is_admin`.
-        if (loggedInUser && loggedInUser.admin === 1) {
+        if (loggedInUser && loggedInUser.admin == 1) {
             localStorage.setItem('authToken', token);
             setUser(loggedInUser);
         } else {
