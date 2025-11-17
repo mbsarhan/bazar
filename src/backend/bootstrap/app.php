@@ -24,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             HandleCors::class,
         ]);
+        // --- ADD THIS LINE ---
+        // This tells Laravel: "For any route in the 'api' group (defined in api.php),
+        // also run our CheckForBan middleware."
+        $middleware->appendToGroup('api', \App\Http\Middleware\CheckForBan::class);
+        // --- END OF ADDITION ---
         
     })
     ->withExceptions(function (Exceptions $exceptions): void {

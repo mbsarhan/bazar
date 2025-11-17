@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 
 class AuthService
@@ -81,6 +82,28 @@ class AuthService
                     'credential' => ['الرجاء التحقق من بريدك الإلكتروني قبل تسجيل الدخول.'],
                 ]);
             }
+
+            // --- THIS IS THE CORRECT, ENHANCED BAN CHECK ---
+        // We use the isBanned() helper method to correctly check for active bans.
+        if ($user->isBanned()) {
+            $bannedUntil = $user->banned_until;
+            $message = 'حسابك موقوف.';
+            $isPermanent = $bannedUntil->isAfter(Carbon::now()->addYears(5)); // Check for permanent ban
+
+            if ($isPermanent) {
+                $message = 'تم تعليق حسابك بشكل دائم لمخالفة شروط الخدمة.';
+            } else {
+                // Give the user a clear, localized message with the expiry date.
+                $formattedDate = $bannedUntil->translatedFormat('j F Y, h:i A');
+                $message = 'حسابك موقوف بشكل مؤقت. سيتم رفع التعليق بتاريخ: ' . $formattedDate;
+            }
+
+            // Throw the professional error message.
+            throw ValidationException::withMessages([
+                'credential' => [$message],
+            ]);
+        }
+        // --- END OF BAN CHECK ---
 
             $token = $user->createToken('authToken')->plainTextToken;
 
