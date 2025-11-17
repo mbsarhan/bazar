@@ -5,15 +5,17 @@ import React, { createContext, useState, useContext, useMemo } from 'react';
 export const countries = {
     SY: { 
         code: 'SY', 
-        name: 'Syria', // This value will be sent to the backend
-        displayName: 'الجمهورية العربية السورية', // This text will be shown to the user
-        currency: 'USD' 
+        name: 'Syria',
+        displayName: 'الجمهورية العربية السورية',
+        currency: 'USD',
+        flag: '/assets/flags/sy.svg', // ← updated
     },
     SA: { 
         code: 'SA', 
-        name: 'Saudi Arabia', // This value will be sent to the backend
-        displayName: 'المملكة العربية السعودية', // This text will be shown to the user
-        currency: 'SAR' 
+        name: 'Saudi Arabia',
+        displayName: 'المملكة العربية السعودية',
+        currency: 'SAR',
+        flag: '/assets/flags/sa.svg', // ← updated
     },
 };
 

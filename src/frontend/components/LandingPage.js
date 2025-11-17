@@ -84,16 +84,24 @@ const LandingPage = () => {
                 {/* Country Selector */}
                 <div className="landing-country-selector">
                     <Globe size={20} />
-                    <select
-                        value={country.code}
-                        onChange={(e) => setCountry(e.target.value)}
-                    >
-                        {Object.values(countries).map((countryOption) => (
-                            <option key={countryOption.code} value={countryOption.code}>
-                                {countryOption.displayName}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="flag-select-wrapper">
+                        <img
+                            src={country.flag}
+                            alt={country.name}
+                            style={{ width: 20, height: 14, marginRight: 8 }}
+                        />
+                        <select
+                            value={country.code}
+                            onChange={(e) => setCountry(e.target.value)}
+                            style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none' }}
+                        >
+                            {Object.values(countries).map((c) => (
+                                <option key={c.code} value={c.code}>
+                                    {c.displayName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="landing-choices-wrapper">

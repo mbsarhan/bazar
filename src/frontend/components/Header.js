@@ -15,7 +15,6 @@ const Header = () => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // FIXED: The comment below tells the linter to ignore the "unused variable" warning for the next line.
   // eslint-disable-next-line no-unused-vars
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastFilterType, setLastFilterType] = useState(() => {
@@ -119,14 +118,19 @@ const Header = () => {
         <nav className="desktop-nav">
           <div className="nav-item country-selector-wrapper">
             <MapPin size={18} className="nav-icon" />
+            <img
+              src={country.flag}
+              alt={country.name}
+              style={{ width: 20, height: 14, marginRight: 6 }}
+            />
             <select
               value={country.code}
               onChange={(e) => setCountry(e.target.value)}
               className="country-select"
             >
-              {Object.values(countries).map((countryOption) => (
-                <option key={countryOption.code} value={countryOption.code}>
-                  {countryOption.displayName}
+              {Object.values(countries).map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.displayName}
                 </option>
               ))}
             </select>
@@ -171,6 +175,11 @@ const Header = () => {
       <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="mobile-menu-item">
           <MapPin size={18} className="mobile-icon" />
+          <img
+            src={country.flag}
+            alt={country.name}
+            style={{ width: 20, height: 14, marginRight: 6 }}
+          />
           <select
             value={country.code}
             onChange={(e) => {
@@ -179,9 +188,9 @@ const Header = () => {
             }}
             className="mobile-country-select"
           >
-            {Object.values(countries).map((countryOption) => (
-              <option key={countryOption.code} value={countryOption.code}>
-                {countryOption.displayName}
+            {Object.values(countries).map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.displayName}
               </option>
             ))}
           </select>
