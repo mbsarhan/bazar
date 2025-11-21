@@ -37,6 +37,7 @@ import SecuritySettings from './components/dashboard/SecuritySettings';
 import MyCarAds from './components/dashboard/MyCarAds';
 import MyRealEstateAds from './components/dashboard/MyRealEstateAds';
 import Reviews from './components/dashboard/Reviews';
+import Favorites from './components/dashboard/Favorites';
 
 import Conversations from './components/Conversations';
 import Chat from './components/Chat';
@@ -86,6 +87,7 @@ function App() {
                         <Route path="car-ads" element={<MyCarAds />} />
                         <Route path="real-estate-ads" element={<MyRealEstateAds />} />
                         <Route path="reviews" element={<Reviews />} />
+                        <Route path="favorites" element={<Favorites />} />
                       </Route>
                     </Route>
 

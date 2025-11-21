@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Advertisement;
 use App\Models\Favorite;
 use Illuminate\Http\Request;
+use App\Http\Resources\AdvertisementResource;
 
 class FavoriteController extends Controller
 {
@@ -23,9 +24,7 @@ class FavoriteController extends Controller
             ->latest()
             ->get();
 
-        return response()->json([
-            'data' => $favorites,
-        ]);
+        return AdvertisementResource::collection($favorites);
     }
 
     /**
