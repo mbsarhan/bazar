@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany; // Import for type hinting
 use App\Notifications\VerifyEmailWithOtp;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements MustVerifyEmail 
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -38,11 +38,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'strike_count',
         'banned_until',
         // ---
-        'verification_code',         
+        'verification_code',
         'verification_code_expires_at',
-        'pending_email', 
-        'pending_email_verification_code', 
-        'pending_email_expires_at', 
+        'pending_email',
+        'pending_email_verification_code',
+        'pending_email_expires_at',
     ];
 
     /**
@@ -73,10 +73,10 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-     public function sendEmailVerificationNotification()
+    public function sendEmailVerificationNotification()
     {
         $code = random_int(100000, 999999);
-        $expiresAt = now()->addMinutes(10); 
+        $expiresAt = now()->addMinutes(10);
 
         $this->forceFill([
             'verification_code' => $code,
@@ -98,17 +98,17 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
-       public function advertisements()
+    public function advertisements()
     {
-        
+
         return $this->hasMany(Advertisement::class, 'owner_id');
     }
-        public function ratingsGiven() 
+    public function ratingsGiven()
     {
         return $this->hasMany(UserRating::class, 'rater_id');
     }
 
-      public function ratingsReceived()
+    public function ratingsReceived()
     {
         return $this->hasMany(UserRating::class, 'rated_id');
     }
@@ -133,5 +133,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserStrike::class, 'user_id');
     }
 
-  
+
+    // App\Models\User.php
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function favoriteAdvertisements()
+{
+    return $this->belongsToMany(
+        Advertisement::class,
+        'favorites',
+        'user_id',
+        'advertisement_id'
+    )->withTimestamps();
+}
+
+
 }

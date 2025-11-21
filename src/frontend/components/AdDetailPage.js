@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAds } from '../context/AdContext';
 import { useAuth } from '../context/AuthContext';
 import AdDetailSkeleton from './AdDetailSkeleton';
+import api from '../api.js'; // adjust path if needed
 import '../styles/AdDetailPage.css';
 import {
     ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, GitCommitVertical,
@@ -26,6 +27,7 @@ const AdDetailPage = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const thumbnailScrollerRef = useRef(null);
     const [videoPlayerOptions, setVideoPlayerOptions] = useState(null);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
         const fetchAd = async () => {
@@ -57,6 +59,22 @@ const AdDetailPage = () => {
         };
         fetchAd();
     }, [adId, getAdById]);
+    useEffect(() => {
+        const checkFavorite = async () => {
+            if (!user || !ad) return;
+
+            try {
+                const res = await api.get('/favorites/status', {
+                    params: { advertisement_id: ad.id },
+                });
+                setIsFavorite(res.data.is_favorite);
+            } catch (e) {
+                console.error('Error checking favorite status', e);
+            }
+        };
+
+        checkFavorite();
+    }, [user, ad]);
 
     useEffect(() => {
         const fetchAndSetAdIds = async () => {
@@ -142,6 +160,31 @@ const AdDetailPage = () => {
         } else {
             navigator.clipboard.writeText(window.location.href);
             alert('تم نسخ الرابط');
+        }
+    };
+    const handleToggleFavorite = async () => {
+        if (!user) {
+            navigate('/login', { state: { from: `/ad/${adId}` } });
+            return;
+        }
+
+        try {
+            if (isFavorite) {
+                // remove from favorites
+                await api.delete('/favorites', {
+                    data: { advertisement_id: ad.id },
+                });
+                setIsFavorite(false);
+            } else {
+                // add to favorites
+                await api.post('/favorites', {
+                    advertisement_id: ad.id,
+                });
+                setIsFavorite(true);
+            }
+        } catch (error) {
+            console.error('Error toggling favorite', error);
+            alert('حدث خطأ أثناء تعديل قائمة المفضلة');
         }
     };
 
@@ -245,9 +288,13 @@ const AdDetailPage = () => {
                             <button className="icon-btn" onClick={handleShareClick}>
                                 <Share2 size={20} />
                             </button>
-                            <button className="icon-btn">
-                                <Heart size={20} />
-                            </button>
+                            <button className="icon-btn" onClick={handleToggleFavorite}>
+  <Heart
+    size={20}
+    stroke={isFavorite ? 'red' : '#333'}    // outline color
+    fill={isFavorite ? 'red' : 'none'}      // fill only when favorite
+  />
+</button>
                         </div>
 
                         <h1 className="ad-title">{ad.title}</h1>
