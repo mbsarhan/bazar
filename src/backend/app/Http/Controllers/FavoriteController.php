@@ -81,7 +81,7 @@ class FavoriteController extends Controller
         'advertisement_id' => 'required|integer|exists:advertisements,id',
     ]);
 
-    $exists = \App\Models\Favorite::where('user_id', $user->id)
+    $exists = Favorite::where('user_id', $user->id)
         ->where('advertisement_id', $data['advertisement_id'])
         ->exists();
 
