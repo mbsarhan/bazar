@@ -29,15 +29,17 @@ class Advertisement extends Model
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
-    public function carDetails(){
+    public function carDetails()
+    {
 
-        return $this->hasOne(CarAds::class,'ads_id');
+        return $this->hasOne(CarAds::class, 'ads_id');
 
     }
 
-       public function realEstateDetails(){
+    public function realEstateDetails()
+    {
 
-        return $this->hasOne(RealestateAds::class,'ads_id');
+        return $this->hasOne(RealestateAds::class, 'ads_id');
 
     }
     /**
@@ -47,4 +49,20 @@ class Advertisement extends Model
     {
         return $this->hasOne(PendingAdvertisement::class);
     }
+
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+public function favoredByUsers()
+{
+    return $this->belongsToMany(
+        User::class,
+        'favorites',
+        'advertisement_id',
+        'user_id'
+    )->withTimestamps();
+}
 }

@@ -26,6 +26,9 @@ use App\Http\Controllers\ChatController; // <-- IMPORT THE CHAT CONTROLLER
 use App\Http\Controllers\Admin\PendingUpdateController; // <-- IMPORT THE CONTROLLER
 
 
+use App\Http\Controllers\FavoriteController;
+
+
 Route::get('/chat/messages/{senderId}/{recipientId}', [App\Http\Controllers\ChatController::class, 'getMessages']);
 Route::post('/chat/messages/{recipientId}', [App\Http\Controllers\ChatController::class, 'sendMessage']);
 
@@ -155,6 +158,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/users/{user}/report', [App\Http\Controllers\UserReportController::class, 'store'])
     ->name('users.report');
+
+
+    Route::get('/favorites/status', [FavoriteController::class, 'status']); // NEW: check if an ad is favorited  
+    Route::get('/favorites', [FavoriteController::class, 'index']);      // list favorites
+    Route::post('/favorites', [FavoriteController::class, 'store']);     // add
+    Route::delete('/favorites', [FavoriteController::class, 'destroy']); // remove
 
 
 
