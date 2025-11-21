@@ -1,9 +1,9 @@
 // src/frontend/components/Header.js
-import React, { useState, useEffect, useRef } from 'react'; // Import useRef
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation as useReactRouterLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocation, countries } from '../context/LocationContext';
-import { Plus, User, LogIn, Menu, X, MapPin, MessageSquare } from 'lucide-react';
+import { Plus, User, LogIn, MapPin, MessageSquare, ChevronDown } from 'lucide-react'; // Added ChevronDown
 import '../styles/Header.css';
 
 const Header = () => {
@@ -11,14 +11,18 @@ const Header = () => {
   const { country, setCountry } = useLocation();
   const navigate = useNavigate();
   const reactRouterLocation = useReactRouterLocation();
-  const headerRef = useRef(null); // Create a ref for the header element
+  const headerRef = useRef(null);
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [unreadCount, setUnreadCount] = useState(0);
   const [lastFilterType, setLastFilterType] = useState(() => {
     return localStorage.getItem('lastFilterType') || 'cars';
+  });
+  
+  // Get last selected mobile button from localStorage, default to 'add-ad'
+  const [selectedMobileButton, setSelectedMobileButton] = useState(() => {
+    return localStorage.getItem('selectedMobileButton') || 'add-ad';
   });
 
   // Effect to set the --header-height CSS variable
@@ -30,16 +34,13 @@ const Header = () => {
       }
     };
 
-    // Run on mount
     updateHeaderHeight();
 
-    // Use ResizeObserver to detect header size changes
     const resizeObserver = new ResizeObserver(updateHeaderHeight);
     if (headerRef.current) {
       resizeObserver.observe(headerRef.current);
     }
 
-    // Cleanup observer on unmount
     return () => resizeObserver.disconnect();
   }, []);
 
@@ -55,7 +56,6 @@ const Header = () => {
   useEffect(() => {
     if (user) {
       // You can implement unread count if needed in backend
-      // For now, we'll skip this or you can add an endpoint
     }
   }, [user]);
 
@@ -72,13 +72,13 @@ const Header = () => {
 
   const handleAddAdClick = () => {
     if (user) {
-      // User is logged in, go to ad choice page
       navigate('/add-ad-choice');
     } else {
-      // User not logged in, redirect to login then to ad choice page
       navigate('/login', { state: { redirectTo: '/add-ad-choice' } });
     }
     setIsMobileMenuOpen(false);
+    setSelectedMobileButton('add-ad');
+    localStorage.setItem('selectedMobileButton', 'add-ad');
   };
 
   const handleLogoClick = () => {
@@ -94,10 +94,60 @@ const Header = () => {
       navigate('/conversations');
     }
     setIsMobileMenuOpen(false);
+    setSelectedMobileButton('chat');
+    localStorage.setItem('selectedMobileButton', 'chat');
   };
 
+  const handleProfileClick = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
+    }
+    setIsMobileMenuOpen(false);
+    setSelectedMobileButton('profile');
+    localStorage.setItem('selectedMobileButton', 'profile');
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Get the current button config based on selected state
+  const getMobileButtonConfig = () => {
+    switch (selectedMobileButton) {
+      case 'chat':
+        return {
+          icon: MessageSquare,
+          text: 'المحادثات',
+          onClick: toggleMobileMenu,
+          className: 'chat',
+          showBadge: unreadCount > 0
+        };
+      case 'profile':
+        return {
+          icon: user ? User : LogIn,
+          text: user ? user.fname : 'تسجيل الدخول',
+          onClick: toggleMobileMenu,
+          className: user ? 'user' : 'login',
+          showBadge: false
+        };
+      default: // 'add-ad'
+        return {
+          icon: Plus,
+          text: 'أضف إعلاناً',
+          onClick: toggleMobileMenu,
+          className: 'add-ad',
+          showBadge: false
+        };
+    }
+  };
+
+  const currentButton = getMobileButtonConfig();
+  const ButtonIcon = currentButton.icon;
+
   return (
-    <header ref={headerRef} className={`modern-header ${isScrolled ? 'scrolled' : ''}`}>
+    <header ref={headerRef} className={`modern-header ${isMobileMenuOpen ? 'menu-open' : ''} ${isScrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         {/* Logo Section */}
         <Link to={homeLink} className="logo-section" onClick={handleLogoClick}>
@@ -162,12 +212,23 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Toggle - Shows Last Clicked Button */}
         <button
-          className="mobile-menu-toggle"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className={`mobile-menu-toggle ${currentButton.className}`}
+          onClick={currentButton.onClick}
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <ButtonIcon size={20} />
+          <span>{currentButton.text}</span>
+          {currentButton.showBadge && (
+            <span className="mobile-toggle-badge">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+          {/* Chevron Icon Added Here */}
+          <ChevronDown 
+            size={18} 
+            className={`dropdown-chevron ${isMobileMenuOpen ? 'open' : ''}`}
+          />
         </button>
       </div>
 
@@ -210,23 +271,15 @@ const Header = () => {
         </button>
 
         {user ? (
-          <Link
-            to="/dashboard"
-            className="mobile-menu-button user"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
+          <button onClick={handleProfileClick} className="mobile-menu-button user">
             <User size={20} />
             <span>{user.fname}</span>
-          </Link>
+          </button>
         ) : (
-          <Link
-            to="/login"
-            className="mobile-menu-button login"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
+          <button onClick={handleProfileClick} className="mobile-menu-button login">
             <LogIn size={20} />
             <span>تسجيل الدخول</span>
-          </Link>
+          </button>
         )}
       </div>
     </header>
