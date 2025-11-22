@@ -161,58 +161,77 @@ class ChatController extends Controller
         ]);
     }
     public function markSingleMessageAsRead(Request $request, $id)
-{
-    $user = $request->user();
-    if (!$user) {
-        return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
-    }
-
-    $messageId = (int) $id;
-
-    // Try to atomically mark the message as read (only if receiver is current user and read_at is null)
-    $updated = DB::table('messages')
-        ->where('id', $messageId)
-        ->where('receiver_id', $user->id)
-        ->whereNull('read_at')
-        ->update(['read_at' => now()]);
-
-    // If nothing was updated, figure out why and return a helpful response
-    if (! $updated) {
-        // Does the message exist?
-        $exists = DB::table('messages')->where('id', $messageId)->exists();
-        if (! $exists) {
-            return response()->json(['status' => 'error', 'message' => 'Message not found'], 404);
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        // Is the current user the receiver?
-        $isReceiver = DB::table('messages')
+        $messageId = (int) $id;
+
+        // Try to atomically mark the message as read (only if receiver is current user and read_at is null)
+        $updated = DB::table('messages')
             ->where('id', $messageId)
             ->where('receiver_id', $user->id)
-            ->exists();
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
-        if (! $isReceiver) {
-            return response()->json(['status' => 'error', 'message' => 'You are not the receiver of this message'], 403);
+        // If nothing was updated, figure out why and return a helpful response
+        if (!$updated) {
+            // Does the message exist?
+            $exists = DB::table('messages')->where('id', $messageId)->exists();
+            if (!$exists) {
+                return response()->json(['status' => 'error', 'message' => 'Message not found'], 404);
+            }
+
+            // Is the current user the receiver?
+            $isReceiver = DB::table('messages')
+                ->where('id', $messageId)
+                ->where('receiver_id', $user->id)
+                ->exists();
+
+            if (!$isReceiver) {
+                return response()->json(['status' => 'error', 'message' => 'You are not the receiver of this message'], 403);
+            }
+
+            // If we reach here, message exists and user is receiver but nothing updated => already read
+            $readAt = DB::table('messages')->where('id', $messageId)->value('read_at');
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Message already read.',
+                'message_id' => $messageId,
+                'read_at' => $readAt,
+            ]);
         }
 
-        // If we reach here, message exists and user is receiver but nothing updated => already read
+        // Fetch and return the updated read_at
         $readAt = DB::table('messages')->where('id', $messageId)->value('read_at');
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Message already read.',
+            'message' => 'Message marked as read.',
             'message_id' => $messageId,
             'read_at' => $readAt,
         ]);
     }
 
-    // Fetch and return the updated read_at
-    $readAt = DB::table('messages')->where('id', $messageId)->value('read_at');
 
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Message marked as read.',
-        'message_id' => $messageId,
-        'read_at' => $readAt,
-    ]);
-}
+    // ✅ New Method: Get total count of unread messages for the current user
+    public function getGlobalUnreadCount(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['count' => 0]);
+        }
+
+        // Count messages where I am the receiver and I haven't read them
+        $count = DB::table('messages')
+            ->where('receiver_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
+
+        return response()->json(['count' => $count]);
+    }
 }

@@ -531,3 +531,123 @@
     font-size: 0.9rem;
   }
 }
+/* ============================================
+   MESSAGE NOTIFICATION TOAST (Themed)
+   ============================================ */
+
+.message-notification-toast {
+  position: fixed;
+  top: 90px; 
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* THEME CHANGE: White Glassmorphism */
+  background: rgba(255, 255, 255, 0.95); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  border: 1px solid rgba(0, 0, 0, 0.08); /* Subtle border */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12); /* Softer, deeper shadow */
+  
+  padding: 12px 18px;
+  border-radius: 50px; 
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 10001; 
+  cursor: pointer;
+  min-width: 320px;
+  max-width: 90%;
+  
+  animation: slideDownFadeIn 0.5s ease-out, fadeOutUp 0.5s ease-in 3s forwards;
+}
+
+.toast-icon {
+  /* THEME CHANGE: Your Website's Brand Gradient */
+  background: linear-gradient(135deg, var(--color-accent-primary, #4caf50) 0%, #78d878 100%);
+  color: white;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(120, 216, 120, 0.3); /* Subtle Green Shadow/Glow */
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* Small gap between name and message */
+  flex: 1;
+  min-width: 0; 
+}
+
+.toast-sender {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  /* THEME CHANGE: Dark text */
+  color: var(--color-text-dark, #1f2937); 
+  line-height: 1.2;
+}
+
+.toast-body {
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  /* THEME CHANGE: Grey text */
+  color: #666; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-close:hover {
+  background-color: rgba(0,0,0,0.05); /* Hover circle */
+}
+
+/* Animations Keyframes */
+@keyframes slideDownFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes fadeOutUp {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 768px) {
+  .message-notification-toast {
+    top: 20px;
+    width: 90%;
+    border-radius: 20px;
+  }
+}
