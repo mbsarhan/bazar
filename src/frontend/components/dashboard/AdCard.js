@@ -111,7 +111,7 @@ const AdCard = ({ ad, isPublic = false, onDelete, onStatusUpdate, adIdList, retu
 
     return (
         <div className="ad-card" onClick={handleShowClick}>
-            {!isPublic && ad.status === 'فعال' && onStatusUpdate && (
+            {!isPublic && onStatusUpdate && (
                 <button 
                     className="status-change-btn"
                     onClick={(e) => {
