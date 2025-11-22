@@ -1,22 +1,26 @@
 // src/frontend/components/dashboard/MyRealEstateAds.js
 import React, { useState, useEffect } from 'react';
 import AdCard from './AdCard';
-import AdCardSkeleton from './AdCardSkeleton';
 import Modal from './Modal';
+import StatusUpdateModal from './StatusUpdateModal'; // New component
 import { useAds } from '../../context/AdContext';
+import AdCardSkeleton from './AdCardSkeleton';
 import '../../styles/StatusFilter.css';
 
 const MyRealEstateAds = () => {
     const [ads, setAds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { getMyRealEstateAds ,deleteRealEstateAd} = useAds();
+    const { getMyRealEstateAds, deleteRealEstateAd, updateRealEstateAdStatus } = useAds();
     const [activeStatus, setActiveStatus] = useState('all');
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [adToDelete, setAdToDelete] = useState(null);
     const [deleteError, setDeleteError] = useState('');
 
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [adToUpdate, setAdToUpdate] = useState(null);
+    const [statusUpdateError, setStatusUpdateError] = useState('');
 
     useEffect(() => {
         const fetchAds = async () => {
@@ -33,7 +37,7 @@ const MyRealEstateAds = () => {
         };
 
         fetchAds();
-    }, [getMyRealEstateAds,activeStatus]);
+    }, [getMyRealEstateAds, activeStatus]);
 
 
     const handleDeleteClick = (ad) => {
@@ -55,7 +59,31 @@ const MyRealEstateAds = () => {
         }
     };
 
+    const handleStatusUpdateClick = (ad) => {
+        setAdToUpdate(ad);
+        setStatusUpdateError('');
+        setIsStatusModalOpen(true);
+    };
 
+    const handleStatusUpdateConfirm = async (newStatus) => {
+        if (!adToUpdate) return;
+
+        try {
+            await updateRealEstateAdStatus(adToUpdate.id, newStatus);
+            
+            // Update the ad in the local state
+            setAds(prevAds => prevAds.map(ad => 
+                ad.id === adToUpdate.id 
+                    ? { ...ad, status: newStatus }
+                    : ad
+            ));
+            
+            setIsStatusModalOpen(false);
+            setAdToUpdate(null);
+        } catch (err) {
+            setStatusUpdateError(err.message);
+        }
+    };
 
     return (
         <div>
@@ -86,10 +114,11 @@ const MyRealEstateAds = () => {
 
                         // 2. Map over the ads and pass the ID list to each AdCard.
                         return ads.map(ad => (
-                            <AdCard 
-                                key={ad.id} 
-                                ad={ad} 
+                            <AdCard
+                                key={ad.id}
+                                ad={ad}
                                 onDelete={() => handleDeleteClick(ad)}
+                                onStatusUpdate={() => handleStatusUpdateClick(ad)}
                                 adIdList={filteredAdIds} // <-- PASS THE CONTEXTUAL LIST HERE
                             />
                         ));
@@ -109,6 +138,15 @@ const MyRealEstateAds = () => {
                 {deleteError && <p className="error-message" style={{ marginTop: '15px' }}>{deleteError}</p>}
             </Modal>
 
+            {/* Status Update Modal */}
+            <StatusUpdateModal
+                isOpen={isStatusModalOpen}
+                onClose={() => setIsStatusModalOpen(false)}
+                onConfirm={handleStatusUpdateConfirm}
+                currentStatus={adToUpdate?.status}
+                adTitle={adToUpdate?.title}
+                error={statusUpdateError}
+            />
         </div>
     );
 };
