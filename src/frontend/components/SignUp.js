@@ -94,8 +94,8 @@ const SignUp = () => {
                         </div>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="credential">البريد الإلكتروني أو رقم هاتف سوري</label>
-                        <input type="text" id="credential" value={credential} onChange={(e) => setCredential(e.target.value)} placeholder="example@mail.com or 09********" required />
+                        <label htmlFor="credential">البريد الإلكتروني أو رقم هاتف</label>
+                        <input type="text" id="credential" value={credential} onChange={(e) => setCredential(e.target.value)} placeholder="example@mail.com أو **********" required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">كلمة المرور</label>

@@ -56,17 +56,18 @@ class AdvertisementService
                 case 'oldest-first':
                     $query->oldest(); // Sorts by created_at ascending
                     break;
-            case 'price-asc':
-                // This raw expression tells the database:
-                // "First, sort all ads with a price of 0 to the bottom (CASE ... 1),
-                // and then sort the rest by their price in ascending order."
-                $query->orderByRaw('CASE WHEN price = 0 THEN 1 ELSE 0 END, price ASC');
-                break;
-            case 'price-desc':
-                // Similarly, here we push the zero-price ads to the bottom,
-                // and then sort the rest by their price in descending order.
-                $query->orderByRaw('CASE WHEN price = 0 THEN 1 ELSE 0 END, price DESC');
-                break;
+                case 'price-asc':
+                    // --- THIS IS THE FIX ---
+                    // The new expression correctly groups both NULL and 0 prices together at the end.
+                    $query->orderByRaw('CASE WHEN price IS NULL OR price = 0 THEN 1 ELSE 0 END, price ASC');
+                    break;
+
+                case 'price-desc':
+                    // --- THIS IS THE FIX ---
+                    // The same logic applies here for descending order.
+                    $query->orderByRaw('CASE WHEN price IS NULL OR price = 0 THEN 1 ELSE 0 END, price DESC');
+                    break;
+                // there is no logic for case newest-first cause the default is newest-first
                 case 'newest-first':
                 default:
                     $query->latest(); // Sorts by created_at descending

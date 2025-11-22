@@ -1,7 +1,7 @@
 // src/frontend/components/dashboard/DashboardLayout.js
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, User, Car, Home, Star, LogOut, PanelLeftClose, PanelRightClose, Menu } from 'lucide-react';
+import { LayoutDashboard, User, Car, Home, Star, LogOut, PanelLeftClose, PanelRightClose, Menu, Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Modal from './Modal';
 import Tippy from '@tippyjs/react';
@@ -125,6 +125,14 @@ const DashboardLayout = () => {
                                 <NavLink to="/dashboard/reviews" onClick={handleNavLinkClick}>
                                     <Star size={20} />
                                     <span>تقييماتي</span>
+                                </NavLink>
+                            </TooltipWrapper>
+                        </li>
+                        <li>
+                            <TooltipWrapper content="المفضلة">
+                                <NavLink to="/dashboard/favorites" onClick={handleNavLinkClick}>
+                                    <Heart size={20} />
+                                    <span>المفضلة</span>
                                 </NavLink>
                             </TooltipWrapper>
                         </li>
