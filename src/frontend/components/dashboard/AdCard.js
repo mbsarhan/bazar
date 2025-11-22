@@ -4,7 +4,7 @@ import { useAds } from '../../context/AdContext';
 import { 
     ChevronLeft, ChevronRight, GaugeCircle, Calendar, MapPin, 
     GitCommitVertical, Fuel, Wrench, Home, Square, BedDouble, 
-    Eye, Edit, Trash2, ExternalLink
+    Eye, Edit, Trash2, ExternalLink, RefreshCw, ChevronDown
 } from 'lucide-react';
 
 // Re-defining these here for completeness as simple functional components
@@ -13,11 +13,12 @@ const DeleteIcon = () => <Trash2 size={16} />;
 const ViewIcon = () => <ExternalLink size={16} />;
 
 // 1. Accept `adIdList` as a new prop. This list comes from the parent component.
-const AdCard = ({ ad, isPublic = false, onDelete, adIdList, returnPath }) => {
+const AdCard = ({ ad, isPublic = false, onDelete, onStatusUpdate, adIdList, returnPath }) => {
 
     const navigate = useNavigate();
     const { incrementAdView } = useAds();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
     const getStatusClass = (status) => {
         if (status === 'فعال') return 'status-active';
@@ -110,6 +111,19 @@ const AdCard = ({ ad, isPublic = false, onDelete, adIdList, returnPath }) => {
 
     return (
         <div className="ad-card" onClick={handleShowClick}>
+            {!isPublic && onStatusUpdate && (
+                <button 
+                    className="status-change-btn"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onStatusUpdate();
+                    }}
+                >
+                    <RefreshCw size={16} className="status-icon" />
+                    <span className="status-text">تغيير الحالة</span>
+                </button>
+            )}
             <Link 
                 to={`/ad/${ad.id}`} 
                 className="ad-card-clickable-area" 

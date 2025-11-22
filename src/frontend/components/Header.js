@@ -1,10 +1,16 @@
 // src/frontend/components/Header.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback  } from 'react';
 import { Link, useNavigate, useLocation as useReactRouterLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLocation, countries } from '../context/LocationContext';
-import { Plus, User, LogIn, MapPin, MessageSquare, ChevronDown } from 'lucide-react'; // Added ChevronDown
+import { Plus, User, LogIn, MapPin, MessageSquare, ChevronDown, Bell, X } from 'lucide-react'; // Added ChevronDown
+import api from '../api'; // <--- IMPORT THE CUSTOM API INSTANCE
+import Echo from 'laravel-echo'; // Added this import
+import Pusher from 'pusher-js';
 import '../styles/Header.css';
+
+// Configure Pusher for Reverb globally (required for Echo to work)
+window.Pusher = Pusher;
 
 const Header = () => {
   const { user } = useAuth();
@@ -16,14 +22,34 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  // State for Real-time Notification Toast
+  const [notification, setNotification] = useState(null); // { sender: string, body: string } | null
   const [lastFilterType, setLastFilterType] = useState(() => {
     return localStorage.getItem('lastFilterType') || 'cars';
   });
-  
+
   // Get last selected mobile button from localStorage, default to 'add-ad'
   const [selectedMobileButton, setSelectedMobileButton] = useState(() => {
     return localStorage.getItem('selectedMobileButton') || 'add-ad';
   });
+
+
+
+  // --- 1. Define Fetch Count Function (Memoized) ---
+  const fetchUnreadCount = useCallback(async () => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+    try {
+      const response = await api.get('/chat/unread-count');
+      if (response.data && typeof response.data.count !== 'undefined') {
+        setUnreadCount(response.data.count);
+      }
+    } catch (error) {
+      console.error("Error fetching unread messages count:", error);
+    }
+  }, [user]);
 
   // Effect to set the --header-height CSS variable
   useEffect(() => {
@@ -53,11 +79,68 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // --- 2. Initial Fetch & Polling Fallback ---
   useEffect(() => {
+    fetchUnreadCount(); // Initial fetch
+    
+    // Poll as a fallback every 60s
+    let intervalId;
     if (user) {
-      // You can implement unread count if needed in backend
+      intervalId = setInterval(fetchUnreadCount, 60000); 
     }
-  }, [user]);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [user, fetchUnreadCount]);
+
+  // --- 3. WebSocket Listener (Reverb/Echo) ---
+  useEffect(() => {
+    if (!user) return;
+
+    // Initialize Echo with Reverb configuration
+    const echo = new Echo({
+        broadcaster: 'reverb',
+        key: 'rjd1p6mdpoowjxbenvzg', // Your App Key
+        wsHost: '127.0.0.1',         // Your Host
+        wsPort: 8080,                // Your Port
+        forceTLS: false,
+        enabledTransports: ['ws', 'wss'],
+    });
+
+    const channelName = `chat.${user.id}`; // Usually 'chat.' + User ID
+
+    // Listen for the event
+    echo.channel(channelName)
+        // Note: Assuming your backend event is broadcastAs 'new-message' 
+        // OR using the default class name. Adjust the string below if needed.
+        // Based on your snippet:
+        .listen('.new-message', (event) => {
+            console.log("New Message Received:", event);
+
+            // 1. Refresh the red badge number immediately
+            fetchUnreadCount();
+
+            // 2. Trigger the "Cool Notification"
+            // We verify the sender is NOT the current user (just in case)
+            if (event && event.sender_id !== user.id) {
+                setNotification({
+                    sender: event.sender ? event.sender.fname : 'New Message',
+                    body: event.body || 'You received a new message',
+                    id: event.id // Helper for navigation if needed
+                });
+
+                // 3. Clear notification automatically after 3.5 seconds (allow animation time)
+                setTimeout(() => {
+                    setNotification(null);
+                }, 3500);
+            }
+        });
+
+    // Cleanup: Leave channel on unmount
+    return () => {
+        echo.leave(channelName);
+    };
+  }, [user, fetchUnreadCount]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(reactRouterLocation.search);
@@ -93,6 +176,7 @@ const Header = () => {
     } else {
       navigate('/conversations');
     }
+    setNotification(null); // clear notification if clicking chat
     setIsMobileMenuOpen(false);
     setSelectedMobileButton('chat');
     localStorage.setItem('selectedMobileButton', 'chat');
@@ -147,6 +231,7 @@ const Header = () => {
   const ButtonIcon = currentButton.icon;
 
   return (
+    <>
     <header ref={headerRef} className={`modern-header ${isMobileMenuOpen ? 'menu-open' : ''} ${isScrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         {/* Logo Section */}
@@ -225,8 +310,8 @@ const Header = () => {
             </span>
           )}
           {/* Chevron Icon Added Here */}
-          <ChevronDown 
-            size={18} 
+          <ChevronDown
+            size={18}
             className={`dropdown-chevron ${isMobileMenuOpen ? 'open' : ''}`}
           />
         </button>
@@ -283,6 +368,26 @@ const Header = () => {
         )}
       </div>
     </header>
+    {/* --- NOTIFICATION TOAST UI (Updated Colors) --- */}
+      {notification && (
+        <div className="message-notification-toast" onClick={handleChatClick}>
+          <div className="toast-icon">
+            {/* Keep Icon White because the bg circle is now your green gradient */}
+            <Bell size={18} color="white" />
+          </div>
+          <div className="toast-content">
+            <span className="toast-sender">{notification.sender}</span>
+            <span className="toast-body">
+               {notification.body ? (notification.body.length > 35 ? notification.body.substring(0, 35) + '...' : notification.body) : 'رسالة جديدة'}
+            </span>
+          </div>
+          {/* CHANGE: Color to #666 to see it on white bg */}
+          <button className="toast-close" onClick={(e) => { e.stopPropagation(); setNotification(null); }}>
+            <X size={16} color="#666" />
+          </button>
+        </div>
+      )}
+    </>
   );
 };
 

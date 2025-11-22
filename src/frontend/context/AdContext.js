@@ -210,9 +210,44 @@ export const AdProvider = ({ children }) => {
     };
 
 
+    const updateCarAdStatus = async (id, newStatus) => {
+    try {
+        // The backend expects:
+        // Method: PATCH
+        // URL: /advertisements/{id}/status
+        // Body: { status: 'مباع' } (or 'فعال', etc)
+        
+        const response = await api.patch(`/advertisements/${id}/status`, {
+            status: newStatus
+        });
+
+        return response.data;
+    } catch (error) {
+        // Helper to extract the exact error message from backend JSON
+        const message = error.response?.data?.message || 'حدث خطأ أثناء تحديث الحالة';
+        throw new Error(message);
+    }
+};
+const updateRealEstateAdStatus = async (id, newStatus) => {
+    try {
+        // We reuse the generic '/advertisements' endpoint because we are using 
+        // the same backend logic (AdvertisementController).
+        const response = await api.patch(`/advertisements/${id}/status`, {
+            status: newStatus
+        });
+        
+        return response.data;
+    } catch (error) {
+        // Handle backend validation errors (e.g., "Ad is pending review")
+        const message = error.response?.data?.message || 'حدث خطأ أثناء تحديث حالة العقار';
+        throw new Error(message);
+    }
+};
+
+
     // Add the new function to the provider's value
     return (
-        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView ,updateCarAd ,updateRealEstateAd,searchAds}}>
+        <AdContext.Provider value={{ createCarAd ,getMyCarAds ,deleteCarAd ,getAdById ,createRealEstateAd ,getMyRealEstateAds ,deleteRealEstateAd ,getPublicAds ,incrementAdView ,updateCarAd ,updateRealEstateAd,searchAds, updateCarAdStatus,updateRealEstateAdStatus}}>
             {children}
         </AdContext.Provider>
     );

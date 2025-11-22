@@ -150,8 +150,8 @@
     }
 }
 
-/* For Extra small mobile devices (≤ 380px) */
-@media (max-width: 380px) {
+/* For Extra small mobile devices (≤ 360px) */
+@media (max-width: 360px) {
     .modal-overlay {
         padding: 0; /* Remove padding to let the modal use the full screen */
     }

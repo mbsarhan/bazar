@@ -496,8 +496,8 @@
     }
 }
 
-/* Extra small mobile (≤380px) */
-@media (max-width: 380px) {
+/* Extra small mobile (≤360px) */
+@media (max-width: 360px) {
     .list-header h1 {
         font-size: 1.25rem;
     }
