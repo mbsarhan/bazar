@@ -113,32 +113,43 @@ class AdvertisementController extends Controller
 
 
         /**
-     * Update advertisement status (فعال → مباع/مؤجر).
+     * Update advertisement status.
+     * Endpoint: PATCH /api/advertisements/{ad}/status
      */
     public function updateStatus(Request $request, Advertisement $ad)
     {
-        $user = $request->user();
-
-        // 1. Ownership check
-        if ($ad->owner_id !== $user->id) {
+        // 1. Verify Ownership
+        // We use stricter checking here to ensure safety
+        if ($ad->owner_id !== $request->user()->id) {
             return response()->json([
-                'message' => 'لا يمكنك تعديل حالة هذا الإعلان.'
+                'message' => 'غير مصرح لك بتعديل هذا الإعلان.'
             ], 403);
         }
 
         // 2. Validate incoming status
+        // Ensure the values exactly match what MyCarAds.js sends
         $request->validate([
             'status' => 'required|string|in:مباع,مؤجر,فعال'
         ]);
 
-        // 3. Only allow change if current status is 'فعال'
-        if ($ad->ad_status == 'قيد المراجعة') {
+        // 3. Logic Check: Prevent changing status if currently "Pending Review"
+        if ($ad->ad_status === 'قيد المراجعة') {
             return response()->json([
-                'message' => 'لا يمكن تغيير حالة الإعلان لأنه غير فعال حالياً.'
+                'message' => 'لا يمكن تغيير حالة الإعلان لأنه قيد المراجعة حالياً.'
             ], 400);
         }
 
-        // 4. Update status
+        // 4. Logic Check: Optimistic Locking / Redundancy check
+        // If the status is already the same, just return success
+        if ($ad->ad_status === $request->status) {
+            return response()->json([
+                'message' => 'حالة الإعلان محدثة بالفعل.',
+                'ad' => $ad
+            ]);
+        }
+
+        // 5. Update status in Database
+        // We map 'status' from request to 'ad_status' in database
         $ad->update([
             'ad_status' => $request->status
         ]);
