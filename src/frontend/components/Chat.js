@@ -210,13 +210,13 @@ const Chat = () => {
 
 
     const markOneRead = async (messageId) => {
-  try {
-    const res = await api.post(`/chat/message/${messageId}/read`);
-    console.log('markSingleMessageAsRead response', res.data);
-  } catch (err) {
-    console.error('Failed to mark message read', err.response?.data || err.message);
-  }
-};
+        try {
+            const res = await api.post(`/chat/message/${messageId}/read`);
+            console.log('markSingleMessageAsRead response', res.data);
+        } catch (err) {
+            console.error('Failed to mark message read', err.response?.data || err.message);
+        }
+    };
 
     const groupMessagesByDate = (messages) => { const groups = []; let currentDate = null; messages.forEach(message => { const messageDate = formatDate(message.created_at); if (messageDate !== currentDate) { currentDate = messageDate; groups.push({ date: messageDate, messages: [message] }); } else { groups[groups.length - 1].messages.push(message); } }); return groups; };
 

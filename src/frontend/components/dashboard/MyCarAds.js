@@ -1,7 +1,8 @@
-// src/components/dashboard/MyCarAds.js
+// src/components/dashboard/MyCarAds.js - Enhanced with Status Update
 import React, { useState, useEffect } from 'react';
 import AdCard from './AdCard';
 import Modal from './Modal';
+import StatusUpdateModal from './StatusUpdateModal'; // New component
 import { useAds } from '../../context/AdContext';
 import AdCardSkeleton from './AdCardSkeleton';
 import '../../styles/StatusFilter.css';
@@ -10,13 +11,18 @@ const MyCarAds = () => {
     const [ads, setAds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { getMyCarAds, deleteCarAd } = useAds();
+    const { getMyCarAds, deleteCarAd, updateCarAdStatus } = useAds(); // Add updateCarAdStatus
     const [activeStatus, setActiveStatus] = useState('all');
 
+    // Delete modal states
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [adToDelete, setAdToDelete] = useState(null);
     const [deleteError, setDeleteError] = useState('');
 
+    // Status update modal states
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [adToUpdate, setAdToUpdate] = useState(null);
+    const [statusUpdateError, setStatusUpdateError] = useState('');
 
     useEffect(() => {
         const fetchAds = async () => {
@@ -29,10 +35,11 @@ const MyCarAds = () => {
             } finally {
                 setIsLoading(false);
             }
-        }; fetchAds();
-    }, [getMyCarAds,activeStatus]);
+        };
+        fetchAds();
+    }, [getMyCarAds, activeStatus]);
 
-
+    // Delete handlers
     const handleDeleteClick = (ad) => {
         setAdToDelete(ad);
         setDeleteError('');
@@ -52,6 +59,32 @@ const MyCarAds = () => {
         }
     };
 
+    // Status update handlers
+    const handleStatusUpdateClick = (ad) => {
+        setAdToUpdate(ad);
+        setStatusUpdateError('');
+        setIsStatusModalOpen(true);
+    };
+
+    const handleStatusUpdateConfirm = async (newStatus) => {
+        if (!adToUpdate) return;
+
+        try {
+            await updateCarAdStatus(adToUpdate.id, newStatus);
+            
+            // Update the ad in the local state
+            setAds(prevAds => prevAds.map(ad => 
+                ad.id === adToUpdate.id 
+                    ? { ...ad, status: newStatus }
+                    : ad
+            ));
+            
+            setIsStatusModalOpen(false);
+            setAdToUpdate(null);
+        } catch (err) {
+            setStatusUpdateError(err.message);
+        }
+    };
 
     if (error) {
         return (
@@ -83,16 +116,14 @@ const MyCarAds = () => {
                     ))
                 ) : ads.length > 0 ? (
                     (() => {
-                        // 1. Get the list of IDs from your currently filtered ads.
                         const filteredAdIds = ads.map(ad => ad.id);
-
-                        // 2. Map over the ads and pass the ID list to each AdCard.
                         return ads.map(ad => (
                             <AdCard 
                                 key={ad.id} 
                                 ad={ad} 
-                                onDelete={() => handleDeleteClick(ad)} 
-                                adIdList={filteredAdIds} // <-- PASS THE CONTEXTUAL LIST HERE
+                                onDelete={() => handleDeleteClick(ad)}
+                                onStatusUpdate={() => handleStatusUpdateClick(ad)} // Pass status update handler
+                                adIdList={filteredAdIds}
                             />
                         ));
                     })()
@@ -101,6 +132,7 @@ const MyCarAds = () => {
                 )}
             </div>
             
+            {/* Delete Modal */}
             <Modal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
@@ -110,6 +142,16 @@ const MyCarAds = () => {
                 <p>هل أنت متأكد أنك تريد حذف هذا الإعلان؟ لا يمكن التراجع عن هذا الإجراء.</p>
                 {deleteError && <p className="error-message" style={{ marginTop: '15px' }}>{deleteError}</p>}
             </Modal>
+
+            {/* Status Update Modal */}
+            <StatusUpdateModal
+                isOpen={isStatusModalOpen}
+                onClose={() => setIsStatusModalOpen(false)}
+                onConfirm={handleStatusUpdateConfirm}
+                currentStatus={adToUpdate?.status}
+                adTitle={adToUpdate?.title}
+                error={statusUpdateError}
+            />
         </div>
     );
 };

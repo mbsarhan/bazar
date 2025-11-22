@@ -1,0 +1,248 @@
+/* StatusUpdateModal.css */
+
+.status-update-modal {
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+}
+
+/* 2. Style the Close Button */
+.modal-close {
+    position: absolute;
+    top: 8px;
+    right: 8px; /* Moved to the right */
+    left: auto;  /* Ensure left is unset */
+    background: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 20;
+}
+
+/* 2. Hover & Active Effects */
+.modal-close:hover {
+    background-color: rgba(239, 68, 68, 0.1); /* Subtle red background */
+    color: #ef4444; /* Red icon */
+    transform: rotate(90deg);
+}
+
+.modal-close:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.modal-header h2 {
+    margin: 0 0 12px 0;
+    font-size: 1.5rem;
+    color: var(--color-text-dark);
+}
+
+.ad-title-preview {
+    margin: 0 0 16px 0;
+    padding: 12px;
+    background: var(--color-bg-page);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: var(--color-text-dark);
+    font-weight: 600;
+}
+
+.current-status-text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-dark);
+    opacity: 0.7;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: var(--color-accent-primary);
+    color: var(--color-text-dark);
+}
+
+.instruction-text {
+    margin: 0 0 20px 0;
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    font-weight: 600;
+}
+
+/* Status Options */
+.status-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.status-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 16px;
+    background: var(--color-bg-card);
+    border: 3px solid var(--color-border-subtle);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cairo', sans-serif;
+}
+
+.status-option:hover {
+    border-color: var(--option-color);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.status-option.selected {
+    border-color: var(--option-color);
+    background: var(--color-bg-page);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.status-option.selected::before {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: var(--option-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.status-option {
+    position: relative;
+}
+
+.status-icon {
+    transition: transform 0.3s ease;
+}
+
+.status-option:hover .status-icon,
+.status-option.selected .status-icon {
+    transform: scale(1.2);
+}
+
+.status-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+}
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid;
+    font-family: 'Cairo', sans-serif;
+}
+
+.cancel-btn {
+    background: var(--color-bg-card);
+    border-color: var(--color-border-subtle);
+    color: var(--color-text-dark);
+}
+
+.cancel-btn:hover {
+    background: var(--color-bg-page);
+    transform: translateY(-2px);
+}
+
+.confirm-btn {
+    background: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+    color: var(--color-text-dark);
+}
+
+.confirm-btn:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(144, 238, 144, 0.3);
+}
+
+.confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.error-message {
+    margin: 16px 0 0 0;
+    padding: 12px;
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 8px;
+    color: #c00;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .status-update-modal {
+        width: 95%;
+    }
+
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .status-options {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .status-option {
+        padding: 20px 16px;
+    }
+
+    .modal-btn {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+
+    .modal-close {
+        top: 12px;
+        left: 12px;
+        padding: 6px;
+    }
+    
+    .modal-close svg {
+        width: 20px;
+        height: 20px;
+    }
+}
