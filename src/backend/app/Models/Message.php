@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
 
 class Message extends Model
 {
@@ -16,6 +17,30 @@ class Message extends Model
     protected $casts = [
         'read_at' => 'datetime',
     ];
+
+
+    // Encrypt before save
+    public function setBodyAttribute($value)
+    {
+        $this->attributes['body'] = $value !== null
+            ? Crypt::encryptString($value)
+            : null;
+    }
+
+    // Decrypt when reading
+    public function getBodyAttribute($value)
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            // In case old data is still plain text or corrupted
+            return $value;
+        }
+    }
 
     public function sender()
     {

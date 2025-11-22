@@ -26,6 +26,9 @@ use App\Http\Controllers\ChatController; // <-- IMPORT THE CHAT CONTROLLER
 use App\Http\Controllers\Admin\PendingUpdateController; // <-- IMPORT THE CONTROLLER
 
 
+use App\Http\Controllers\FavoriteController;
+
+
 Route::get('/chat/messages/{senderId}/{recipientId}', [App\Http\Controllers\ChatController::class, 'getMessages']);
 Route::post('/chat/messages/{recipientId}', [App\Http\Controllers\ChatController::class, 'sendMessage']);
 
@@ -157,6 +160,12 @@ Route::middleware('auth:sanctum')->group(function () {
     ->name('users.report');
 
 
+    Route::get('/favorites/status', [FavoriteController::class, 'status']); // NEW: check if an ad is favorited  
+    Route::get('/favorites', [FavoriteController::class, 'index']);      // list favorites
+    Route::post('/favorites', [FavoriteController::class, 'store']);     // add
+    Route::delete('/favorites', [FavoriteController::class, 'destroy']); // remove
+
+
 
 });
 
@@ -207,4 +216,18 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
 
     // --- THIS IS THE NEW ROUTE FOR THE CHART ---
     Route::get('/dashboard/weekly-ads-chart', [AdminDashboardController::class, 'getWeeklyAdsChart']);
+
+
+
+    // --- ADD THESE NEW ROUTES FOR MANAGING REPORTS ---
+    
+    // GET /api/admin/reports?status=pending
+    Route::get('/reports', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])
+        ->name('reports.index');
+
+    // POST /api/admin/reports/{report}/process
+    Route::post('/reports/{report}/process', [App\Http\Controllers\Admin\AdminReportController::class, 'process'])
+        ->name('reports.process');
+
+    // --- END OF NEW ROUTES ---
 });

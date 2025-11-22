@@ -1,96 +1,66 @@
 // admin-panel/src/components/admin/ManageReports.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Flag, Eye, Check, X, AlertTriangle, User, Calendar, FileText } from 'lucide-react';
 import '../../styles/ManageReports.css';
+import api from '../../api'; // Assuming you have a centralized api.js like in your main app
 
 const ManageReports = () => {
     const [reports, setReports] = useState([]);
+    const [pagination, setPagination] = useState({});
     const [isLoading, setIsLoading] = useState(true);
-    const [filterStatus, setFilterStatus] = useState('all'); // all, pending, reviewed, dismissed
+    const [filterStatus, setFilterStatus] = useState('pending'); // all, pending, reviewed, dismissed
+    // Note: your API doesn't filter by type yet, so we remove this state for now
     const [filterType, setFilterType] = useState('all'); // all, user, ad
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(''); // Search not implemented in backend yet
 
-    useEffect(() => {
-        fetchReports();
-    }, []);
-
-    const fetchReports = async () => {
+    
+    // --- DATA FETCHING ---
+    const fetchReports = useCallback(async () => {
         setIsLoading(true);
         try {
-            // Replace with your actual API call
-            // const response = await api.get('/admin/reports');
-            // setReports(response.data);
-            
-            // Mock data for demonstration
-            const mockReports = [
-                {
-                    id: 1,
-                    type: 'user',
-                    reportedUserId: 123,
-                    reportedUserName: 'أحمد محمد',
-                    reporterUserId: 456,
-                    reporterUserName: 'علي حسن',
-                    reason: 'fraud',
-                    reasonLabel: 'احتيال أو نصب',
-                    description: 'هذا المستخدم يحاول الاحتيال على المشترين بطلب دفعات مقدمة',
-                    status: 'pending',
-                    createdAt: '2024-01-15T10:30:00Z'
-                },
-                {
-                    id: 2,
-                    type: 'user',
-                    reportedUserId: 789,
-                    reportedUserName: 'محمد أحمد',
-                    reporterUserId: 321,
-                    reporterUserName: 'سارة علي',
-                    reason: 'spam',
-                    reasonLabel: 'محتوى غير مرغوب فيه',
-                    description: 'يرسل رسائل غير مرغوب فيها بشكل متكرر',
-                    status: 'reviewed',
-                    createdAt: '2024-01-14T14:20:00Z',
-                    reviewedAt: '2024-01-14T15:00:00Z',
-                    reviewNote: 'تم التحقق وتحذير المستخدم'
-                },
-                {
-                    id: 3,
-                    type: 'ad',
-                    reportedAdId: 555,
-                    reportedAdTitle: 'Toyota Camry 2020',
-                    reporterUserId: 999,
-                    reporterUserName: 'خالد محمود',
-                    reason: 'inappropriate',
-                    reasonLabel: 'محتوى غير لائق',
-                    description: 'الإعلان يحتوي على صور غير مناسبة',
-                    status: 'pending',
-                    createdAt: '2024-01-16T09:15:00Z'
-                }
-            ];
-            
-            setReports(mockReports);
+            // Build the API query string based on the current filter state
+            const params = new URLSearchParams({
+                status: filterStatus,
+                // Add page, search, etc. later for full functionality
+            });
+            const response = await api.get(`/admin/reports?${params.toString()}`);
+            setReports(response.data.data);
+            setPagination(response.data.meta); // Store pagination info if available
         } catch (error) {
             console.error('Error fetching reports:', error);
+            // Optionally set an error state to show in the UI
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [filterStatus]); // Re-fetch whenever the status filter changes
 
-    const handleReviewReport = async (reportId, action) => {
+
+    useEffect(() => {
+        fetchReports();
+    }, [fetchReports]);
+
+
+    // --- ACTIONS ---
+    const handleReviewReport = async (reportId, action, reviewNote = null) => {
+        const confirmMessage = action === 'approve'
+            ? 'هل أنت متأكد من قبول هذا البلاغ؟ سيؤدي هذا إلى تطبيق عقوبة على المستخدم المبلغ عنه.'
+            : 'هل أنت متأكد من رفض هذا البلاغ؟';
+
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
         try {
-            // Replace with your actual API call
-            // await api.post(`/admin/reports/${reportId}/review`, { action });
+            // Send the processing request to the backend
+            await api.post(`/admin/reports/${reportId}/process`, { action, review_note: reviewNote });
             
-            // Update local state
-            setReports(reports.map(report => 
-                report.id === reportId 
-                    ? { ...report, status: action === 'approve' ? 'reviewed' : 'dismissed' }
-                    : report
-            ));
-            
-            alert(`تم ${action === 'approve' ? 'قبول' : 'رفض'} البلاغ بنجاح`);
+            // On success, simply refetch the list to get the most up-to-date data
+            fetchReports();
+
         } catch (error) {
-            console.error('Error reviewing report:', error);
-            alert('حدث خطأ أثناء معالجة البلاغ');
+            console.error('Error processing report:', error);
+            alert('حدث خطأ أثناء معالجة البلاغ: ' + (error.response?.data?.message || ''));
         }
     };
 

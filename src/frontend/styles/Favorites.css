@@ -1,0 +1,23 @@
+/* src/frontend/styles/Favorites.css */
+
+.favorites-container {
+  padding: 1.5rem;
+}
+
+.favorites-container h2 {
+  margin-bottom: 1rem;
+}
+
+.favorites-error {
+  color: #d9534f;
+}
+
+.favorites-empty {
+  color: #777;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
