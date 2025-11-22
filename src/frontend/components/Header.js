@@ -19,7 +19,7 @@ const Header = () => {
   const [lastFilterType, setLastFilterType] = useState(() => {
     return localStorage.getItem('lastFilterType') || 'cars';
   });
-  
+
   // Get last selected mobile button from localStorage, default to 'add-ad'
   const [selectedMobileButton, setSelectedMobileButton] = useState(() => {
     return localStorage.getItem('selectedMobileButton') || 'add-ad';
@@ -225,8 +225,8 @@ const Header = () => {
             </span>
           )}
           {/* Chevron Icon Added Here */}
-          <ChevronDown 
-            size={18} 
+          <ChevronDown
+            size={18}
             className={`dropdown-chevron ${isMobileMenuOpen ? 'open' : ''}`}
           />
         </button>

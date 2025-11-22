@@ -300,7 +300,8 @@
 }
 
 .mobile-menu.open {
-  max-height: 500px; /* Adjust if more items are added */
+  max-height: 500px;
+  /* Adjust if more items are added */
   padding: 20px 40px;
 }
 
@@ -501,8 +502,8 @@
   }
 }
 
-/* Extra small (≤380px) */
-@media (max-width: 380px) {
+/* Extra small (≤360px) */
+@media (max-width: 360px) {
   .header-container {
     padding: 10px 12px;
   }

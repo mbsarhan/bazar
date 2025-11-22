@@ -230,6 +230,7 @@
 }
 
 .ad-card {
+    position: relative; /* Added this line */
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-border-subtle);
     border-radius: 16px;
@@ -276,13 +277,16 @@
 
 .ad-card-status {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: auto;    /* Unset top */
+    bottom: 12px; /* Move to bottom */
+    right: 12px;  /* Keep on right side */
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
     color: white;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* Added shadow for better visibility on images */
 }
 
 .status-active { background-color: rgba(80, 200, 120, 0.9); }
@@ -309,6 +313,55 @@
 .spec-item svg {
     color: #888;
     flex-shrink: 0;
+}
+
+.status-change-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px; /* Changed from left to right */
+    left: auto;  /* Reset left property */
+    z-index: 20; /* Increased z-index to appear above everything */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 2px solid var(--color-accent-primary);
+    border-radius: 20px;
+    color: var(--color-accent-primary);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(144, 238, 144, 0.3);
+    font-family: 'Cairo', sans-serif;
+}
+
+.status-change-btn:hover {
+    background: var(--color-accent-primary);
+    color: var(--color-text-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(144, 238, 144, 0.4);
+}
+
+.status-change-btn .status-icon {
+    animation: rotate-pulse 3s ease-in-out infinite;
+}
+
+@keyframes rotate-pulse {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(180deg); }
+    50%, 75% { transform: rotate(180deg); }
+}
+
+.status-change-btn:hover .status-icon {
+    animation: rotate-continuous 0.8s linear infinite;
+}
+
+@keyframes rotate-continuous {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .ad-card-actions {
@@ -745,8 +798,8 @@
     }
 }
 
-/* ---------- Extra Small Mobile (≤380px) — THE FIX ---------- */
-@media (max-width: 380px) {
+/* ---------- Extra Small Mobile (≤360px) — THE FIX ---------- */
+@media (max-width: 360px) {
     /* Sidebar NEVER takes full width — stays drawer style */
     .dashboard-sidebar {
         width: 240px !important;
