@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation as useReactRouterLocation } from 'react-
 import { useAuth } from '../context/AuthContext';
 import { useLocation, countries } from '../context/LocationContext';
 import { Plus, User, LogIn, MapPin, MessageSquare, ChevronDown } from 'lucide-react'; // Added ChevronDown
+import api from '../api'; // <--- IMPORT THE CUSTOM API INSTANCE
 import '../styles/Header.css';
 
 const Header = () => {
@@ -53,11 +54,39 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // --- CHANGED: Effect to Fetch Unread Count ---
   useEffect(() => {
+    let intervalId;
+
+    const fetchUnreadCount = async () => {
+      if (!user) {
+        setUnreadCount(0);
+        return;
+      }
+
+      try {
+        const response = await api.get('/chat/unread-count');
+        if (response.data && typeof response.data.count !== 'undefined') {
+          setUnreadCount(response.data.count);
+        }
+      } catch (error) {
+        console.error("Error fetching unread messages count:", error);
+      }
+    };
+
+    // 1. Fetch immediately when user loads/changes
+    fetchUnreadCount();
+
+    // 2. Poll every 30 seconds to keep badge updated while browsing
     if (user) {
-      // You can implement unread count if needed in backend
+      intervalId = setInterval(fetchUnreadCount, 30000); 
     }
-  }, [user]);
+
+    // Cleanup interval on unmount or user logout
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [user]); 
 
   useEffect(() => {
     const searchParams = new URLSearchParams(reactRouterLocation.search);
